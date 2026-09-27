@@ -432,7 +432,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "importFile": MessageLookupByLibrary.simpleMessage("ファイルからインポート"),
     "importFromURL": MessageLookupByLibrary.simpleMessage("URLからインポート"),
     "importModule": MessageLookupByLibrary.simpleMessage("モジュールをインポート"),
-    "importSubscription": MessageLookupByLibrary.simpleMessage("サブスクリプションをインポート"),
+    "importSubscription": MessageLookupByLibrary.simpleMessage(
+      "サブスクリプションをインポート",
+    ),
     "importUrl": MessageLookupByLibrary.simpleMessage("URLからインポート"),
     "inbound": MessageLookupByLibrary.simpleMessage("インバウンド"),
     "includeAllProxies": MessageLookupByLibrary.simpleMessage("すべてのプロキシを含める"),

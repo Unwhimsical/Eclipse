@@ -528,7 +528,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "importFile": MessageLookupByLibrary.simpleMessage("Import from file"),
     "importFromURL": MessageLookupByLibrary.simpleMessage("Import from URL"),
     "importModule": MessageLookupByLibrary.simpleMessage("Import module"),
-    "importSubscription": MessageLookupByLibrary.simpleMessage("Import subscription"),
+    "importSubscription": MessageLookupByLibrary.simpleMessage(
+      "Import subscription",
+    ),
     "importUrl": MessageLookupByLibrary.simpleMessage("Import from URL"),
     "inbound": MessageLookupByLibrary.simpleMessage("Inbound"),
     "includeAllProxies": MessageLookupByLibrary.simpleMessage(

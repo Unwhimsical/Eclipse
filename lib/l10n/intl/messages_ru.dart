@@ -134,7 +134,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "addRule": MessageLookupByLibrary.simpleMessage("Добавить правило"),
     "addSsid": MessageLookupByLibrary.simpleMessage("Добавить SSID"),
-    "addSubscription": MessageLookupByLibrary.simpleMessage("Добавить подписку"),
+    "addSubscription": MessageLookupByLibrary.simpleMessage(
+      "Добавить подписку",
+    ),
     "addWidget": MessageLookupByLibrary.simpleMessage("Добавить виджет"),
     "addedRules": MessageLookupByLibrary.simpleMessage("Добавленные правила"),
     "additionalParameters": MessageLookupByLibrary.simpleMessage(
@@ -542,7 +544,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "importFile": MessageLookupByLibrary.simpleMessage("Импорт из файла"),
     "importFromURL": MessageLookupByLibrary.simpleMessage("Импорт из URL"),
     "importModule": MessageLookupByLibrary.simpleMessage("Импорт модуля"),
-    "importSubscription": MessageLookupByLibrary.simpleMessage("Импорт подписки"),
+    "importSubscription": MessageLookupByLibrary.simpleMessage(
+      "Импорт подписки",
+    ),
     "importUrl": MessageLookupByLibrary.simpleMessage("Импорт по URL"),
     "inbound": MessageLookupByLibrary.simpleMessage("Входящие"),
     "includeAllProxies": MessageLookupByLibrary.simpleMessage(
