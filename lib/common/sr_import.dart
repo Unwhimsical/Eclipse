@@ -3,16 +3,11 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../enum/enum.dart';
 import '../models/clash_config.dart';
 import '../models/module.dart';
 import '../models/profile.dart';
 import '../providers/providers.dart';
-import '../state.dart';
-import 'app_localizations.dart';
-import 'dialog.dart';
 import 'module_store.dart';
-import 'picker.dart';
 import 'shadowrocket.dart';
 
 /// Import flows for Shadowrocket formats, built on the existing profile and
@@ -32,7 +27,7 @@ class ShadowrocketImport {
     return _createProfileFromYaml(
       ref,
       yamlText,
-      label: label ?? '导入节点 (${proxies.length})',
+      label ?? '导入节点 (${proxies.length})',
     );
   }
 
@@ -55,9 +50,7 @@ class ShadowrocketImport {
       profileLabel = await _createProfileFromYaml(
         ref,
         yamlText,
-        label:
-            fileName?.replaceAll('.conf', '') ??
-            '导入配置 (${conf.proxies.length})',
+        fileName?.replaceAll('.conf', '') ?? '导入配置 (${conf.proxies.length})',
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -134,28 +127,18 @@ class ShadowrocketImport {
   static Future<String?> _createProfileFromYaml(
     WidgetRef ref,
     String yamlText,
-    {required String label},
+    String label,
   ) async {
     final core = ref.read(coreHandlerProvider);
-    final profile = await globalState.loadingRun(
-      tag: LoadingTag.profiles,
-      () async {
-        return Profile.normal(label: label).saveFile(
-          Uint8List.fromList(utf8.encode(yamlText)),
-          validate: (path) => core.validateConfig(path),
-        );
-      },
-      title: currentAppLocalizations.addProfile,
+    final profile = await Profile.normal(label: label).saveFile(
+      Uint8List.fromList(utf8.encode(yamlText)),
+      validate: (path) => core.validateConfig(path),
     );
-    if (profile == null) return null;
     ref.read(profilesActionProvider.notifier).putProfile(profile);
     return label;
   }
 
-  static Future<int> _addGlobalRules(
-    WidgetRef ref,
-    List<String> lines,
-  ) async {
+  static Future<int> _addGlobalRules(WidgetRef ref, List<String> lines) async {
     final notifier = ref.read(globalRulesProvider.notifier);
     final existing =
         ref.read(globalRulesProvider).value?.map((e) => e.rawValue).toSet() ??
@@ -167,7 +150,7 @@ class ShadowrocketImport {
         final key = rule.rawValue;
         if (existing.contains(key)) continue;
         existing.add(key);
-        await notifier.put(rule);
+        notifier.put(rule);
         count++;
       } catch (_) {
         // Skip lines that do not map to Clash rules.
@@ -188,7 +171,7 @@ class ShadowrocketImport {
         .map((rule) => rule.id)
         .toList();
     if (ids.isNotEmpty) {
-      await notifier.delAll(ids);
+      notifier.delAll(ids);
     }
   }
 }
