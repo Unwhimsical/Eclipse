@@ -70,11 +70,7 @@ class ShadowrocketImport {
     final response = await request.getTextResponseForUrl(url);
     final content = response.data ?? '';
     if (content.isEmpty) return null;
-    return importConf(
-      ref,
-      content: content,
-      fileName: _fileNameFromUrl(url),
-    );
+    return importConf(ref, content: content, fileName: _fileNameFromUrl(url));
   }
 
   /// Import `[Rule]` lines into global rules.
@@ -114,11 +110,7 @@ class ShadowrocketImport {
     final response = await request.getTextResponseForUrl(url);
     final raw = response.data ?? '';
     if (raw.isEmpty) return null;
-    return importModule(
-      ref,
-      raw: raw,
-      fileName: _fileNameFromUrl(url),
-    );
+    return importModule(ref, raw: raw, fileName: _fileNameFromUrl(url));
   }
 
   static String _fileNameFromUrl(String url) {

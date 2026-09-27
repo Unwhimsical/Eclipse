@@ -348,7 +348,10 @@ class ConfData {
   });
 
   bool get isEmpty =>
-      proxies.isEmpty && proxyGroups.isEmpty && rules.isEmpty && general.isEmpty;
+      proxies.isEmpty &&
+      proxyGroups.isEmpty &&
+      rules.isEmpty &&
+      general.isEmpty;
 
   /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
   List<String> get dnsServers {
@@ -385,8 +388,9 @@ ConfData parseConf(String content) {
       case 'general':
         final eq = line.indexOf('=');
         if (eq > 0) {
-          general[line.substring(0, eq).trim().toLowerCase()] =
-              line.substring(eq + 1).trim();
+          general[line.substring(0, eq).trim().toLowerCase()] = line
+              .substring(eq + 1)
+              .trim();
         }
       case 'proxy':
         final proxy = _parseConfProxyLine(line);
@@ -768,10 +772,7 @@ String buildClashConfigFromProxies({
     'rules': configRules,
   };
   if (dnsServers != null && dnsServers.isNotEmpty) {
-    config['dns'] = {
-      'enable': true,
-      'nameserver': dnsServers,
-    };
+    config['dns'] = {'enable': true, 'nameserver': dnsServers};
   }
   return yaml.encode(config);
 }

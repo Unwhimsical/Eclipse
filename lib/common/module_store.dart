@@ -77,9 +77,7 @@ class ModuleStore {
       final policy = entry.key;
       final domains = entry.value.toList()..sort();
       final path = await ruleProviderPath(id, policy);
-      await File(path).writeAsString(
-        yaml.encode({'payload': domains}),
-      );
+      await File(path).writeAsString(yaml.encode({'payload': domains}));
       ruleSetRules.add('RULE-SET,${id}_$policy,$policy');
     }
     // Non-domain rules that couldn't go into providers are returned for

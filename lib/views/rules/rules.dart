@@ -46,12 +46,10 @@ class _RulesViewState extends ConsumerState<RulesView> {
       ),
     );
     if (url == null || url.isEmpty || !mounted) return;
-    final content = await globalState.safeRun(
-      () async {
-        final response = await request.getTextResponseForUrl(url);
-        return response.data ?? '';
-      },
-    );
+    final content = await globalState.safeRun(() async {
+      final response = await request.getTextResponseForUrl(url);
+      return response.data ?? '';
+    });
     if (content == null || content.isEmpty || !mounted) {
       dialogs.showNotifier('下载失败或内容为空', level: MessageLevel.warning);
       return;

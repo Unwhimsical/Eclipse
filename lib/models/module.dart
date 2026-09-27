@@ -92,7 +92,8 @@ class ModuleInfo {
       importDate:
           DateTime.tryParse('${json['importDate'] ?? ''}') ?? DateTime.now(),
       ruleSetRules:
-          (json['ruleSetRules'] as List?)?.map((e) => '$e').toList() ?? const [],
+          (json['ruleSetRules'] as List?)?.map((e) => '$e').toList() ??
+          const [],
     );
   }
 }

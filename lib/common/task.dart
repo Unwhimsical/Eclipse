@@ -311,8 +311,10 @@ void _injectModuleRuleProviders(
 ) {
   final providerNames = <String>{};
   for (final rule in rules) {
-    final match =
-        RegExp(r'^RULE-SET,([^,]+),', caseSensitive: false).firstMatch(rule);
+    final match = RegExp(
+      r'^RULE-SET,([^,]+),',
+      caseSensitive: false,
+    ).firstMatch(rule);
     if (match != null) {
       providerNames.add(match.group(1)!.trim());
     }
@@ -330,11 +332,7 @@ void _injectModuleRuleProviders(
     if (!RegExp(r'^\d+_[A-Z]+$').hasMatch(name)) continue;
     final path = join(modulesDir, '$name.yaml');
     if (!File(path).existsSync()) continue;
-    providers[name] = {
-      'type': 'file',
-      'behavior': 'domain',
-      'path': path,
-    };
+    providers[name] = {'type': 'file', 'behavior': 'domain', 'path': path};
   }
   if (providers.isNotEmpty) {
     rawConfig['rule-providers'] = providers;
