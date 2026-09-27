@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -137,6 +136,3 @@ func handleMitmGetStatus() (map[string]interface{}, error) {
 	running := mitmProxy != nil && mitmProxy.IsRunning()
 	return map[string]interface{}{"running": running}, nil
 }
-
-// ensure mitm package JSON marshaling works for logging.
-var _ = json.Marshal
