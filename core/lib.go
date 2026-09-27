@@ -1,4 +1,4 @@
-//go:build android && cgo
+//go:build (android || ios) && cgo
 
 package main
 
@@ -40,7 +40,7 @@ type TunHandler struct {
 	mu sync.RWMutex
 }
 
-func (th *TunHandler) start(fd int, stack, address, dns string) bool {
+func (th *TunHandler) start(fd int, options t.Options) bool {
 	configMu.Lock()
 	defer configMu.Unlock()
 
@@ -53,7 +53,7 @@ func (th *TunHandler) start(fd int, stack, address, dns string) bool {
 	// on this very goroutine — an RLock taken while this one holds the write
 	// lock deadlocks the start outright. Nothing is lost by dropping it: both
 	// hooks return early until th.listener is set, which is below.
-	tunListener := t.Start(fd, stack, address, dns)
+	tunListener := t.Start(fd, options)
 
 	th.mu.Lock()
 	defer th.mu.Unlock()
@@ -92,7 +92,7 @@ func (th *TunHandler) handleProtect(fd int) error {
 	th.mu.RLock()
 	defer th.mu.RUnlock()
 
-	if th.listener == nil || th.callback == nil {
+	if th.listener == nil || (th.callback == nil && platform.RequiresProtectCallback()) {
 		// The tun routes are already live at this point (Android establishes
 		// them before it hands the fd over), so an unprotected socket would be
 		// routed straight back into the tunnel and hang until it times out.
@@ -216,7 +216,7 @@ func stopTunLocked() {
 	tunHandler = nil
 }
 
-func handleStartTun(callback unsafe.Pointer, fd int, stack, address, dns string) bool {
+func handleStartTun(callback unsafe.Pointer, fd int, options t.Options) bool {
 	tunLock.Lock()
 	defer tunLock.Unlock()
 	stopTunLocked()
@@ -230,7 +230,7 @@ func handleStartTun(callback unsafe.Pointer, fd int, stack, address, dns string)
 	tunHandler = &TunHandler{
 		callback: callback,
 	}
-	if tunHandler.start(fd, stack, address, dns) {
+	if tunHandler.start(fd, options) {
 		return true
 	}
 	// start() already cleared the handler, so nothing protects sockets from
@@ -289,8 +289,17 @@ func invokeMethod(callback unsafe.Pointer, paramsChar *C.char) {
 }
 
 //export startTUN
-func startTUN(callback unsafe.Pointer, fd C.int, stackChar, addressChar, dnsChar *C.char) bool {
-	started := handleStartTun(callback, int(fd), takeCString(stackChar), takeCString(addressChar), takeCString(dnsChar))
+func startTUN(callback unsafe.Pointer, fd C.int, optionsChar *C.char) bool {
+	options := t.Options{}
+	if err := json.Unmarshal([]byte(takeCString(optionsChar)), &options); err != nil {
+		logError("invalid TUN options: %v", err)
+		if callback != nil {
+			releaseObject(callback)
+		}
+		platform.CloseRejectedTunDescriptor(int(fd))
+		return false
+	}
+	started := handleStartTun(callback, int(fd), options)
 	if !started {
 		return false
 	}

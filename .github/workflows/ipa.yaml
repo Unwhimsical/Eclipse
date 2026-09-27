@@ -1,0 +1,61 @@
+name: ipa
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: '3.47.1'
+  GO_VERSION: '1.26.4'
+
+jobs:
+  build:
+    name: Build iOS IPA (unsigned)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      # The Xcode "Run Script" phase calls
+      # plugins/setup/setup_hooks/bin/build_ios.dart automatically,
+      # compiling core/ into libclash/ios/arm64/libclash{,_lowmem}.a.
+      - name: Build iOS app (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        run: |
+          rm -rf Payload PigCat-unsigned.ipa
+          mkdir Payload
+          ditto build/ios/iphoneos/Runner.app Payload/Runner.app
+          ditto -c -k --sequesterRsrc --keepParent Payload PigCat-unsigned.ipa
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipa
+          path: PigCat-unsigned.ipa
+          overwrite: true

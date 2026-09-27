@@ -1,4 +1,4 @@
-//go:build android && cgo
+//go:build (android || ios) && cgo
 
 package platform
 
@@ -159,4 +159,19 @@ func probeFdPressure() bool {
 		return false
 	}
 	return count > fdCeilingValue()
+}
+
+// RequiresProtectCallback reports whether the platform needs a non-nil
+// socket-protect callback before the TUN listener may serve traffic.
+// Android requires it (unprotected sockets would loop back into the tunnel);
+// iOS owns routing via the NetworkExtension and passes nil.
+func RequiresProtectCallback() bool {
+	return true
+}
+
+// CloseRejectedTunDescriptor closes a tunnel file descriptor the Go core
+// refuses to use. On iOS the descriptor is owned by the NetworkExtension and
+// must not be closed here.
+func CloseRejectedTunDescriptor(fd int) {
+	_ = syscall.Close(fd)
 }

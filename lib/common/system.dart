@@ -37,6 +37,10 @@ class System {
 
   bool get isAndroid => Platform.isAndroid;
 
+  bool get isIOS => Platform.isIOS;
+
+  bool get isMobile => isAndroid || isIOS;
+
   bool get isLinux => Platform.isLinux;
 
   bool get isTV => _isTV;
@@ -55,6 +59,11 @@ class System {
     return switch (Platform.operatingSystem) {
       'macos' => (deviceInfo as MacOsDeviceInfo).majorVersion,
       'android' => (deviceInfo as AndroidDeviceInfo).version.sdkInt,
+      'ios' =>
+        int.tryParse(
+              (deviceInfo as IosDeviceInfo).systemVersion.split('.').first,
+            ) ??
+            0,
       'windows' => (deviceInfo as WindowsDeviceInfo).majorVersion,
       String() => 0,
     };

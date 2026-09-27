@@ -15,8 +15,11 @@ data class AccessControlProps(
 data class VpnOptions(
     val enable: Boolean,
     val port: Int,
+    val mtu: Int = 9000,
     val ipv6: Boolean,
     val dnsHijacking: Boolean,
+    val disableIcmpForwarding: Boolean = false,
+    val endpointIndependentNat: Boolean = false,
     val accessControlProps: AccessControlProps,
     val allowBypass: Boolean,
     val systemProxy: Boolean,

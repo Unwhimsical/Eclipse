@@ -23,14 +23,14 @@ import (
 // whether tunNew was reached; the options built below never enable the
 // tun features whose validation runs before tunNew, so New cannot fail
 // before taking ownership of dupFd.
-func Start(fd int, stack string, address, dns string) *sing_tun.Listener {
+func Start(fd int, config Options) *sing_tun.Listener {
 	var prefix4 []netip.Prefix
 	var prefix6 []netip.Prefix
-	tunStack, ok := constant.StackTypeMapping[strings.ToLower(stack)]
+	tunStack, ok := constant.StackTypeMapping[strings.ToLower(config.Stack)]
 	if !ok {
 		tunStack = constant.TunSystem
 	}
-	for _, a := range strings.Split(address, ",") {
+	for _, a := range strings.Split(config.Address, ",") {
 		a = strings.TrimSpace(a)
 		if len(a) == 0 {
 			continue
@@ -49,7 +49,7 @@ func Start(fd int, stack string, address, dns string) *sing_tun.Listener {
 	}
 
 	var dnsHijack []string
-	for _, d := range strings.Split(dns, ",") {
+	for _, d := range strings.Split(config.DNS, ",") {
 		d = strings.TrimSpace(d)
 		if len(d) == 0 {
 			continue
@@ -72,16 +72,18 @@ func Start(fd int, stack string, address, dns string) *sing_tun.Listener {
 	defer func() { _ = syscall.Close(fd) }()
 
 	options := LC.Tun{
-		Enable:              true,
-		Device:              "FlClash",
-		Stack:               tunStack,
-		DNSHijack:           dnsHijack,
-		AutoRoute:           false,
-		AutoDetectInterface: false,
-		Inet4Address:        prefix4,
-		Inet6Address:        prefix6,
-		MTU:                 9000,
-		FileDescriptor:      dupFd,
+		Enable:                 true,
+		Device:                 "FlClash",
+		Stack:                  tunStack,
+		DNSHijack:              dnsHijack,
+		AutoRoute:              false,
+		AutoDetectInterface:    false,
+		Inet4Address:           prefix4,
+		Inet6Address:           prefix6,
+		MTU:                    config.MTU,
+		FileDescriptor:         dupFd,
+		DisableICMPForwarding:  config.DisableICMPForwarding,
+		EndpointIndependentNat: config.EndpointIndependentNAT,
 	}
 
 	listener, err := sing_tun.New(options, tunnel.Tunnel)

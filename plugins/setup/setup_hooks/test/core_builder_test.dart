@@ -36,6 +36,7 @@ void main() {
     bool codeAssets = true,
     Uri? compiler,
     int ndkApi = 23,
+    IOSSdk iosSdk = IOSSdk.iPhoneOS,
     Directory? package,
     Map<String, Object?> userDefines = const {},
   }) {
@@ -66,6 +67,9 @@ void main() {
                 archiver: compiler.resolve('llvm-ar'),
                 linker: compiler.resolve('ld.lld'),
               ),
+        iOS: os == OS.iOS
+            ? IOSCodeConfig(targetSdk: iosSdk, targetVersion: 15)
+            : null,
         android: os == OS.android
             ? AndroidCodeConfig(targetNdkApi: ndkApi)
             : null,
@@ -75,7 +79,7 @@ void main() {
   }
 
   group('requestFor', () {
-    test('has nothing to build without code assets or on iOS', () {
+    test('has nothing to build without code assets', () {
       const builder = CoreBuilder();
 
       expect(
@@ -89,10 +93,25 @@ void main() {
         isNull,
       );
       expect(
-        builder.requestFor(
-          buildInput(os: OS.iOS, architecture: Architecture.arm64),
+        builder
+            .requestFor(
+              buildInput(os: OS.iOS, architecture: Architecture.arm64),
+            )
+            ?.target,
+        Target.iosArm64,
+      );
+    });
+
+    test('rejects simulator builds instead of staging device archives', () {
+      expect(
+        () => const CoreBuilder().requestFor(
+          buildInput(
+            os: OS.iOS,
+            architecture: Architecture.arm64,
+            iosSdk: IOSSdk.iPhoneSimulator,
+          ),
         ),
-        isNull,
+        throwsA(isA<BuildException>()),
       );
     });
 
@@ -107,14 +126,16 @@ void main() {
       expect(request.androidToolchain, isNull);
     });
 
-    test('skips the macOS slice the host does not run', () {
-      const builder = CoreBuilder(hostArchitecture: Architecture.arm64);
+    test('builds the requested macOS architecture regardless of host', () {
+      const builder = CoreBuilder();
 
       expect(
-        builder.requestFor(
-          buildInput(os: OS.macOS, architecture: Architecture.x64),
-        ),
-        isNull,
+        builder
+            .requestFor(
+              buildInput(os: OS.macOS, architecture: Architecture.x64),
+            )!
+            .target,
+        Target.macosAmd64,
       );
       expect(
         builder
@@ -140,7 +161,10 @@ void main() {
       expect(request.target, Target.androidArm64);
       expect(
         request.androidToolchain!.clangFor(Target.androidArm64),
-        p.join(bin, 'aarch64-linux-android23-clang'),
+        p.join(
+          bin,
+          'aarch64-linux-android23-clang${Platform.isWindows ? '.cmd' : ''}',
+        ),
       );
     });
 
@@ -193,7 +217,7 @@ void main() {
             return BuildReport(
               inputs: [goFile],
               outputs: [
-                p.join(coreDir, 'PigCatCore'),
+                p.join(coreDir, 'FlClashCore'),
                 p.join(coreDir, 'manifest.json'),
               ],
               rebuilt: true,
@@ -226,7 +250,11 @@ void main() {
       final output = BuildOutputBuilder();
 
       await builder.run(
-        input: buildInput(os: OS.iOS, architecture: Architecture.arm64),
+        input: buildInput(
+          os: OS.iOS,
+          architecture: Architecture.arm64,
+          codeAssets: false,
+        ),
         output: output,
       );
 

@@ -31,11 +31,11 @@ class BuildConfig {
     tags: 'with_gvisor',
     goLdflags: '-w -s',
     coreDir: 'core',
-    coreName: 'PigCatCore',
+    coreName: 'FlClashCore',
     libName: 'libclash',
     outputDir: 'libclash',
     helperDir: 'services/helper',
-    helperName: 'PigCatHelperService',
+    helperName: 'FlClashHelperService',
   );
 
   static BuildConfig load({required String rootDir}) {

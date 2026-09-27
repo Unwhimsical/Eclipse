@@ -105,7 +105,7 @@ class VpnService : SystemVpnService(), ManagedService {
         }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Android starts always-on VPN through this callback instead of PigCat's bound-service
+        // Android starts always-on VPN through this callback instead of FlClash's bound-service
         // path. Notify the app layer so it can restore Core and fully initialize the VPN service.
         notifyVpnStartRequested()
         return super.onStartCommand(intent, flags, startId)
@@ -120,7 +120,7 @@ class VpnService : SystemVpnService(), ManagedService {
         val fd = with(Builder()) {
             addAddressAndRoutes(options)
             addDnsServers(options)
-            setMtu(MTU)
+            setMtu(options.mtu)
             configureAccessControl(options)
             setSession(getString(CommonR.string.app_name))
             setBlocking(false)
@@ -157,9 +157,14 @@ class VpnService : SystemVpnService(), ManagedService {
                         protect = this::protect,
                         resolveUid = this::resolveUid,
                         resolvePackage = this::resolvePackage,
-                        stack = options.stack,
-                        address = options.tunAddress,
-                        dns = options.tunDns,
+                        options = Core.TunOptions(
+                            stack = options.stack,
+                            address = options.tunAddress,
+                            dns = options.tunDns,
+                            mtu = options.mtu,
+                            disableIcmpForwarding = options.disableIcmpForwarding,
+                            endpointIndependentNat = options.endpointIndependentNat,
+                        ),
                     ),
                 ) { "Core rejected the tun file descriptor" }
             } catch (error: Exception) {
@@ -292,6 +297,5 @@ class VpnService : SystemVpnService(), ManagedService {
         private const val NET_ANY = "0.0.0.0"
         private const val NET_ANY6 = "::"
         private const val LOCAL_HOST = "127.0.0.1"
-        private const val MTU = 9000
     }
 }

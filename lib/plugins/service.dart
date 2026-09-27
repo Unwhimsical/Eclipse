@@ -66,8 +66,12 @@ class Service {
     return CoreMethodResponse.fromJson(dataJson);
   }
 
-  Future<bool> start() async {
-    return await methodChannel.invokeMethod<bool>('start') ?? false;
+  Future<bool> start(SharedState state) async {
+    return await methodChannel.invokeMethod<bool>(
+          'start',
+          json.encode(state),
+        ) ??
+        false;
   }
 
   Future<bool> stop() async {
@@ -111,4 +115,4 @@ class Service {
   }
 }
 
-Service? get service => system.isAndroid ? Service() : null;
+Service? get service => system.isAndroid || system.isIOS ? Service() : null;
