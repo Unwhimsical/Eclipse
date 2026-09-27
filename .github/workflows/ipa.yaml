@@ -43,14 +43,25 @@ jobs:
       # The Xcode "Run Script" phase calls
       # plugins/setup/setup_hooks/bin/build_ios.dart automatically,
       # compiling core/ into libclash/ios/arm64/libclash{,_lowmem}.a.
+      # NOTE: `flutter build ios --no-codesign` still demands a Development
+      # Team for its export step, so we generate the Xcode project with
+      # --config-only and drive xcodebuild directly with signing disabled.
       - name: Build iOS app (no codesign)
-        run: flutter build ios --release --no-codesign
+        run: |
+          flutter build ios --config-only --release
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
 
       - name: Package unsigned IPA
         run: |
           rm -rf Payload PigCat-unsigned.ipa
           mkdir Payload
-          ditto build/ios/iphoneos/Runner.app Payload/Runner.app
+          ditto "build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app" Payload/Runner.app
           ditto -c -k --sequesterRsrc --keepParent Payload PigCat-unsigned.ipa
 
       - name: Upload IPA

@@ -39,6 +39,15 @@ class _MutatingListener with ServiceListener {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  const testState = SharedState(
+    stopTip: '',
+    startTip: '',
+    currentProfileName: '',
+    stopText: '',
+    onlyStatisticsProxy: false,
+    crashlytics: false,
+  );
+
   const channelName = '$packageName/service';
   const channel = MethodChannel(channelName);
   const codec = StandardMethodCodec();
@@ -82,7 +91,7 @@ void main() {
     test('start and stop report the platform result', () async {
       mockChannel((call) async => call.method == 'start');
 
-      expect(await Service().start(), isTrue);
+      expect(await Service().start(testState), isTrue);
       expect(await Service().stop(), isFalse);
       expect(calls.map((call) => call.method), ['start', 'stop']);
     });
@@ -90,7 +99,7 @@ void main() {
     test('an absent start or stop result is treated as failure', () async {
       mockChannel((_) async => null);
 
-      expect(await Service().start(), isFalse);
+      expect(await Service().start(testState), isFalse);
       expect(await Service().stop(), isFalse);
     });
 
