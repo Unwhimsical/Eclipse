@@ -12,7 +12,8 @@ enum SupportPlatform {
   Windows,
   MacOS,
   Linux,
-  Android;
+  Android,
+  IOS;
 
   static SupportPlatform get currentPlatform {
     if (system.isWindows) {
@@ -23,6 +24,8 @@ enum SupportPlatform {
       return SupportPlatform.Linux;
     } else if (system.isAndroid) {
       return SupportPlatform.Android;
+    } else if (system.isIOS) {
+      return SupportPlatform.IOS;
     }
     throw UnsupportedError('Unsupported platform: ${Platform.operatingSystem}');
   }
@@ -282,7 +285,7 @@ enum DashboardWidget {
   trafficUsage,
   networkDetection,
   tunButton(platforms: desktopPlatforms),
-  vpnButton(platforms: [SupportPlatform.Android]),
+  vpnButton(platforms: [SupportPlatform.Android, SupportPlatform.IOS]),
   systemProxyButton(platforms: desktopPlatforms),
   intranetIp,
   memoryInfo;
