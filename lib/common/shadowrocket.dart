@@ -218,9 +218,7 @@ Map<String, dynamic>? _parseVmess(String body) {
       'path': '${json['path'] ?? '/'}',
     };
   } else if (net == 'grpc') {
-    result['grpc-opts'] = {
-      'grpc-service-name': '${json['path'] ?? ''}',
-    };
+    result['grpc-opts'] = {'grpc-service-name': '${json['path'] ?? ''}'};
   }
   return result;
 }
@@ -274,9 +272,7 @@ Map<String, dynamic>? _parseVless(String body) {
       },
     };
   } else if (net == 'grpc') {
-    result['grpc-opts'] = {
-      'grpc-service-name': params['serviceName'] ?? '',
-    };
+    result['grpc-opts'] = {'grpc-service-name': params['serviceName'] ?? ''};
   }
   return result;
 }
@@ -296,8 +292,7 @@ Map<String, dynamic>? _parseTrojan(String body) {
     'password': password,
     'udp': true,
     'sni': params['sni'] ?? host,
-    if (params['alpn']?.isNotEmpty == true)
-      'alpn': params['alpn']!.split(','),
+    if (params['alpn']?.isNotEmpty == true) 'alpn': params['alpn']!.split(','),
   };
 }
 
@@ -334,8 +329,7 @@ Map<String, dynamic>? _parseTuic(String body) {
     'uuid': userInfo[0],
     'password': userInfo.length > 1 ? userInfo[1] : '',
     'sni': params['sni'] ?? host,
-    if (params['alpn']?.isNotEmpty == true)
-      'alpn': params['alpn']!.split(','),
+    if (params['alpn']?.isNotEmpty == true) 'alpn': params['alpn']!.split(','),
   };
 }
 
@@ -351,8 +345,7 @@ class ConfData {
     this.rules = const [],
   });
 
-  bool get isEmpty =>
-      proxies.isEmpty && proxyGroups.isEmpty && rules.isEmpty;
+  bool get isEmpty => proxies.isEmpty && proxyGroups.isEmpty && rules.isEmpty;
 }
 
 /// Parse a Shadowrocket `.conf` text into proxies / proxy-groups / rules.
@@ -383,11 +376,7 @@ ConfData parseConf(String content) {
         if (rule != null) rules.add(rule);
     }
   }
-  return ConfData(
-    proxies: proxies,
-    proxyGroups: proxyGroups,
-    rules: rules,
-  );
+  return ConfData(proxies: proxies, proxyGroups: proxyGroups, rules: rules);
 }
 
 /// Parse one `[Proxy]` line: `Name = ss, host, port, cipher, password, ...`.
@@ -395,8 +384,7 @@ Map<String, dynamic>? _parseConfProxyLine(String line) {
   final eq = line.indexOf('=');
   if (eq < 0) return null;
   final name = line.substring(0, eq).trim();
-  final parts =
-      line.substring(eq + 1).split(',').map((e) => e.trim()).toList();
+  final parts = line.substring(eq + 1).split(',').map((e) => e.trim()).toList();
   if (parts.isEmpty || name.isEmpty) return null;
   final type = parts[0].toLowerCase();
   try {
@@ -470,14 +458,10 @@ Map<String, dynamic> _confVmess(String name, List<String> parts) {
   if (net == 'ws') {
     result['ws-opts'] = {
       'path': _part(parts, 5, '/'),
-      'headers': {
-        if (_part(parts, 7).isNotEmpty) 'Host': _part(parts, 7),
-      },
+      'headers': {if (_part(parts, 7).isNotEmpty) 'Host': _part(parts, 7)},
     };
   } else if (net == 'grpc') {
-    result['grpc-opts'] = {
-      'grpc-service-name': _part(parts, 5),
-    };
+    result['grpc-opts'] = {'grpc-service-name': _part(parts, 5)};
   }
   return result;
 }
@@ -503,9 +487,7 @@ Map<String, dynamic> _confVless(String name, List<String> parts) {
   if (net == 'ws') {
     result['ws-opts'] = {
       'path': _part(parts, 5, '/'),
-      'headers': {
-        if (_part(parts, 7).isNotEmpty) 'Host': _part(parts, 7),
-      },
+      'headers': {if (_part(parts, 7).isNotEmpty) 'Host': _part(parts, 7)},
     };
   }
   if (tlsValue == 'xtls' && _part(parts, 8).isNotEmpty) {
@@ -578,8 +560,7 @@ Map<String, dynamic>? _parseConfProxyGroupLine(String line) {
   final eq = line.indexOf('=');
   if (eq < 0) return null;
   final name = line.substring(0, eq).trim();
-  final parts =
-      line.substring(eq + 1).split(',').map((e) => e.trim()).toList();
+  final parts = line.substring(eq + 1).split(',').map((e) => e.trim()).toList();
   if (parts.isEmpty || name.isEmpty) return null;
   final type = parts[0].toLowerCase();
   final proxies = parts.sublist(1).where((e) => e.isNotEmpty).toList();
@@ -597,8 +578,7 @@ Map<String, dynamic>? _parseConfProxyGroupLine(String line) {
     'proxies': proxies,
     if (clashType == 'url-test' || clashType == 'fallback')
       'url': 'http://www.gstatic.com/generate_204',
-    if (clashType == 'url-test' || clashType == 'fallback')
-      'interval': 300,
+    if (clashType == 'url-test' || clashType == 'fallback') 'interval': 300,
   };
 }
 
@@ -640,10 +620,7 @@ class Sgmodule {
   });
 
   bool get isEmpty =>
-      rules.isEmpty &&
-      hosts.isEmpty &&
-      urlRewrites.isEmpty &&
-      scripts.isEmpty;
+      rules.isEmpty && hosts.isEmpty && urlRewrites.isEmpty && scripts.isEmpty;
 
   bool get needsMitm => urlRewrites.isNotEmpty || scripts.isNotEmpty;
 }
@@ -692,9 +669,7 @@ Sgmodule parseSgmodule(String content) {
       case 'host':
         final eq = line.indexOf('=');
         if (eq > 0) {
-          hosts[line.substring(0, eq).trim()] = line
-              .substring(eq + 1)
-              .trim();
+          hosts[line.substring(0, eq).trim()] = line.substring(eq + 1).trim();
         }
       case 'url rewrite':
         urlRewrites.add(line);
@@ -738,11 +713,7 @@ String buildClashConfigFromProxies({
   final groups =
       proxyGroups ??
       [
-        {
-          'name': mainGroup,
-          'type': 'select',
-          'proxies': proxyNames,
-        },
+        {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
       ];
   final configRules = rules ?? ['MATCH,$mainGroup'];
   return yaml.encode({

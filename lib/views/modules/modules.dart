@@ -48,10 +48,7 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
       dialogs.showNotifier('未识别到有效模块', level: MessageLevel.warning);
       return;
     }
-    dialogs.showNotifier(
-      '已导入模块：${info.name}',
-      level: MessageLevel.success,
-    );
+    dialogs.showNotifier('已导入模块：${info.name}', level: MessageLevel.success);
     await _refresh();
   }
 

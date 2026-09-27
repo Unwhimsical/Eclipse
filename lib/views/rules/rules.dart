@@ -21,18 +21,12 @@ class _RulesViewState extends ConsumerState<RulesView> {
     final content = String.fromCharCodes(bytes);
     final conf = parseConf(content);
     if (conf.rules.isEmpty) {
-      dialogs.showNotifier(
-        '.conf 中没有找到规则',
-        level: MessageLevel.warning,
-      );
+      dialogs.showNotifier('.conf 中没有找到规则', level: MessageLevel.warning);
       return;
     }
     final count = await ShadowrocketImport.importRules(ref, conf.rules);
     if (!mounted) return;
-    dialogs.showNotifier(
-      '已导入 $count 条规则',
-      level: MessageLevel.success,
-    );
+    dialogs.showNotifier('已导入 $count 条规则', level: MessageLevel.success);
   }
 
   @override

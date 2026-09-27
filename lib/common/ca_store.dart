@@ -22,19 +22,18 @@ class CaMeta {
   });
 
   Map<String, Object?> toJson() => {
-        'createdAt': createdAt.toIso8601String(),
-        'expiresAt': expiresAt.toIso8601String(),
-        'sha256': sha256,
-      };
+    'createdAt': createdAt.toIso8601String(),
+    'expiresAt': expiresAt.toIso8601String(),
+    'sha256': sha256,
+  };
 
   factory CaMeta.fromJson(Map<String, Object?> json) => CaMeta(
-        createdAt:
-            DateTime.tryParse('${json['createdAt']}') ?? DateTime.now(),
-        expiresAt:
-            DateTime.tryParse('${json['expiresAt']}') ??
-            DateTime.now().add(const Duration(days: 3650)),
-        sha256: '${json['sha256'] ?? ''}',
-      );
+    createdAt: DateTime.tryParse('${json['createdAt']}') ?? DateTime.now(),
+    expiresAt:
+        DateTime.tryParse('${json['expiresAt']}') ??
+        DateTime.now().add(const Duration(days: 3650)),
+    sha256: '${json['sha256'] ?? ''}',
+  );
 }
 
 /// Manages the MITM CA: generation (via Go core), storage and metadata.

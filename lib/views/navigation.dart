@@ -40,8 +40,7 @@ class Navigation implements NavigationPort {
       NavigationItem(
         icon: const Icon(Icons.rule),
         label: PageLabel.rules,
-        builder: (_) =>
-            const RulesView(key: GlobalObjectKey(PageLabel.rules)),
+        builder: (_) => const RulesView(key: GlobalObjectKey(PageLabel.rules)),
         modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
       ),
       NavigationItem(

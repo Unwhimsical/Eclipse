@@ -43,9 +43,7 @@ class _CaViewState extends ConsumerState<CaView> {
   Future<void> _handleGenerate() async {
     final confirmed = await dialogs.showMessage(
       title: currentAppLocalizations.tip,
-      message: const TextSpan(
-        text: '生成新的 MITM 根证书？旧证书将失效，已安装的旧证书需要重新安装。',
-      ),
+      message: const TextSpan(text: '生成新的 MITM 根证书？旧证书将失效，已安装的旧证书需要重新安装。'),
     );
     if (confirmed != true || !mounted) return;
     setState(() => _generating = true);
@@ -174,7 +172,9 @@ class _CaViewState extends ConsumerState<CaView> {
               children: [
                 FilledButton(
                   onPressed: _generating ? null : _handleGenerate,
-                  child: Text(_generating ? '生成中…' : (_exists ? '重新生成' : '生成根证书')),
+                  child: Text(
+                    _generating ? '生成中…' : (_exists ? '重新生成' : '生成根证书'),
+                  ),
                 ),
                 if (_exists)
                   OutlinedButton(
@@ -187,10 +187,7 @@ class _CaViewState extends ConsumerState<CaView> {
                     child: const Text('导出证书'),
                   ),
                 if (_exists)
-                  TextButton(
-                    onPressed: _handleDelete,
-                    child: const Text('删除'),
-                  ),
+                  TextButton(onPressed: _handleDelete, child: const Text('删除')),
               ],
             ),
           ],
