@@ -19,9 +19,10 @@ global-hotkey = "0.8"
 [target.'cfg(all(unix, not(target_os = "android")))'.dependencies]
 libc = "0.2"
 
-# rquickjs ships pre-generated bindings for every target this project builds
-# except the Android ones, which have to be generated during the build.
-[target.'cfg(target_os = "android")'.dependencies]
+# rquickjs ships pre-generated bindings for most desktop targets, but NOT for
+# Android or iOS (aarch64-apple-ios). Those have to be generated during the
+# build with the `bindgen` feature (requires libclang on the CI runner).
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 rquickjs = { version = "0.12", default-features = false, features = ["bindgen"] }
 
 [target.'cfg(target_os = "macos")'.dependencies]
