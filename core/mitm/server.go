@@ -115,10 +115,6 @@ func (p *Proxy) handleConnect(conn net.Conn, br *bufio.Reader, req *http.Request
 }
 
 // tunnel transparently proxies a CONNECT tunnel upstream.
-func (p *Proxy) handleConnectTunnel(conn net.Conn, br *bufio.Reader, req *http.Request) {
-	p.tunnel(conn, br, req)
-}
-
 func (p *Proxy) tunnel(conn net.Conn, br *bufio.Reader, req *http.Request) {
 	upstream, err := p.dialUpstream(req.Host)
 	if err != nil {
