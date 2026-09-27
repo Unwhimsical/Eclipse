@@ -115,10 +115,6 @@ const (
 	getConfigMethod                CoreMethod = "getConfig"
 	clearEffectMethod              CoreMethod = "clearEffect"
 	generateCAMethod               CoreMethod = "generateCA"
-	mitmStartMethod                CoreMethod = "mitmStart"
-	mitmStopMethod                 CoreMethod = "mitmStop"
-	mitmUpdateConfigMethod         CoreMethod = "mitmUpdateConfig"
-	mitmGetStatusMethod            CoreMethod = "mitmGetStatus"
 )
 
 type CoreMethod string

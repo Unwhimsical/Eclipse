@@ -282,46 +282,6 @@ var methodHandlers = map[CoreMethod]methodHandler{
 			response.success(result)
 		})
 	}),
-	mitmStartMethod: withArguments(func(args map[string]interface{}, response MethodResponse) {
-		safeGo(response, func() {
-			result, err := handleMitmStart(args)
-			if err != nil {
-				response.failure("core_error", err.Error(), nil)
-				return
-			}
-			response.success(result)
-		})
-	}),
-	mitmStopMethod: withoutArguments(func(response MethodResponse) {
-		safeGo(response, func() {
-			result, err := handleMitmStop()
-			if err != nil {
-				response.failure("core_error", err.Error(), nil)
-				return
-			}
-			response.success(result)
-		})
-	}),
-	mitmUpdateConfigMethod: withArguments(func(args map[string]interface{}, response MethodResponse) {
-		safeGo(response, func() {
-			result, err := handleMitmUpdateConfig(args)
-			if err != nil {
-				response.failure("core_error", err.Error(), nil)
-				return
-			}
-			response.success(result)
-		})
-	}),
-	mitmGetStatusMethod: withoutArguments(func(response MethodResponse) {
-		safeGo(response, func() {
-			result, err := handleMitmGetStatus()
-			if err != nil {
-				response.failure("core_error", err.Error(), nil)
-				return
-			}
-			response.success(result)
-		})
-	}),
 }
 
 func registerMethod(method CoreMethod, handler methodHandler) {
