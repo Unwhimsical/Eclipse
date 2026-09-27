@@ -4,6 +4,7 @@ channel = "1.95.0"
 targets = [
   "aarch64-apple-darwin",
   "x86_64-apple-darwin",
+  "aarch64-apple-ios",
   "aarch64-linux-android",
   "armv7-linux-androideabi",
   "x86_64-linux-android",
