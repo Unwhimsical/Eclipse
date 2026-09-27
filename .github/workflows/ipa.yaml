@@ -43,12 +43,11 @@ jobs:
       # The Xcode "Run Script" phase calls
       # plugins/setup/setup_hooks/bin/build_ios.dart automatically,
       # compiling core/ into libclash/ios/arm64/libclash{,_lowmem}.a.
-      # NOTE: `flutter build ios --no-codesign` still demands a Development
-      # Team for its export step, so we generate the Xcode project with
-      # --config-only and drive xcodebuild directly with signing disabled.
+      # --no-codesign keeps `flutter build ios --config-only` from demanding
+      # a Development Team; the archive below disables signing itself.
       - name: Build iOS app (no codesign)
         run: |
-          flutter build ios --config-only --release
+          flutter build ios --config-only --release --no-codesign
           xcodebuild -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
