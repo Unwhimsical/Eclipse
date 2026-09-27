@@ -272,6 +272,16 @@ var methodHandlers = map[CoreMethod]methodHandler{
 			response.success(handleClearEffect(*profileId))
 		})
 	}),
+	generateCAMethod: withoutArguments(func(response MethodResponse) {
+		safeGo(response, func() {
+			result, err := handleGenerateCA()
+			if err != nil {
+				response.failure("core_error", err.Error(), nil)
+				return
+			}
+			response.success(result)
+		})
+	}),
 }
 
 func registerMethod(method CoreMethod, handler methodHandler) {

@@ -35,6 +35,7 @@ enum CoreMethod {
   setupConfig,
   clearEffect,
   updateDns,
+  generateCA,
 }
 
 class CoreMethodCall {

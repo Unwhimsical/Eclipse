@@ -23,6 +23,9 @@ mixin CoreInterface {
 
   Future<String> validateConfig(String path);
 
+  /// Generate a self-signed CA for MITM. Returns cert/key PEM strings.
+  Future<Map<String, String>> generateCA();
+
   Future<Map<String, dynamic>> getConfig(String path);
 
   Future<Delay?> asyncTestDelay(String url, String proxyName);
@@ -151,6 +154,13 @@ abstract class CoreHandlerInterface with CoreInterface {
   @override
   Future<String> validateConfig(String path) async {
     return _invokeMessage(method: CoreMethod.validateConfig, arguments: path);
+  }
+
+  @override
+  Future<Map<String, String>> generateCA() async {
+    final res = await _invokeMethod<Map>(method: CoreMethod.generateCA);
+    if (res == null) return {};
+    return res.map((key, value) => MapEntry('$key', '$value'));
   }
 
   @override

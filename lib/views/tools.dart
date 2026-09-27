@@ -18,6 +18,7 @@ import 'package:path/path.dart' show dirname, join;
 import 'config/advanced.dart';
 import 'developer.dart';
 import 'theme.dart';
+import 'ca/ca.dart';
 
 class ToolsView extends ConsumerStatefulWidget {
   const ToolsView({super.key});
@@ -75,6 +76,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         if (system.isAndroid) const _AccessItem(),
         const _ConfigItem(),
         const _AdvancedConfigItem(),
+        if (system.isMobile) const _CaItem(),
         const _SettingItem(),
       ],
     );
@@ -233,6 +235,20 @@ class _ConfigItem extends StatelessWidget {
       title: Text(context.appLocalizations.basicConfig),
       subtitle: Text(context.appLocalizations.basicConfigDesc),
       widget: const ConfigView(),
+    );
+  }
+}
+
+class _CaItem extends StatelessWidget {
+  const _CaItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListItem.open(
+      leading: const Icon(Icons.verified),
+      title: const Text('CA 中心'),
+      subtitle: const Text('生成 MITM 根证书，安装与信任引导'),
+      widget: const CaView(),
     );
   }
 }

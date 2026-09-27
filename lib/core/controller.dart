@@ -95,6 +95,10 @@ class CoreController {
     return res;
   }
 
+  Future<Map<String, String>> generateCA() async {
+    return _interface.generateCA();
+  }
+
   Future<String> validateConfigWithData(String data) async {
     final path = await appPath.tempFilePath;
     final file = File(path);
