@@ -26,8 +26,8 @@ void main() {
   setUpAll(() {
     core = MockCoreHandlerInterface();
     globalState.packageInfo = PackageInfo(
-      appName: 'FlClash',
-      packageName: 'com.follow.clash',
+      appName: 'PigCat',
+      packageName: 'com.pigcat.clash',
       version: runningVersion,
       buildNumber: '1',
     );

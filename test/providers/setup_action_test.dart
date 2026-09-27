@@ -613,8 +613,8 @@ void main() {
           return '';
         });
         globalState.packageInfo = PackageInfo(
-          appName: 'FlClash',
-          packageName: 'com.follow.clash',
+          appName: 'PigCat',
+          packageName: 'com.pigcat.clash',
           version: '0.0.0',
           buildNumber: '0',
         );

@@ -230,7 +230,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     for (final entry in dns.nameserverPolicy.entries) {
       nameserverPolicy[entry.key] = entry.value.splitByMultipleSeparators;
     }
-    // Merged, not assigned: the model only covers the keys FlClash can edit.
+    // Merged, not assigned: the model only covers the keys PigCat can edit.
     rawConfig['dns'] = {
       ...rawDns,
       ...dns.toJson(),
