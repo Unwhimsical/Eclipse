@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"net"
 	"sync"
 )
 
@@ -55,7 +56,7 @@ type Proxy struct {
 	caCert   *x509.Certificate
 	caKey    *rsa.PrivateKey
 	certCache sync.Map // host -> *tls.Certificate
-	listener interface{ Close() error }
+	listener net.Listener
 	mu       sync.RWMutex
 	running  bool
 }
