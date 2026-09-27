@@ -6,6 +6,8 @@ import 'package:archive/archive_io.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/module_store.dart';
+import 'package:fl_clash/common/shadowrocket.dart';
 import 'package:fl_clash/database/database.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -297,9 +299,94 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     rawConfig['proxy-groups'] = data.proxyGroups;
   }
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
+  await _injectMitmProxy(rawConfig, rules);
+  await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
+}
+
+/// Inject `[Host]` entries from enabled modules into the Clash `hosts` map.
+Future<void> _injectModuleHosts(Map rawConfig) async {
+  try {
+    final moduleStore = ModuleStore();
+    final modules = await moduleStore.list();
+    if (rawConfig['hosts'] == null) {
+      rawConfig['hosts'] = <String, dynamic>{};
+    }
+    final hosts = Map<String, dynamic>.from(rawConfig['hosts'] as Map);
+    for (final module in modules.where((m) => m.enabled)) {
+      try {
+        final path = await moduleStore.moduleFilePath(module.id);
+        final file = File(path);
+        if (!await file.exists()) continue;
+        final sg = parseSgmodule(await file.readAsString());
+        for (final entry in sg.hosts.entries) {
+          // Shadowrocket: `domain = ip` or `domain = server:port`.
+          hosts[entry.key] = entry.value;
+        }
+      } catch (_) {}
+    }
+    rawConfig['hosts'] = hosts;
+  } catch (_) {}
+}
+
+/// Inject the local MITM proxy and routing rules for MITM hostnames.
+/// The Go MITM proxy listens on 127.0.0.1:9092; traffic to MITM hosts is
+/// routed through it so scripts/rewrites can run on decrypted traffic.
+Future<void> _injectMitmProxy(
+  Map rawConfig,
+  List<String> rules,
+) async {
+  try {
+    final moduleStore = ModuleStore();
+    final modules = await moduleStore.list();
+    final hosts = <String>{};
+    for (final module in modules.where((m) => m.enabled)) {
+      try {
+        final path = await moduleStore.moduleFilePath(module.id);
+        final file = File(path);
+        if (!await file.exists()) continue;
+        final sg = parseSgmodule(await file.readAsString());
+        hosts.addAll(sg.mitmHostnames);
+        // Modules with rewrites/scripts but no explicit MITM hostnames:
+        // their patterns may still need interception. Skip for now;
+        // hostname list drives interception.
+      } catch (_) {}
+    }
+    if (hosts.isEmpty) return;
+    // Add MITM proxy.
+    final proxies = rawConfig['proxies'] is List
+        ? List<Map<String, dynamic>>.from(
+            (rawConfig['proxies'] as List).map(
+              (e) => Map<String, dynamic>.from(e as Map),
+            ),
+          )
+        : <Map<String, dynamic>>[];
+    const mitmProxyName = 'PigCat-MITM';
+    if (!proxies.any((p) => p['name'] == mitmProxyName)) {
+      proxies.add({
+        'name': mitmProxyName,
+        'type': 'http',
+        'server': '127.0.0.1',
+        'port': 9092,
+      });
+    }
+    rawConfig['proxies'] = proxies;
+    // Add rules: route MITM hosts to the proxy. Insert at the top so they
+    // take precedence.
+    final mitmRules = <String>[];
+    for (final host in hosts) {
+      final h = host.trim();
+      if (h.isEmpty) continue;
+      if (h.startsWith('*.')) {
+        mitmRules.add('DOMAIN-SUFFIX,${h.substring(2)},$mitmProxyName');
+      } else {
+        mitmRules.add('DOMAIN,$h,$mitmProxyName');
+      }
+    }
+    rules.insertAll(0, mitmRules);
+  } catch (_) {}
 }
 
 /// Inject file-based `rule-providers` for `RULE-SET` rules that reference

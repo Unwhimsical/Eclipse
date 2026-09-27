@@ -26,6 +26,18 @@ mixin CoreInterface {
   /// Generate a self-signed CA for MITM. Returns cert/key PEM strings.
   Future<Map<String, String>> generateCA();
 
+  /// Start the MITM proxy with the given config.
+  Future<Map<String, dynamic>> mitmStart(Map<String, dynamic> config);
+
+  /// Stop the MITM proxy.
+  Future<Map<String, dynamic>> mitmStop();
+
+  /// Update MITM proxy config at runtime.
+  Future<Map<String, dynamic>> mitmUpdateConfig(Map<String, dynamic> config);
+
+  /// Get MITM proxy status.
+  Future<Map<String, dynamic>> mitmGetStatus();
+
   Future<Map<String, dynamic>> getConfig(String path);
 
   Future<Delay?> asyncTestDelay(String url, String proxyName);
@@ -161,6 +173,41 @@ abstract class CoreHandlerInterface with CoreInterface {
     final res = await _invokeMethod<Map>(method: CoreMethod.generateCA);
     if (res == null) return {};
     return res.map((key, value) => MapEntry('$key', '$value'));
+  }
+
+  @override
+  Future<Map<String, dynamic>> mitmStart(Map<String, dynamic> config) async {
+    final res = await _invokeMethod<Map>(
+      method: CoreMethod.mitmStart,
+      arguments: config,
+    );
+    if (res == null) return {};
+    return Map<String, dynamic>.from(res);
+  }
+
+  @override
+  Future<Map<String, dynamic>> mitmStop() async {
+    final res = await _invokeMethod<Map>(method: CoreMethod.mitmStop);
+    if (res == null) return {};
+    return Map<String, dynamic>.from(res);
+  }
+
+  @override
+  Future<Map<String, dynamic>> mitmUpdateConfig(
+      Map<String, dynamic> config) async {
+    final res = await _invokeMethod<Map>(
+      method: CoreMethod.mitmUpdateConfig,
+      arguments: config,
+    );
+    if (res == null) return {};
+    return Map<String, dynamic>.from(res);
+  }
+
+  @override
+  Future<Map<String, dynamic>> mitmGetStatus() async {
+    final res = await _invokeMethod<Map>(method: CoreMethod.mitmGetStatus);
+    if (res == null) return {};
+    return Map<String, dynamic>.from(res);
   }
 
   @override

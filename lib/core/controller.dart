@@ -99,6 +99,23 @@ class CoreController {
     return _interface.generateCA();
   }
 
+  Future<Map<String, dynamic>> mitmStart(Map<String, dynamic> config) async {
+    return _interface.mitmStart(config);
+  }
+
+  Future<Map<String, dynamic>> mitmStop() async {
+    return _interface.mitmStop();
+  }
+
+  Future<Map<String, dynamic>> mitmUpdateConfig(
+      Map<String, dynamic> config) async {
+    return _interface.mitmUpdateConfig(config);
+  }
+
+  Future<Map<String, dynamic>> mitmGetStatus() async {
+    return _interface.mitmGetStatus();
+  }
+
   Future<String> validateConfigWithData(String data) async {
     final path = await appPath.tempFilePath;
     final file = File(path);

@@ -36,6 +36,10 @@ enum CoreMethod {
   clearEffect,
   updateDns,
   generateCA,
+  mitmStart,
+  mitmStop,
+  mitmUpdateConfig,
+  mitmGetStatus,
 }
 
 class CoreMethodCall {

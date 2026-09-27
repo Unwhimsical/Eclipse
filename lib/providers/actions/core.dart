@@ -60,7 +60,17 @@ class CoreAction extends _$CoreAction {
       await initCore();
       ref.read(coreStatusProvider.notifier).value = CoreStatus.connected;
     }
+    // Start MITM proxy if modules need it (fire-and-forget).
+    unawaited(_syncMitm());
     return true;
+  }
+
+  /// Sync MITM proxy with enabled modules.
+  Future<void> _syncMitm() async {
+    try {
+      final manager = MitmManager(_core);
+      await manager.syncAndStart();
+    } catch (_) {}
   }
 
   Future<void> closeConnection(String id) async {
