@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-
-import '../common/ca_store.dart';
-import '../common/module_store.dart';
-import '../common/shadowrocket.dart';
-import '../core/controller.dart';
+import 'package:fl_clash/common/ca_store.dart';
+import 'package:fl_clash/common/module_store.dart';
+import 'package:fl_clash/common/shadowrocket.dart';
+import 'package:fl_clash/core/controller.dart';
 
 /// Manages the MITM proxy lifecycle: collects hosts/rewrites/scripts from
 /// enabled modules, downloads remote scripts, and starts/stops the Go MITM
