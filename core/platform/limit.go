@@ -160,3 +160,11 @@ func probeFdPressure() bool {
 	}
 	return count > fdCeilingValue()
 }
+
+func RequiresProtectCallback() bool {
+	return true
+}
+
+func CloseRejectedTunDescriptor(fd int) {
+	_ = syscall.Close(fd)
+}
