@@ -134,6 +134,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "addRule": MessageLookupByLibrary.simpleMessage("Добавить правило"),
     "addSsid": MessageLookupByLibrary.simpleMessage("Добавить SSID"),
+    "addSubscription": MessageLookupByLibrary.simpleMessage("Добавить подписку"),
     "addWidget": MessageLookupByLibrary.simpleMessage("Добавить виджет"),
     "addedRules": MessageLookupByLibrary.simpleMessage("Добавленные правила"),
     "additionalParameters": MessageLookupByLibrary.simpleMessage(
@@ -540,6 +541,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "import": MessageLookupByLibrary.simpleMessage("Импорт"),
     "importFile": MessageLookupByLibrary.simpleMessage("Импорт из файла"),
     "importFromURL": MessageLookupByLibrary.simpleMessage("Импорт из URL"),
+    "importModule": MessageLookupByLibrary.simpleMessage("Импорт модуля"),
+    "importSubscription": MessageLookupByLibrary.simpleMessage("Импорт подписки"),
     "importUrl": MessageLookupByLibrary.simpleMessage("Импорт по URL"),
     "inbound": MessageLookupByLibrary.simpleMessage("Входящие"),
     "includeAllProxies": MessageLookupByLibrary.simpleMessage(
@@ -684,6 +687,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "minutesAgo": m20,
     "mixedPort": MessageLookupByLibrary.simpleMessage("Смешанный порт"),
     "mode": MessageLookupByLibrary.simpleMessage("Режим"),
+    "module": MessageLookupByLibrary.simpleMessage("Модуль"),
+    "modules": MessageLookupByLibrary.simpleMessage("Модули"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("Монохром"),
     "monthsAgo": m21,
     "more": MessageLookupByLibrary.simpleMessage("Ещё"),
@@ -1151,6 +1156,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage(
       "Информация о подписке",
     ),
+    "subscriptions": MessageLookupByLibrary.simpleMessage("Подписки"),
     "suspended": MessageLookupByLibrary.simpleMessage("Приостановлено..."),
     "sync": MessageLookupByLibrary.simpleMessage("Синхронизация"),
     "system": MessageLookupByLibrary.simpleMessage("Система"),

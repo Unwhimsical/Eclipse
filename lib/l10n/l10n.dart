@@ -65,6 +65,56 @@ class AppLocalizations {
     return Intl.message('Rules', name: 'rules', desc: '', args: []);
   }
 
+  /// `Subscriptions`
+  String get subscriptions {
+    return Intl.message(
+      'Subscriptions',
+      name: 'subscriptions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modules`
+  String get modules {
+    return Intl.message('Modules', name: 'modules', desc: '', args: []);
+  }
+
+  /// `Module`
+  String get module {
+    return Intl.message('Module', name: 'module', desc: '', args: []);
+  }
+
+  /// `Import subscription`
+  String get importSubscription {
+    return Intl.message(
+      'Import subscription',
+      name: 'importSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import module`
+  String get importModule {
+    return Intl.message(
+      'Import module',
+      name: 'importModule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add subscription`
+  String get addSubscription {
+    return Intl.message(
+      'Add subscription',
+      name: 'addSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Global`
   String get global {
     return Intl.message('Global', name: 'global', desc: '', args: []);

@@ -132,6 +132,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "addRule": MessageLookupByLibrary.simpleMessage("Add rule"),
     "addSsid": MessageLookupByLibrary.simpleMessage("Add SSID"),
+    "addSubscription": MessageLookupByLibrary.simpleMessage("Add subscription"),
     "addWidget": MessageLookupByLibrary.simpleMessage("Add widget"),
     "addedRules": MessageLookupByLibrary.simpleMessage("Added rules"),
     "additionalParameters": MessageLookupByLibrary.simpleMessage(
@@ -526,6 +527,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "import": MessageLookupByLibrary.simpleMessage("Import"),
     "importFile": MessageLookupByLibrary.simpleMessage("Import from file"),
     "importFromURL": MessageLookupByLibrary.simpleMessage("Import from URL"),
+    "importModule": MessageLookupByLibrary.simpleMessage("Import module"),
+    "importSubscription": MessageLookupByLibrary.simpleMessage("Import subscription"),
     "importUrl": MessageLookupByLibrary.simpleMessage("Import from URL"),
     "inbound": MessageLookupByLibrary.simpleMessage("Inbound"),
     "includeAllProxies": MessageLookupByLibrary.simpleMessage(
@@ -664,6 +667,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "minutesAgo": m20,
     "mixedPort": MessageLookupByLibrary.simpleMessage("Mixed port"),
     "mode": MessageLookupByLibrary.simpleMessage("Mode"),
+    "module": MessageLookupByLibrary.simpleMessage("Module"),
+    "modules": MessageLookupByLibrary.simpleMessage("Modules"),
     "monochromeScheme": MessageLookupByLibrary.simpleMessage("Monochrome"),
     "monthsAgo": m21,
     "more": MessageLookupByLibrary.simpleMessage("More"),
@@ -1103,6 +1108,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "subscriptionInfo": MessageLookupByLibrary.simpleMessage(
       "Subscription info",
     ),
+    "subscriptions": MessageLookupByLibrary.simpleMessage("Subscriptions"),
     "suspended": MessageLookupByLibrary.simpleMessage("Suspended..."),
     "sync": MessageLookupByLibrary.simpleMessage("Sync"),
     "system": MessageLookupByLibrary.simpleMessage("System"),

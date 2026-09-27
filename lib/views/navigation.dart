@@ -30,6 +30,28 @@ class Navigation implements NavigationPort {
             : [],
       ),
       NavigationItem(
+        icon: const Icon(Icons.subscriptions),
+        label: PageLabel.subscriptions,
+        builder: (_) => const SubscriptionsView(
+          key: GlobalObjectKey(PageLabel.subscriptions),
+        ),
+        modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.rule),
+        label: PageLabel.rules,
+        builder: (_) =>
+            const RulesView(key: GlobalObjectKey(PageLabel.rules)),
+        modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.extension),
+        label: PageLabel.modules,
+        builder: (_) =>
+            const ModulesView(key: GlobalObjectKey(PageLabel.modules)),
+        modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
+      ),
+      NavigationItem(
         icon: const Icon(Icons.folder),
         label: PageLabel.profiles,
         builder: (_) =>
