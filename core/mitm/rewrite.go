@@ -15,12 +15,6 @@ type RewriteAction struct {
 	Status int
 }
 
-func (a *RewriteAction) writeTo(conn interface {
-	Write([]byte) (int, error)
-}, req *http.Request) {
-	// Implemented via http.Response for simplicity by caller.
-}
-
 // applyRewrite matches the request URL against rewrite rules.
 // Returns nil when no rule matches.
 func (p *Proxy) applyRewrite(req *http.Request) *http.Response {
