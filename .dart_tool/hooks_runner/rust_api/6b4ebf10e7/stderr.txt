@@ -1,0 +1,47 @@
+ProcessException: No such file or directory
+  Command: rustup show active-toolchain
+#0      _ProcessImpl._start (dart:io-patch/process_patch.dart:411:33)
+#1      Process.start (dart:io-patch/process_patch.dart:42:20)
+#2      _runNonInteractiveProcess (dart:io-patch/process_patch.dart:613:18)
+#3      Process.run (dart:io-patch/process_patch.dart:56:12)
+#4      ProcessRunner.invoke (package:native_toolchain_rust/src/process_runner.dart:24:36)
+#5      InvokeRustup.invokeRustup (package:native_toolchain_rust/src/process_runner.dart:56:20)
+#6      RustBuildRunner.ensureToolchainDownloaded (package:native_toolchain_rust/src/build_runner.dart:141:53)
+#7      RustBuildRunner.run (package:native_toolchain_rust/src/build_runner.dart:82:11)
+#8      RustBuilder.run (package:native_toolchain_rust/native_toolchain_rust.dart:122:7)
+#9      FlutterRustBridgeNativeAssetsBuilder.run.<anonymous closure> (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:73:9)
+<asynchronous suspension>
+#10     _withOutputDirectoryBuildLock (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:130:12)
+<asynchronous suspension>
+#11     FlutterRustBridgeNativeAssetsBuilder.run (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:60:5)
+<asynchronous suspension>
+#12     main.<anonymous closure> (file:///home/hatch/workspace/projects/flclash-work/plugins/rust_api/hook/build.dart:12:5)
+<asynchronous suspension>
+#13     build (package:hooks/src/api/build_and_link.dart:250:5)
+<asynchronous suspension>
+#14     main (file:///home/hatch/workspace/projects/flclash-work/plugins/rust_api/hook/build.dart:7:3)
+<asynchronous suspension>
+
+
+Unhandled exception:
+RustProcessException(message: Failed to invoke rustup; is it installed? For help installing rust, see https://rustup.rs, innerProcessException: ProcessException: No such file or directory
+  Command: rustup show active-toolchain)
+#0      InvokeRustup.invokeRustup (package:native_toolchain_rust/src/process_runner.dart:63:7)
+<asynchronous suspension>
+#1      RustBuildRunner.ensureToolchainDownloaded (package:native_toolchain_rust/src/build_runner.dart:141:33)
+<asynchronous suspension>
+#2      RustBuildRunner.run (package:native_toolchain_rust/src/build_runner.dart:82:5)
+<asynchronous suspension>
+#3      FlutterRustBridgeNativeAssetsBuilder.run.<anonymous closure> (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:65:7)
+<asynchronous suspension>
+#4      _withOutputDirectoryBuildLock (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:130:12)
+<asynchronous suspension>
+#5      FlutterRustBridgeNativeAssetsBuilder.run (package:flutter_rust_bridge_hooks/src/native_assets_builder.dart:60:5)
+<asynchronous suspension>
+#6      main.<anonymous closure> (file:///home/hatch/workspace/projects/flclash-work/plugins/rust_api/hook/build.dart:12:5)
+<asynchronous suspension>
+#7      build (package:hooks/src/api/build_and_link.dart:250:5)
+<asynchronous suspension>
+#8      main (file:///home/hatch/workspace/projects/flclash-work/plugins/rust_api/hook/build.dart:7:3)
+<asynchronous suspension>
+

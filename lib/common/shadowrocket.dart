@@ -338,14 +338,30 @@ class ConfData {
   final List<Map<String, dynamic>> proxies;
   final List<Map<String, dynamic>> proxyGroups;
   final List<String> rules;
+  final Map<String, String> general;
 
   const ConfData({
     this.proxies = const [],
     this.proxyGroups = const [],
     this.rules = const [],
+    this.general = const {},
   });
 
-  bool get isEmpty => proxies.isEmpty && proxyGroups.isEmpty && rules.isEmpty;
+  bool get isEmpty =>
+      proxies.isEmpty && proxyGroups.isEmpty && rules.isEmpty && general.isEmpty;
+
+  /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
+  List<String> get dnsServers {
+    final servers = <String>[];
+    for (final key in ['dns-server', 'fallback-dns-server']) {
+      final value = general[key];
+      if (value == null || value.isEmpty) continue;
+      servers.addAll(
+        value.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty),
+      );
+    }
+    return servers;
+  }
 }
 
 /// Parse a Shadowrocket `.conf` text into proxies / proxy-groups / rules.
@@ -353,6 +369,7 @@ ConfData parseConf(String content) {
   final proxies = <Map<String, dynamic>>[];
   final proxyGroups = <Map<String, dynamic>>[];
   final rules = <String>[];
+  final general = <String, String>{};
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -365,6 +382,12 @@ ConfData parseConf(String content) {
       continue;
     }
     switch (section) {
+      case 'general':
+        final eq = line.indexOf('=');
+        if (eq > 0) {
+          general[line.substring(0, eq).trim().toLowerCase()] =
+              line.substring(eq + 1).trim();
+        }
       case 'proxy':
         final proxy = _parseConfProxyLine(line);
         if (proxy != null) proxies.add(proxy);
@@ -376,7 +399,12 @@ ConfData parseConf(String content) {
         if (rule != null) rules.add(rule);
     }
   }
-  return ConfData(proxies: proxies, proxyGroups: proxyGroups, rules: rules);
+  return ConfData(
+    proxies: proxies,
+    proxyGroups: proxyGroups,
+    rules: rules,
+    general: general,
+  );
 }
 
 /// Parse one `[Proxy]` line: `Name = ss, host, port, cipher, password, ...`.
@@ -592,7 +620,24 @@ String? _normalizeConfRule(String line) {
     // Clash has no USER-AGENT rule; keep as comment-safe skip.
     return null;
   }
-  return line;
+  var normalized = line;
+  // Shadowrocket `PROTOCOL,UDP` -> Clash Meta `NETWORK,UDP`.
+  normalized = normalized.replaceAll(
+    RegExp(r'(?<![A-Z-])PROTOCOL(?![A-Z-])', caseSensitive: false),
+    'NETWORK',
+  );
+  // Shadowrocket `DEST-PORT` -> Clash `DST-PORT`.
+  normalized = normalized.replaceAll(
+    RegExp(r'(?<![A-Z-])DEST-PORT(?![A-Z-])', caseSensitive: false),
+    'DST-PORT',
+  );
+  // Shadowrocket `REJECT-NO-DROP` behaves like Clash `REJECT` (TCP RST,
+  // not silent drop).
+  normalized = normalized.replaceAll(
+    RegExp(r'(?<![A-Z-])REJECT-NO-DROP(?![A-Z-])', caseSensitive: false),
+    'REJECT',
+  );
+  return normalized;
 }
 
 /// A parsed `.sgmodule` file.
@@ -703,6 +748,7 @@ String buildClashConfigFromProxies({
   required List<Map<String, dynamic>> proxies,
   List<Map<String, dynamic>>? proxyGroups,
   List<String>? rules,
+  List<String>? dnsServers,
   String? groupName,
 }) {
   final proxyNames = proxies
@@ -716,9 +762,16 @@ String buildClashConfigFromProxies({
         {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
       ];
   final configRules = rules ?? ['MATCH,$mainGroup'];
-  return yaml.encode({
+  final config = <String, dynamic>{
     'proxies': proxies,
     'proxy-groups': groups,
     'rules': configRules,
-  });
+  };
+  if (dnsServers != null && dnsServers.isNotEmpty) {
+    config['dns'] = {
+      'enable': true,
+      'nameserver': dnsServers,
+    };
+  }
+  return yaml.encode(config);
 }

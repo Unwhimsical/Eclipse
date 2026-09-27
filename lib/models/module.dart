@@ -13,6 +13,10 @@ class ModuleInfo {
   final bool needsMitm;
   final DateTime importDate;
 
+  /// For large modules: `RULE-SET` rules referencing file providers,
+  /// e.g. `RULE-SET,<id>_PROXY,PROXY`. Empty when rules are inlined.
+  final List<String> ruleSetRules;
+
   const ModuleInfo({
     required this.id,
     required this.name,
@@ -25,6 +29,7 @@ class ModuleInfo {
     this.scriptCount = 0,
     this.needsMitm = false,
     required this.importDate,
+    this.ruleSetRules = const [],
   });
 
   ModuleInfo copyWith({
@@ -37,6 +42,7 @@ class ModuleInfo {
     int? rewriteCount,
     int? scriptCount,
     bool? needsMitm,
+    List<String>? ruleSetRules,
   }) {
     return ModuleInfo(
       id: id,
@@ -50,6 +56,7 @@ class ModuleInfo {
       scriptCount: scriptCount ?? this.scriptCount,
       needsMitm: needsMitm ?? this.needsMitm,
       importDate: importDate,
+      ruleSetRules: ruleSetRules ?? this.ruleSetRules,
     );
   }
 
@@ -66,6 +73,7 @@ class ModuleInfo {
       'scriptCount': scriptCount,
       'needsMitm': needsMitm,
       'importDate': importDate.toIso8601String(),
+      'ruleSetRules': ruleSetRules,
     };
   }
 
@@ -83,6 +91,8 @@ class ModuleInfo {
       needsMitm: json['needsMitm'] as bool? ?? false,
       importDate:
           DateTime.tryParse('${json['importDate'] ?? ''}') ?? DateTime.now(),
+      ruleSetRules:
+          (json['ruleSetRules'] as List?)?.map((e) => '$e').toList() ?? const [],
     );
   }
 }

@@ -39,10 +39,49 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     if (platformFile == null || !mounted) return;
     final bytes = await platformFile.readBytes();
     final raw = String.fromCharCodes(bytes);
+    await _importModuleContent(raw, platformFile.name);
+  }
+
+  Future<void> _handleImportFromUrl() async {
+    final appLocalizations = context.appLocalizations;
+    final url = await dialogs.showCommonDialog<String>(
+      child: InputDialog(
+        autovalidateMode: AutovalidateMode.onUnfocus,
+        title: appLocalizations.importFromURL,
+        labelText: appLocalizations.url,
+        hintText: 'https://example.com/module.sgmodule',
+        value: '',
+        keyboardType: TextInputType.url,
+        inputFormatters: TextInputLimits.limit(TextInputLimits.url),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return appLocalizations.emptyTip('').trim();
+          }
+          if (!value.isUrl) {
+            return appLocalizations.urlTip('').trim();
+          }
+          return null;
+        },
+      ),
+    );
+    if (url == null || url.isEmpty || !mounted) return;
+    final info = await globalState.safeRun(
+      () => ShadowrocketImport.importModuleFromUrl(ref, url: url),
+    );
+    if (!mounted) return;
+    if (info == null) {
+      dialogs.showNotifier('下载失败或未识别到有效模块', level: MessageLevel.warning);
+      return;
+    }
+    dialogs.showNotifier('已导入模块：${info.name}', level: MessageLevel.success);
+    await _refresh();
+  }
+
+  Future<void> _importModuleContent(String raw, String? fileName) async {
     final info = await ShadowrocketImport.importModule(
       ref,
       raw: raw,
-      fileName: platformFile.name,
+      fileName: fileName,
     );
     if (!mounted) return;
     if (info == null) {
@@ -51,6 +90,35 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     }
     dialogs.showNotifier('已导入模块：${info.name}', level: MessageLevel.success);
     await _refresh();
+  }
+
+  void _showImportMenu() {
+    dialogs.showCommonDialog(
+      child: CommonDialog(
+        title: '导入模块',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListItem(
+              leading: const Icon(Icons.file_open),
+              title: const Text('从 .sgmodule 文件导入'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _handleImport();
+              },
+            ),
+            ListItem(
+              leading: const Icon(Icons.link),
+              title: const Text('从 URL 导入'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _handleImportFromUrl();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _handleToggle(ModuleInfo info, bool enabled) async {
@@ -107,7 +175,7 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
       title: appLocalizations.modules,
       isLoading: _loading,
       floatingActionButton: FloatingActionButton(
-        onPressed: _handleImport,
+        onPressed: _showImportMenu,
         child: const Icon(Icons.add),
       ),
       body: NullStatusSwitcher(

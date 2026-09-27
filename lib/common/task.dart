@@ -296,9 +296,49 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   if (data.proxyGroups.isNotEmpty) {
     rawConfig['proxy-groups'] = data.proxyGroups;
   }
+  _injectModuleRuleProviders(rawConfig, rules, profilesPath);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
+}
+
+/// Inject file-based `rule-providers` for `RULE-SET` rules that reference
+/// module provider files written by [ModuleStore] (`<moduleId>_<policy>`).
+void _injectModuleRuleProviders(
+  Map rawConfig,
+  List<String> rules,
+  String profilesPath,
+) {
+  final providerNames = <String>{};
+  for (final rule in rules) {
+    final match =
+        RegExp(r'^RULE-SET,([^,]+),', caseSensitive: false).firstMatch(rule);
+    if (match != null) {
+      providerNames.add(match.group(1)!.trim());
+    }
+  }
+  if (providerNames.isEmpty) return;
+  final modulesDir = join(dirname(profilesPath), 'modules');
+  final providers = rawConfig['rule-providers'] is Map
+      ? Map<String, dynamic>.from(
+          (rawConfig['rule-providers'] as Map).cast<String, dynamic>(),
+        )
+      : <String, dynamic>{};
+  for (final name in providerNames) {
+    if (providers.containsKey(name)) continue;
+    // Module provider files are named `<moduleId>_<policy>.yaml`.
+    if (!RegExp(r'^\d+_[A-Z]+$').hasMatch(name)) continue;
+    final path = join(modulesDir, '$name.yaml');
+    if (!File(path).existsSync()) continue;
+    providers[name] = {
+      'type': 'file',
+      'behavior': 'domain',
+      'path': path,
+    };
+  }
+  if (providers.isNotEmpty) {
+    rawConfig['rule-providers'] = providers;
+  }
 }
 
 Future<List<String>> shakingProfileTask(

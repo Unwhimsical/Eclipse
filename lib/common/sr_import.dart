@@ -8,6 +8,7 @@ import '../models/module.dart';
 import '../models/profile.dart';
 import '../providers/providers.dart';
 import 'module_store.dart';
+import 'request.dart';
 import 'shadowrocket.dart';
 
 /// Import flows for Shadowrocket formats, built on the existing profile and
@@ -32,7 +33,8 @@ class ShadowrocketImport {
   }
 
   /// Import a `.conf` file. Nodes become a new profile; rules and proxy
-  /// groups are merged into global rules / the new profile.
+  /// groups are merged into global rules / the new profile. `[General]`
+  /// DNS servers are applied to the generated profile.
   static Future<String?> importConf(
     WidgetRef ref, {
     required String content,
@@ -46,6 +48,7 @@ class ShadowrocketImport {
         proxies: conf.proxies,
         proxyGroups: conf.proxyGroups.isEmpty ? null : conf.proxyGroups,
         rules: conf.rules.isEmpty ? null : conf.rules,
+        dnsServers: conf.dnsServers.isEmpty ? null : conf.dnsServers,
       );
       profileLabel = await _createProfileFromYaml(
         ref,
@@ -59,24 +62,68 @@ class ShadowrocketImport {
     return profileLabel ?? '规则已导入 (${conf.rules.length})';
   }
 
+  /// Download a `.conf` from a remote URL and import it.
+  static Future<String?> importConfFromUrl(
+    WidgetRef ref, {
+    required String url,
+  }) async {
+    final response = await request.getTextResponseForUrl(url);
+    final content = response.data ?? '';
+    if (content.isEmpty) return null;
+    return importConf(
+      ref,
+      content: content,
+      fileName: _fileNameFromUrl(url),
+    );
+  }
+
   /// Import `[Rule]` lines into global rules.
   static Future<int> importRules(WidgetRef ref, List<String> lines) async {
     return _addGlobalRules(ref, lines);
   }
 
   /// Import a `.sgmodule` file into the module store and apply its static
-  /// `[Rule]` / `[Host]` entries as global rules.
+  /// `[Rule]` / `[Host]` entries as global rules. Large modules use
+  /// file-based `rule-providers` with `RULE-SET` rules instead.
   static Future<ModuleInfo?> importModule(
     WidgetRef ref, {
     required String raw,
     String? fileName,
   }) async {
     final info = await moduleStore.import(raw, fileName: fileName);
-    final parsed = parseSgmodule(raw);
-    if (parsed.rules.isNotEmpty) {
-      await _addGlobalRules(ref, parsed.rules);
+    if (info.ruleSetRules.isNotEmpty) {
+      await _addGlobalRules(ref, info.ruleSetRules);
+      final inline = await moduleStore.readInlineRules(info.id);
+      if (inline.isNotEmpty) {
+        await _addGlobalRules(ref, inline);
+      }
+    } else {
+      final parsed = parseSgmodule(raw);
+      if (parsed.rules.isNotEmpty) {
+        await _addGlobalRules(ref, parsed.rules);
+      }
     }
     return info;
+  }
+
+  /// Download a `.sgmodule` from a remote URL and import it.
+  static Future<ModuleInfo?> importModuleFromUrl(
+    WidgetRef ref, {
+    required String url,
+  }) async {
+    final response = await request.getTextResponseForUrl(url);
+    final raw = response.data ?? '';
+    if (raw.isEmpty) return null;
+    return importModule(
+      ref,
+      raw: raw,
+      fileName: _fileNameFromUrl(url),
+    );
+  }
+
+  static String _fileNameFromUrl(String url) {
+    final name = url.split('/').last.split('?').first;
+    return name.isEmpty ? url : name;
   }
 
   /// Toggle a module. Disabling removes its rules; enabling re-applies them.
@@ -87,6 +134,22 @@ class ShadowrocketImport {
     bool enabled,
   ) async {
     await moduleStore.toggle(info.id, enabled);
+    if (info.ruleSetRules.isNotEmpty) {
+      if (enabled) {
+        await _addGlobalRules(ref, info.ruleSetRules);
+        final inline = await moduleStore.readInlineRules(info.id);
+        if (inline.isNotEmpty) {
+          await _addGlobalRules(ref, inline);
+        }
+      } else {
+        await _removeGlobalRules(ref, info.ruleSetRules);
+        final inline = await moduleStore.readInlineRules(info.id);
+        if (inline.isNotEmpty) {
+          await _removeGlobalRules(ref, inline);
+        }
+      }
+      return;
+    }
     final raw = await moduleStore.readRaw(info.id);
     if (raw == null) return;
     final parsed = parseSgmodule(raw);
