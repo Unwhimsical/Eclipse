@@ -47,7 +47,7 @@ func Start(fd int, config Options) *sing_tun.Listener {
 
 	tunStack, ok := constant.StackTypeMapping[strings.ToLower(config.Stack)]
 	if !ok {
-		tunStack = constant.TunMips
+		tunStack = constant.TunSystem
 	}
 
 	var dnsHijack []string
