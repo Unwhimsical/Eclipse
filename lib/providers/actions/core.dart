@@ -61,14 +61,19 @@ class CoreAction extends _$CoreAction {
       ref.read(coreStatusProvider.notifier).value = CoreStatus.connected;
     }
     // Start MITM proxy if modules need it (fire-and-forget).
-    unawaited(_syncMitm());
+    // Resolve the controller synchronously inside the guard: without a
+    // Flutter binding (unit tests) the read throws here instead of
+    // escaping from the async gap.
+    try {
+      unawaited(_syncMitm(_core));
+    } catch (_) {}
     return true;
   }
 
   /// Sync MITM proxy with enabled modules.
-  Future<void> _syncMitm() async {
+  Future<void> _syncMitm(CoreController controller) async {
     try {
-      final manager = MitmManager(_core);
+      final manager = MitmManager(controller);
       await manager.syncAndStart();
     } catch (_) {}
   }
