@@ -17,9 +17,7 @@ class MitmManager {
   final ModuleStore _moduleStore;
   final Dio _dio;
 
-  MitmManager(this._controller)
-      : _moduleStore = ModuleStore(),
-        _dio = Dio();
+  MitmManager(this._controller) : _moduleStore = ModuleStore(), _dio = Dio();
 
   /// Build MITM config from all enabled modules and start the proxy.
   /// Returns true if the proxy was started (at least one module needs MITM).

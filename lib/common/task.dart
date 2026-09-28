@@ -334,10 +334,7 @@ Future<void> _injectModuleHosts(Map rawConfig) async {
 /// Inject the local MITM proxy and routing rules for MITM hostnames.
 /// The Go MITM proxy listens on 127.0.0.1:9092; traffic to MITM hosts is
 /// routed through it so scripts/rewrites can run on decrypted traffic.
-Future<void> _injectMitmProxy(
-  Map rawConfig,
-  List<String> rules,
-) async {
+Future<void> _injectMitmProxy(Map rawConfig, List<String> rules) async {
   try {
     final moduleStore = ModuleStore();
     final modules = await moduleStore.list();

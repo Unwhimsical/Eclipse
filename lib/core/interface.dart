@@ -194,7 +194,8 @@ abstract class CoreHandlerInterface with CoreInterface {
 
   @override
   Future<Map<String, dynamic>> mitmUpdateConfig(
-      Map<String, dynamic> config) async {
+    Map<String, dynamic> config,
+  ) async {
     final res = await _invokeMethod<Map>(
       method: CoreMethod.mitmUpdateConfig,
       arguments: config,

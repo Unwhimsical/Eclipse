@@ -108,7 +108,8 @@ class CoreController {
   }
 
   Future<Map<String, dynamic>> mitmUpdateConfig(
-      Map<String, dynamic> config) async {
+    Map<String, dynamic> config,
+  ) async {
     return _interface.mitmUpdateConfig(config);
   }
 
