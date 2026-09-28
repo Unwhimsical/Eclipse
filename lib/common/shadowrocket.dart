@@ -365,6 +365,82 @@ class ConfData {
     }
     return servers;
   }
+
+  /// Direct DNS servers from `[General]` `direct-dns-server`.
+  /// Used for domains that should resolve without proxy.
+  List<String> get directDnsServers {
+    final value = general['direct-dns-server'];
+    if (value == null || value.isEmpty) return [];
+    return value
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  /// Domains/IPs from `[General]` `skip-proxy` that bypass the proxy.
+  List<String> get skipProxy {
+    final value = general['skip-proxy'];
+    if (value == null || value.isEmpty) return [];
+    return value
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  /// Routes from `[General]` `tun-excluded-routes` (CIDR list).
+  List<String> get tunExcludedRoutes {
+    final value = general['tun-excluded-routes'];
+    if (value == null || value.isEmpty) return [];
+    return value
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  /// Routes from `[General]` `tun-included-routes` (CIDR list).
+  List<String> get tunIncludedRoutes {
+    final value = general['tun-included-routes'];
+    if (value == null || value.isEmpty) return [];
+    return value
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+  }
+
+  /// Whether IPv6 is enabled (`[General]` `ipv6`).
+  bool get ipv6Enabled {
+    final value = general['ipv6']?.toLowerCase();
+    return value == 'true' || value == '1' || value == 'yes';
+  }
+
+  /// Whether to prefer IPv6 (`[General]` `prefer-ipv6`).
+  bool get preferIpv6 {
+    final value = general['prefer-ipv6']?.toLowerCase();
+    return value == 'true' || value == '1' || value == 'yes';
+  }
+
+  /// Whether to allow private IP answers (`[General]` `private-ip-answer`).
+  bool get privateIpAnswer {
+    final value = general['private-ip-answer']?.toLowerCase();
+    // Default true in Shadowrocket; only false if explicitly disabled.
+    return value != 'false' && value != '0' && value != 'no';
+  }
+
+  /// Whether to always use real IP (`[General]` `always-real-ip`).
+  bool get alwaysRealIp {
+    final value = general['always-real-ip']?.toLowerCase();
+    return value == 'true' || value == '1' || value == 'yes';
+  }
+
+  /// URL from `[General]` `include` for an included remote config.
+  String? get includeUrl {
+    final value = general['include']?.trim();
+    return (value == null || value.isEmpty) ? null : value;
+  }
 }
 
 /// Parse a Shadowrocket `.conf` text into proxies / proxy-groups / rules.
@@ -753,6 +829,13 @@ String buildClashConfigFromProxies({
   List<Map<String, dynamic>>? proxyGroups,
   List<String>? rules,
   List<String>? dnsServers,
+  List<String>? directDnsServers,
+  List<String>? skipProxy,
+  List<String>? tunExcludedRoutes,
+  List<String>? tunIncludedRoutes,
+  bool? ipv6Enabled,
+  bool? preferIpv6,
+  bool? alwaysRealIp,
   String? groupName,
 }) {
   final proxyNames = proxies
@@ -765,14 +848,54 @@ String buildClashConfigFromProxies({
       [
         {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
       ];
-  final configRules = rules ?? ['MATCH,$mainGroup'];
+  // Prepend DIRECT rules for skip-proxy domains.
+  final configRules = <String>[];
+  if (skipProxy != null) {
+    for (final domain in skipProxy) {
+      if (domain.contains('/')) {
+        // CIDR → IP-CIDR rule
+        configRules.add('IP-CIDR,$domain,DIRECT');
+      } else {
+        // Domain → DOMAIN-SUFFIX rule
+        configRules.add('DOMAIN-SUFFIX,$domain,DIRECT');
+      }
+    }
+  }
+  configRules.addAll(rules ?? ['MATCH,$mainGroup']);
   final config = <String, dynamic>{
     'proxies': proxies,
     'proxy-groups': groups,
     'rules': configRules,
   };
+  // DNS configuration from [General]
   if (dnsServers != null && dnsServers.isNotEmpty) {
-    config['dns'] = {'enable': true, 'nameserver': dnsServers};
+    final dns = <String, dynamic>{'enable': true, 'nameserver': dnsServers};
+    if (directDnsServers != null && directDnsServers.isNotEmpty) {
+      dns['direct-nameserver'] = directDnsServers;
+    }
+    if (ipv6Enabled != null) {
+      dns['ipv6'] = ipv6Enabled;
+    }
+    if (alwaysRealIp == true) {
+      dns['respect-rules'] = true;
+    }
+    config['dns'] = dns;
+  }
+  // TUN routes from [General]
+  if ((tunExcludedRoutes != null && tunExcludedRoutes.isNotEmpty) ||
+      (tunIncludedRoutes != null && tunIncludedRoutes.isNotEmpty)) {
+    final tun = <String, dynamic>{'enable': true};
+    if (tunExcludedRoutes != null && tunExcludedRoutes.isNotEmpty) {
+      tun['route-exclude-address'] = tunExcludedRoutes;
+    }
+    if (tunIncludedRoutes != null && tunIncludedRoutes.isNotEmpty) {
+      tun['route-include-address'] = tunIncludedRoutes;
+    }
+    config['tun'] = tun;
+  }
+  // IPv6 at top level
+  if (ipv6Enabled != null) {
+    config['ipv6'] = ipv6Enabled;
   }
   return yaml.encode(config);
 }
