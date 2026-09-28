@@ -538,5 +538,56 @@ include = https://example.com/extra.conf
       expect(conf.alwaysRealIp, isTrue);
       expect(conf.includeUrl, 'https://example.com/extra.conf');
     });
+
+    test('parses tun-included-routes', () {
+      final conf = parseConf('''
+[General]
+tun-included-routes = 192.168.1.0/24, 10.0.0.0/8
+''');
+      expect(conf.tunIncludedRoutes, ['192.168.1.0/24', '10.0.0.0/8']);
+    });
+
+    test('returns empty for missing tun routes', () {
+      final conf = parseConf('[General]\n');
+      expect(conf.tunIncludedRoutes, isEmpty);
+      expect(conf.tunExcludedRoutes, isEmpty);
+    });
+  });
+
+  group('parseShareLink edge cases', () {
+    test('parses ss with IPv6 host', () {
+      final proxy = parseShareLink(
+        'ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@[::1]:8388#test-ipv6',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['server'], '::1');
+      expect(proxy['port'], 8388);
+    });
+
+    test('parses ss with fully base64-encoded URI', () {
+      final inner = 'aes-256-gcm:password@example.com:8388';
+      final proxy = parseShareLink('ss://${_b64(inner)}#test-b64');
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'ss');
+      expect(proxy['server'], 'example.com');
+      expect(proxy['cipher'], 'aes-256-gcm');
+    });
+
+    test('parses ss with plugin params', () {
+      final proxy = parseShareLink(
+        'ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@example.com:8388'
+        '?plugin=obfs-local%3Bobfs%3Dhttp#test-plugin',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['plugin'], isNotNull);
+    });
+
+    test('rejects ss with invalid userinfo', () {
+      expect(parseShareLink('ss://bm9jb2xvbg==@example.com:8388'), isNull);
+    });
+
+    test('rejects ss with empty host', () {
+      expect(parseShareLink('ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@:8388'), isNull);
+    });
   });
 }
