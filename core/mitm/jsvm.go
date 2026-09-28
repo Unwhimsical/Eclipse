@@ -73,25 +73,12 @@ func runScript(s *Script, kind string, reqInfo map[string]interface{}, respInfo 
 	}
 	_ = vm.Set("console", console)
 
-	// Wrap in an async IIFE so top-level await works; pump the job queue
-	// until $done is called or the queue drains.
+	// Wrap in an async IIFE so top-level await works. goja drains the
+	// promise microtask queue before RunString returns, so $done called
+	// from promise continuations has already run at this point.
 	wrapped := "(async () => {\n" + s.Content + "\n})();"
-	promise, err := vm.RunString(wrapped)
-	if err != nil {
+	if _, err := vm.RunString(wrapped); err != nil {
 		return res // syntax/runtime error: fail open
-	}
-
-	// Pump promises: run jobs until done or no progress.
-	if p, ok := promise.Export().(*goja.Promise); ok {
-		_ = p
-	}
-	jobQueue := vm.GetJobQueue()
-	if jobQueue != nil {
-		for !res.called {
-			if !jobQueue.RunOne() {
-				break
-			}
-		}
 	}
 
 	if !res.called || doneArg == nil {
