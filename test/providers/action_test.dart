@@ -209,8 +209,10 @@ void main() {
 
   group('CoreAction', () {
     test('applies the profile after restarting a stopped core', () async {
+      final core = _MockCoreHandlerInterface();
       final container = ProviderContainer(
         overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
         ],
@@ -231,8 +233,10 @@ void main() {
     test(
       'restores the started state after restarting a running core',
       () async {
+        final core = _MockCoreHandlerInterface();
         final container = ProviderContainer(
           overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
           ],
@@ -255,8 +259,10 @@ void main() {
     test(
       'a rejected setup while running reports restartCore as unsuccessful',
       () async {
+        final core = _MockCoreHandlerInterface();
         final container = ProviderContainer(
           overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
           ],
@@ -279,8 +285,10 @@ void main() {
     test(
       'coalesces concurrent restart requests into one lifecycle restart',
       () async {
+        final core = _MockCoreHandlerInterface();
         final container = ProviderContainer(
           overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
           ],
@@ -306,8 +314,10 @@ void main() {
     );
 
     test('reapplies the latest request without restarting twice', () async {
+      final core = _MockCoreHandlerInterface();
       final container = ProviderContainer(
         overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
         ],
@@ -338,8 +348,10 @@ void main() {
     });
 
     test('surfaces a failed restart to its caller as a rejection', () async {
+      final core = _MockCoreHandlerInterface();
       final container = ProviderContainer(
         overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
         ],
@@ -366,8 +378,12 @@ void main() {
     test(
       'startCore leaves status and initCore to the superseding operation',
       () async {
+        final core = _MockCoreHandlerInterface();
         final container = ProviderContainer(
-          overrides: [coreActionProvider.overrideWith(_TestCoreAction.new)],
+          overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+            coreActionProvider.overrideWith(_TestCoreAction.new),
+          ],
         );
         addTearDown(container.dispose);
         final coreAction =
@@ -385,8 +401,12 @@ void main() {
     );
 
     test('startCore treats a coalesced outcome as applied', () async {
+      final core = _MockCoreHandlerInterface();
       final container = ProviderContainer(
-        overrides: [coreActionProvider.overrideWith(_TestCoreAction.new)],
+        overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
+          coreActionProvider.overrideWith(_TestCoreAction.new),
+        ],
       );
       addTearDown(container.dispose);
       final coreAction =
@@ -405,8 +425,10 @@ void main() {
     test(
       'restartCore leaves status and initCore to the superseding operation',
       () async {
+        final core = _MockCoreHandlerInterface();
         final container = ProviderContainer(
           overrides: [
+            coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
           ],
@@ -435,8 +457,10 @@ void main() {
     );
 
     test('restartCore treats a coalesced outcome as applied', () async {
+      final core = _MockCoreHandlerInterface();
       final container = ProviderContainer(
         overrides: [
+          coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
         ],
