@@ -39,7 +39,7 @@ class MitmManager {
         final file = File(path);
         if (!await file.exists()) continue;
         final content = await file.readAsString();
-        final sg = parseSgmodule(content);
+        final Sgmodule sg = parseSgmodule(content);
 
         // MITM hostnames.
         hosts.addAll(sg.mitmHostnames);

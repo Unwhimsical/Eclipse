@@ -40,7 +40,7 @@ class ShadowrocketImport {
     required String content,
     String? fileName,
   }) async {
-    final conf = parseConf(content);
+    final ConfData conf = parseConf(content);
     if (conf.isEmpty) return null;
     String? profileLabel;
     if (conf.proxies.isNotEmpty) {
@@ -49,6 +49,23 @@ class ShadowrocketImport {
         proxyGroups: conf.proxyGroups.isEmpty ? null : conf.proxyGroups,
         rules: conf.rules.isEmpty ? null : conf.rules,
         dnsServers: conf.dnsServers.isEmpty ? null : conf.dnsServers,
+        directDnsServers: conf.directDnsServers.isEmpty
+            ? null
+            : conf.directDnsServers,
+        skipProxy: conf.skipProxy.isEmpty ? null : conf.skipProxy,
+        tunExcludedRoutes: conf.tunExcludedRoutes.isEmpty
+            ? null
+            : conf.tunExcludedRoutes,
+        tunIncludedRoutes: conf.tunIncludedRoutes.isEmpty
+            ? null
+            : conf.tunIncludedRoutes,
+        ipv6Enabled: conf.general.containsKey('ipv6') ? conf.ipv6Enabled : null,
+        preferIpv6: conf.general.containsKey('prefer-ipv6')
+            ? conf.preferIpv6
+            : null,
+        alwaysRealIp: conf.general.containsKey('always-real-ip')
+            ? conf.alwaysRealIp
+            : null,
       );
       profileLabel = await _createProfileFromYaml(
         ref,
@@ -94,7 +111,7 @@ class ShadowrocketImport {
         await _addGlobalRules(ref, inline);
       }
     } else {
-      final parsed = parseSgmodule(raw);
+      final Sgmodule parsed = parseSgmodule(raw);
       if (parsed.rules.isNotEmpty) {
         await _addGlobalRules(ref, parsed.rules);
       }
@@ -144,7 +161,7 @@ class ShadowrocketImport {
     }
     final raw = await moduleStore.readRaw(info.id);
     if (raw == null) return;
-    final parsed = parseSgmodule(raw);
+    final Sgmodule parsed = parseSgmodule(raw);
     if (parsed.rules.isEmpty) return;
     if (enabled) {
       await _addGlobalRules(ref, parsed.rules);

@@ -320,7 +320,7 @@ Future<void> _injectModuleHosts(Map rawConfig) async {
         final path = await moduleStore.moduleFilePath(module.id);
         final file = File(path);
         if (!await file.exists()) continue;
-        final sg = parseSgmodule(await file.readAsString());
+        final Sgmodule sg = parseSgmodule(await file.readAsString());
         for (final entry in sg.hosts.entries) {
           // Shadowrocket: `domain = ip` or `domain = server:port`.
           hosts[entry.key] = entry.value;
@@ -344,7 +344,7 @@ Future<void> _injectMitmProxy(Map rawConfig, List<String> rules) async {
         final path = await moduleStore.moduleFilePath(module.id);
         final file = File(path);
         if (!await file.exists()) continue;
-        final sg = parseSgmodule(await file.readAsString());
+        final Sgmodule sg = parseSgmodule(await file.readAsString());
         hosts.addAll(sg.mitmHostnames);
         // Modules with rewrites/scripts but no explicit MITM hostnames:
         // their patterns may still need interception. Skip for now;

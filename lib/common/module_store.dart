@@ -137,7 +137,7 @@ class ModuleStore {
   /// `rule-providers`; [ModuleInfo.ruleSetRules] holds the `RULE-SET` rules
   /// the caller should add to global rules instead of every rule.
   Future<ModuleInfo> import(String raw, {String? fileName}) async {
-    final parsed = parseSgmodule(raw);
+    final Sgmodule parsed = parseSgmodule(raw);
     final id = DateTime.now().microsecondsSinceEpoch.toString();
     final name = parsed.name.isEmpty
         ? (fileName?.replaceAll('.sgmodule', '') ?? 'Module $id')

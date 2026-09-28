@@ -58,7 +58,7 @@ class _RulesViewState extends ConsumerState<RulesView> {
   }
 
   Future<void> _importConfContent(String content) async {
-    final conf = parseConf(content);
+    final ConfData conf = parseConf(content);
     if (conf.rules.isEmpty) {
       if (!mounted) return;
       dialogs.showNotifier('.conf 中没有找到规则', level: MessageLevel.warning);

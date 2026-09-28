@@ -210,6 +210,7 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline),
+                    tooltip: appLocalizations.delete,
                     onPressed: () => _handleDelete(info),
                   ),
                 ],
