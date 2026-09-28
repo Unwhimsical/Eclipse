@@ -298,12 +298,69 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   if (data.proxyGroups.isNotEmpty) {
     rawConfig['proxy-groups'] = data.proxyGroups;
   }
+  await _orderRulesByModules(rules);
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
   await _injectMitmProxy(rawConfig, rules);
   await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
+}
+
+/// Reorder [rules] for Shadowrocket semantics: enabled modules' rules come
+/// first, in the modules' UI list order (top to bottom), followed by the
+/// config's own rules. MITM interception rules are injected separately at
+/// position 0 and are unaffected.
+Future<void> _orderRulesByModules(List<String> rules) async {
+  try {
+    final moduleStore = ModuleStore();
+    final modules = await moduleStore.list();
+    final enabled = modules.where((m) => m.enabled).toList();
+    if (enabled.isEmpty || rules.isEmpty) return;
+
+    // Collect each module's rule strings, in list order.
+    final moduleRuleSets = <Set<String>>[];
+    for (final module in enabled) {
+      final ruleSet = <String>{};
+      // Large modules: RULE-SET references + inline non-domain rules.
+      ruleSet.addAll(module.ruleSetRules);
+      final inline = await moduleStore.readInlineRules(module.id);
+      ruleSet.addAll(inline);
+      // Small modules: rules were inlined directly; parse the raw file.
+      if (ruleSet.isEmpty) {
+        final raw = await moduleStore.readRaw(module.id);
+        if (raw != null) {
+          try {
+            ruleSet.addAll(parseSgmodule(raw).rules);
+          } catch (_) {}
+        }
+      }
+      moduleRuleSets.add(ruleSet);
+    }
+
+    // Stable partition: module buckets in order, then everything else.
+    final buckets = List.generate(enabled.length, (_) => <String>[]);
+    final others = <String>[];
+    for (final rule in rules) {
+      var placed = false;
+      for (var i = 0; i < moduleRuleSets.length; i++) {
+        if (moduleRuleSets[i].contains(rule)) {
+          buckets[i].add(rule);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        others.add(rule);
+      }
+    }
+
+    rules.clear();
+    for (final bucket in buckets) {
+      rules.addAll(bucket);
+    }
+    rules.addAll(others);
+  } catch (_) {}
 }
 
 /// Inject `[Host]` entries from enabled modules into the Clash `hosts` map.
@@ -376,6 +433,9 @@ Future<void> _injectMitmProxy(Map rawConfig, List<String> rules) async {
     for (final host in hosts) {
       final h = host.trim();
       if (h.isEmpty) continue;
+      // Skip exclusions ('-...') and directives ('%...'): they must not
+      // become DOMAIN rules. Excluded hosts simply bypass MITM.
+      if (h.startsWith('-') || h.startsWith('%')) continue;
       if (h.startsWith('*.')) {
         mitmRules.add('DOMAIN-SUFFIX,${h.substring(2)},$mitmProxyName');
       } else {
