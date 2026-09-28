@@ -11,10 +11,7 @@ void main() {
     test('generateRandomSecret produces requested length', () {
       final secret = generateRandomSecret(16);
       expect(secret, hasLength(16));
-      expect(
-        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(secret),
-        isTrue,
-      );
+      expect(RegExp(r'^[a-zA-Z0-9]+$').hasMatch(secret), isTrue);
     });
 
     test('safeSubstring clamps bounds', () {

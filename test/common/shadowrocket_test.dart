@@ -484,7 +484,11 @@ hostname = %APPEND%,example.com,*.example.org
           {'name': 'node1', 'type': 'ss'},
         ],
         proxyGroups: [
-          {'name': 'AUTO', 'type': 'url-test', 'proxies': ['node1']},
+          {
+            'name': 'AUTO',
+            'type': 'url-test',
+            'proxies': ['node1'],
+          },
         ],
         rules: ['DOMAIN-SUFFIX,example.com,AUTO'],
         tunIncludedRoutes: ['192.168.0.0/16'],
