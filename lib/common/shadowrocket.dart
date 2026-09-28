@@ -697,10 +697,19 @@ String? _normalizeConfRule(String line) {
     return 'MATCH,${line.substring(6).trim()}';
   }
   if (upper.startsWith('USER-AGENT,')) {
-    // Clash has no USER-AGENT rule; keep as comment-safe skip.
-    return null;
+    // Clash has no USER-AGENT rule type. Preserve as a YAML comment so
+    // the user sees it was skipped, instead of dropping silently.
+    return '# USER-AGENT not supported by Clash: $line';
   }
   var normalized = line;
+  // Shadowrocket RULE-SET may carry `,update-interval=<seconds>`; Clash
+  // RULE-SET has no such parameter — strip it.
+  // e.g. `RULE-SET,https://x.com/a.txt,PROXY,update-interval=86400`
+  //   -> `RULE-SET,https://x.com/a.txt,PROXY`
+  normalized = normalized.replaceAll(
+    RegExp(r',update-interval=\d+', caseSensitive: false),
+    '',
+  );
   // Shadowrocket `PROTOCOL,UDP` -> Clash Meta `NETWORK,UDP`.
   normalized = normalized.replaceAll(
     RegExp(r'(?<![A-Z-])PROTOCOL(?![A-Z-])', caseSensitive: false),

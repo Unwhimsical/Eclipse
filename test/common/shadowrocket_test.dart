@@ -97,14 +97,36 @@ AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT-NO-DROP
       expect(data.rules[0], isNot(contains('REJECT-NO-DROP')));
     });
 
-    test('drops USER-AGENT rules', () {
+    test('keeps USER-AGENT as comment instead of dropping', () {
+      final data = parseConf('''
+[Rule]
+USER-AGENT,MyApp*,PROXY
+''');
+      expect(data.rules, hasLength(1));
+      expect(data.rules[0], startsWith('#'));
+      expect(data.rules[0], contains('USER-AGENT'));
+    });
+
+    test('strips RULE-SET update-interval', () {
+      final data = parseConf('''
+[Rule]
+RULE-SET,https://example.com/rules.txt,PROXY,update-interval=86400
+''');
+      expect(data.rules, hasLength(1));
+      expect(data.rules[0], 'RULE-SET,https://example.com/rules.txt,PROXY');
+      expect(data.rules[0], isNot(contains('update-interval')));
+    });
+
+    test('keeps USER-AGENT as comment (not silently dropped)', () {
       final data = parseConf('''
 [Rule]
 USER-AGENT,WeChat*,DIRECT
 DOMAIN-SUFFIX,example.com,PROXY
 ''');
-      expect(data.rules, hasLength(1));
-      expect(data.rules[0], 'DOMAIN-SUFFIX,example.com,PROXY');
+      expect(data.rules, hasLength(2));
+      expect(data.rules[0], startsWith('#'));
+      expect(data.rules[0], contains('USER-AGENT'));
+      expect(data.rules[1], 'DOMAIN-SUFFIX,example.com,PROXY');
     });
 
     test('skips comments and empty lines', () {
