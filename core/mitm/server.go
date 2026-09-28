@@ -2,7 +2,9 @@ package mitm
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"io"
 	"net"
 	"net/http"
@@ -61,7 +63,17 @@ func (p *Proxy) handleConnect(conn net.Conn, req *http.Request) {
 }
 
 func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
-	if res := p.applyRewrite(req); res != nil {
+	// Build the full URL for rewrite matching. CONNECT-decrypted inner
+	// requests are origin-form (URL has path only), so reconstruct it.
+	fullURL := req.URL.String()
+	if req.URL.Host == "" {
+		scheme := "http"
+		if isTLS {
+			scheme = "https"
+		}
+		fullURL = scheme + "://" + req.Host + req.URL.RequestURI()
+	}
+	if res := p.applyRewrite(req, fullURL); res != nil {
 		w := newConnWriter(conn, req)
 		writeRewriteResult(w, res)
 		_ = w.finish()
@@ -75,10 +87,11 @@ func (p *Proxy) tunnelRaw(conn net.Conn, req *http.Request) {
 	if host == "" {
 		host = req.URL.Host
 	}
-	if _, _, err := net.SplitHostPort(host); err != nil {
-		host = net.JoinHostPort(host, "443")
-	}
-	up, err := net.DialTimeout("tcp", host, 15*time.Second)
+	h, port := splitHostPort(host, 443)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	// Route through the mihomo proxy chain, not direct.
+	up, err := dialUpstream(ctx, h, port)
 	if err != nil {
 		_, _ = io.WriteString(conn, "HTTP/1.1 502 Bad Gateway\r\n\r\n")
 		return
@@ -87,6 +100,20 @@ func (p *Proxy) tunnelRaw(conn net.Conn, req *http.Request) {
 	_, _ = io.WriteString(conn, "HTTP/1.1 200 Connection Established\r\n\r\n")
 	go io.Copy(up, conn)
 	_, _ = io.Copy(conn, up)
+}
+
+// upstreamTLSConfig builds a verifying TLS config for upstream connections.
+// InsecureSkipVerify is never used: a failed verification drops the connection.
+func (p *Proxy) upstreamTLSConfig(host string) *tls.Config {
+	roots, err := x509.SystemCertPool()
+	if err != nil || roots == nil {
+		roots = x509.NewCertPool()
+	}
+	return &tls.Config{
+		ServerName: host,
+		RootCAs:    roots,
+		MinVersion: tls.VersionTLS12,
+	}
 }
 
 func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
@@ -108,13 +135,29 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 	out.Header = req.Header.Clone()
 	out.Header.Del("Proxy-Connection")
 	out.Header.Del("Proxy-Authorization")
+	// Upstream goes through the mihomo proxy chain with real TLS verification.
+	dialTCP := func(ctx context.Context, _, addr string) (net.Conn, error) {
+		h, port := splitHostPort(addr, 80)
+		return dialUpstream(ctx, h, port)
+	}
+	dialTLS := func(ctx context.Context, _, addr string) (net.Conn, error) {
+		h, port := splitHostPort(addr, 443)
+		raw, err := dialUpstream(ctx, h, port)
+		if err != nil {
+			return nil, err
+		}
+		tlsConn := tls.Client(raw, p.upstreamTLSConfig(h))
+		if err := tlsConn.HandshakeContext(ctx); err != nil {
+			raw.Close()
+			return nil, err
+		}
+		return tlsConn, nil
+	}
 	client := &http.Client{
 		Timeout: 30 * time.Second,
 		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			DialContext: (&net.Dialer{
-				Timeout: 15 * time.Second,
-			}).DialContext,
+			DialContext:    dialTCP,
+			DialTLSContext: dialTLS,
 		},
 		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse

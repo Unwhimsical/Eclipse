@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 
 	"core/mitm"
@@ -13,11 +15,15 @@ var (
 )
 
 func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
-	cfg := mitm.Config{ListenAddr: "127.0.0.1:18080"}
+	// Calling Start implies enable; Dart may omit the flag.
+	cfg := mitm.Config{ListenAddr: "127.0.0.1:18080", Enabled: true}
 	if v, ok := args["enabled"].(bool); ok {
 		cfg.Enabled = v
 	}
-	if v, ok := args["listenAddr"].(string); ok && v != "" {
+	// Dart sends 'listen'; accept 'listenAddr' as well.
+	if v, ok := args["listen"].(string); ok && v != "" {
+		cfg.ListenAddr = v
+	} else if v, ok := args["listenAddr"].(string); ok && v != "" {
 		cfg.ListenAddr = v
 	}
 	if v, ok := args["caCert"].(string); ok {
@@ -26,11 +32,16 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 	if v, ok := args["caKey"].(string); ok {
 		cfg.CAKeyPEM = v
 	}
-	if v, ok := args["hostnames"].([]interface{}); ok {
-		for _, h := range v {
-			if s, ok := h.(string); ok {
-				cfg.Hostnames = append(cfg.Hostnames, s)
-			}
+	// Dart sends 'hosts'; accept 'hostnames' as well.
+	var rawHosts []interface{}
+	if v, ok := args["hosts"].([]interface{}); ok {
+		rawHosts = v
+	} else if v, ok := args["hostnames"].([]interface{}); ok {
+		rawHosts = v
+	}
+	for _, h := range rawHosts {
+		if s, ok := h.(string); ok {
+			cfg.Hostnames = append(cfg.Hostnames, s)
 		}
 	}
 	if v, ok := args["rewrites"].([]interface{}); ok {
@@ -43,8 +54,22 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			action, _ := m["action"].(string)
 			target, _ := m["target"].(string)
 			status := 302
-			if s, ok := m["status"].(float64); ok {
+			switch s := m["status"].(type) {
+			case float64:
 				status = int(s)
+			case int:
+				status = s
+			case string:
+				if n, err := strconv.Atoi(strings.TrimSpace(s)); err == nil {
+					status = n
+				}
+			}
+			if action == "" {
+				action = "redirect"
+				if target == "-" || strings.HasPrefix(strings.ToLower(target), "reject") {
+					action = "reject"
+					target = ""
+				}
 			}
 			rule, err := mitm.CompileRewrite(pattern, action, target, status)
 			if err != nil {

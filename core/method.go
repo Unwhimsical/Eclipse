@@ -282,7 +282,7 @@ var methodHandlers = map[CoreMethod]methodHandler{
 			response.success(result)
 		})
 	}),
-	mitmStartMethod: withArguments(func(args *map[string]interface{}, response MethodResponse) {
+	mitmStartMethod: withArguments(func(args *map[string]any, response MethodResponse) {
 		safeGo(response, func() {
 			result, err := handleMitmStart(*args)
 			if err != nil {
@@ -302,7 +302,7 @@ var methodHandlers = map[CoreMethod]methodHandler{
 			response.success(result)
 		})
 	}),
-	mitmUpdateConfigMethod: withArguments(func(args *map[string]interface{}, response MethodResponse) {
+	mitmUpdateConfigMethod: withArguments(func(args *map[string]any, response MethodResponse) {
 		safeGo(response, func() {
 			result, err := handleMitmUpdateConfig(*args)
 			if err != nil {

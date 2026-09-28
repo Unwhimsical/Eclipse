@@ -29,11 +29,10 @@ type RewriteResult struct {
 	Status int
 }
 
-func (p *Proxy) applyRewrite(req *http.Request) *RewriteResult {
+func (p *Proxy) applyRewrite(req *http.Request, urlStr string) *RewriteResult {
 	p.mu.RLock()
 	rules := p.config.Rewrites
 	p.mu.RUnlock()
-	urlStr := req.URL.String()
 	for _, r := range rules {
 		if r.re == nil || !r.re.MatchString(urlStr) {
 			continue
