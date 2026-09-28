@@ -15,7 +15,7 @@ class CoreController {
   late CoreHandlerInterface _interface;
 
   CoreController._internal() {
-    if (system.isAndroid) {
+    if (system.isMobile) {
       _interface = coreLib!;
     } else {
       _interface = coreService!;
@@ -108,8 +108,7 @@ class CoreController {
   }
 
   Future<Map<String, dynamic>> mitmUpdateConfig(
-    Map<String, dynamic> config,
-  ) async {
+      Map<String, dynamic> config) async {
     return _interface.mitmUpdateConfig(config);
   }
 

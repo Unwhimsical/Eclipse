@@ -22,7 +22,7 @@ class ShadowrocketImport {
     required String text,
     String? label,
   }) async {
-    final proxies = _parseLinkList(text);
+    final proxies = parseLinkList(text);
     if (proxies.isEmpty) return null;
     final yamlText = buildClashConfigFromProxies(proxies: proxies);
     return _createProfileFromYaml(
@@ -87,7 +87,7 @@ class ShadowrocketImport {
     final response = await request.getTextResponseForUrl(url);
     final content = response.data ?? '';
     if (content.isEmpty) return null;
-    return importConf(ref, content: content, fileName: _fileNameFromUrl(url));
+    return importConf(ref, content: content, fileName: fileNameFromUrl(url));
   }
 
   /// Import `[Rule]` lines into global rules.
@@ -127,10 +127,10 @@ class ShadowrocketImport {
     final response = await request.getTextResponseForUrl(url);
     final raw = response.data ?? '';
     if (raw.isEmpty) return null;
-    return importModule(ref, raw: raw, fileName: _fileNameFromUrl(url));
+    return importModule(ref, raw: raw, fileName: fileNameFromUrl(url));
   }
 
-  static String _fileNameFromUrl(String url) {
+  static String fileNameFromUrl(String url) {
     final name = url.split('/').last.split('?').first;
     return name.isEmpty ? url : name;
   }
@@ -170,7 +170,7 @@ class ShadowrocketImport {
     }
   }
 
-  static List<Map<String, dynamic>> _parseLinkList(String text) {
+  static List<Map<String, dynamic>> parseLinkList(String text) {
     final proxies = <Map<String, dynamic>>[];
     final lines = const LineSplitter()
         .convert(text)

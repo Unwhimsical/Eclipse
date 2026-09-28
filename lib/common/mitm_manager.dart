@@ -57,7 +57,7 @@ class MitmManager {
 
         // Scripts: parse and download content.
         for (final line in sg.scripts) {
-          final parsed = _parseScriptLine(line);
+          final parsed = parseScriptLine(line);
           if (parsed == null) continue;
           // Download remote script content.
           final scriptPath = parsed['scriptPath'] as String?;
@@ -130,7 +130,7 @@ class MitmManager {
   }
 
   /// Parse a [Script] line into a map.
-  Map<String, dynamic>? _parseScriptLine(String line) {
+  static Map<String, dynamic>? parseScriptLine(String line) {
     final eq = line.indexOf('=');
     if (eq < 0) return null;
     final name = line.substring(0, eq).trim();

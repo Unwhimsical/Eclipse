@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:fl_clash/common/shadowrocket.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yaml/yaml.dart' as yaml;
+
+String _b64(String s) => base64Encode(utf8.encode(s));
 
 void main() {
   group('parseShareLink', () {
@@ -29,6 +33,139 @@ void main() {
       expect(proxy!['type'], 'trojan');
       expect(proxy['server'], 'example.com');
       expect(proxy['port'], 443);
+    });
+
+    test('parses ssr link', () {
+      final inner =
+          'example.com:8388:origin:aes-256-cfb:plain:${_b64('test-password')}'
+          '/?remarks=${_b64('test-ssr')}';
+      final proxy = parseShareLink('ssr://${_b64(inner)}');
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'ssr');
+      expect(proxy['server'], 'example.com');
+      expect(proxy['port'], 8388);
+      expect(proxy['cipher'], 'aes-256-cfb');
+      expect(proxy['password'], 'test-password');
+      expect(proxy['protocol'], 'origin');
+      expect(proxy['obfs'], 'plain');
+      expect(proxy['name'], 'test-ssr');
+    });
+
+    test('returns null for malformed ssr link', () {
+      expect(parseShareLink('ssr://${_b64('too:few')}'), isNull);
+      expect(parseShareLink('ssr://%%invalid%%'), isNull);
+    });
+
+    test('parses vmess link with ws+tls', () {
+      final json = jsonEncode({
+        'ps': 'test-vmess',
+        'add': 'example.com',
+        'port': '443',
+        'id': '123e4567-e89b-12d3-a456-426614174000',
+        'aid': '0',
+        'net': 'ws',
+        'host': 'example.com',
+        'path': '/ws',
+        'tls': 'tls',
+      });
+      final proxy = parseShareLink('vmess://${_b64(json)}');
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'vmess');
+      expect(proxy['server'], 'example.com');
+      expect(proxy['port'], 443);
+      expect(proxy['uuid'], '123e4567-e89b-12d3-a456-426614174000');
+      expect(proxy['tls'], isTrue);
+      expect(proxy['network'], 'ws');
+      expect(proxy['servername'], 'example.com');
+      expect((proxy['ws-opts'] as Map)['path'], '/ws');
+    });
+
+    test('parses vmess link with grpc without tls', () {
+      final json = jsonEncode({
+        'add': 'example.com',
+        'port': 80,
+        'id': 'uuid',
+        'net': 'grpc',
+        'path': 'svc',
+      });
+      final proxy = parseShareLink('vmess://${_b64(json)}');
+      expect(proxy, isNotNull);
+      expect(proxy!['tls'], isFalse);
+      expect(proxy['network'], 'grpc');
+      expect((proxy['grpc-opts'] as Map)['grpc-service-name'], 'svc');
+      expect(proxy['name'], 'example.com:80');
+    });
+
+    test('returns null for malformed vmess link', () {
+      expect(parseShareLink('vmess://${_b64('not json')}'), isNull);
+      expect(parseShareLink('vmess://${_b64('[]')}'), isNull);
+    });
+
+    test('parses vless link with tls', () {
+      final proxy = parseShareLink(
+        'vless://123e4567-e89b-12d3-a456-426614174000@example.com:443'
+        '?security=tls&sni=example.com&fp=chrome&alpn=h2,http/1.1'
+        '&type=ws&path=/ws&host=example.com#test-vless',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'vless');
+      expect(proxy['tls'], isTrue);
+      expect(proxy['servername'], 'example.com');
+      expect(proxy['client-fingerprint'], 'chrome');
+      expect(proxy['alpn'], ['h2', 'http/1.1']);
+      expect(proxy['network'], 'ws');
+      expect(proxy['name'], 'test-vless');
+    });
+
+    test('parses vless link with reality', () {
+      final proxy = parseShareLink(
+        'vless://uuid@example.com:443?security=reality&sni=example.com'
+        '&pbk=pubkey&sid=shortid#test',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['tls'], isTrue);
+      expect((proxy['reality-opts'] as Map)['public-key'], 'pubkey');
+      expect((proxy['reality-opts'] as Map)['short-id'], 'shortid');
+    });
+
+    test('parses vless link with flow', () {
+      final proxy = parseShareLink(
+        'vless://uuid@example.com:443?security=tls&flow=xtls-rprx-vision#t',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['flow'], 'xtls-rprx-vision');
+    });
+
+    test('returns null for malformed vless link', () {
+      expect(parseShareLink('vless://no-at-sign-here'), isNull);
+    });
+
+    test('parses hysteria2 link', () {
+      final proxy = parseShareLink(
+        'hysteria2://password@example.com:443?sni=example.com&insecure=1#hy2',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'hysteria2');
+      expect(proxy['server'], 'example.com');
+      expect(proxy['password'], 'password');
+      expect(proxy['sni'], 'example.com');
+      expect(proxy['skip-cert-verify'], isTrue);
+      expect(proxy['name'], 'hy2');
+    });
+
+    test('parses tuic link', () {
+      final proxy = parseShareLink(
+        'tuic://myuuid:mypass@example.com:443?sni=example.com#tuic',
+      );
+      expect(proxy, isNotNull);
+      expect(proxy!['type'], 'tuic');
+      expect(proxy['uuid'], 'myuuid');
+      expect(proxy['password'], 'mypass');
+      expect(proxy['sni'], 'example.com');
+    });
+
+    test('returns null for link without @ in tuic', () {
+      expect(parseShareLink('tuic://example.com:443'), isNull);
     });
   });
 
@@ -143,6 +280,85 @@ DOMAIN-SUFFIX,example.com,PROXY
 
     test('empty input yields empty data', () {
       expect(parseConf('').isEmpty, isTrue);
+    });
+
+    test('parses all proxy types', () {
+      final data = parseConf('''
+[Proxy]
+n-ssr = ssr, example.com, 8388, aes-256-cfb, pass, origin, plain
+n-vmess = vmess, example.com, 443, uuid-1, ws, /ws, tls, example.com
+n-vless = vless, example.com, 443, uuid-2, ws, /ws, xtls, example.com, xtls-rprx-vision
+n-hy2 = hysteria2, example.com, 443, pass, example.com
+n-tuic = tuic, example.com, 443, uuid-3, pass, example.com
+n-http = http, example.com, 8080, user, pass, tls
+n-http-noauth = http, example.com, 8080
+n-socks = socks5, example.com, 1080, user, pass
+n-unknown = wireguard, example.com, 51820
+''');
+      expect(data.proxies, hasLength(8));
+      final byName = {for (final p in data.proxies) p['name']: p};
+      expect(byName['n-ssr']!['type'], 'ssr');
+      expect(byName['n-ssr']!['protocol'], 'origin');
+      expect(byName['n-vmess']!['type'], 'vmess');
+      expect(byName['n-vmess']!['tls'], isTrue);
+      expect(byName['n-vmess']!['network'], 'ws');
+      expect(byName['n-vless']!['flow'], 'xtls-rprx-vision');
+      expect(byName['n-hy2']!['type'], 'hysteria2');
+      expect(byName['n-tuic']!['type'], 'tuic');
+      expect(byName['n-tuic']!['uuid'], 'uuid-3');
+      expect(byName['n-http']!['type'], 'http');
+      expect(byName['n-http']!['username'], 'user');
+      expect(byName['n-http']!['tls'], isTrue);
+      expect(byName['n-http-noauth']!['tls'], isFalse);
+      expect(byName['n-http-noauth']!.containsKey('username'), isFalse);
+      expect(byName['n-socks']!['type'], 'socks5');
+      expect(byName['n-socks']!['password'], 'pass');
+      expect(byName.containsKey('n-unknown'), isFalse);
+    });
+
+    test('parses vmess over-tls and grpc variants', () {
+      final data = parseConf('''
+[Proxy]
+a = vmess, example.com, 443, uuid, grpc, svc, over-tls=true, example.com
+b = vmess, example.com, 80, uuid, tcp
+''');
+      final byName = {for (final p in data.proxies) p['name']: p};
+      expect(byName['a']!['tls'], isTrue);
+      expect(byName['a']!['network'], 'grpc');
+      expect(byName['b']!['network'], 'tcp');
+      expect(byName['b']!['tls'], isFalse);
+    });
+
+    test('parses vless plain and ws variants', () {
+      final data = parseConf('''
+[Proxy]
+a = vless, example.com, 443, uuid, tcp, , tls
+b = vless, example.com, 80, uuid
+''');
+      final byName = {for (final p in data.proxies) p['name']: p};
+      expect(byName['a']!['tls'], isTrue);
+      expect(byName['a']!['servername'], 'example.com');
+      expect(byName['b']!['tls'], isFalse);
+    });
+
+    test('parses proxy group types', () {
+      final data = parseConf('''
+[Proxy Group]
+SEL = select, n1, n2
+AUTO = url-test, n1, n2
+FB = fallback, n1
+LB = load-balance, n1, n2
+BAD = bogus-type, n1
+''');
+      expect(data.proxyGroups, hasLength(4));
+      final byName = {for (final g in data.proxyGroups) g['name']: g};
+      expect(byName['SEL']!['type'], 'select');
+      expect(byName['AUTO']!['type'], 'url-test');
+      expect(byName['AUTO']!['url'], isNotEmpty);
+      expect(byName['AUTO']!['interval'], 300);
+      expect(byName['FB']!['type'], 'fallback');
+      expect(byName['LB']!['type'], 'load-balance');
+      expect(byName.containsKey('BAD'), isFalse);
     });
   });
 
@@ -260,6 +476,39 @@ hostname = %APPEND%,example.com,*.example.org
       expect(tun['route-exclude-address'], ['10.0.0.0/8']);
       // top-level ipv6
       expect(doc['ipv6'], false);
+    });
+
+    test('uses provided groups, rules and tun include routes', () {
+      final text = buildClashConfigFromProxies(
+        proxies: [
+          {'name': 'node1', 'type': 'ss'},
+        ],
+        proxyGroups: [
+          {'name': 'AUTO', 'type': 'url-test', 'proxies': ['node1']},
+        ],
+        rules: ['DOMAIN-SUFFIX,example.com,AUTO'],
+        tunIncludedRoutes: ['192.168.0.0/16'],
+        alwaysRealIp: true,
+        dnsServers: ['8.8.8.8'],
+        groupName: 'CUSTOM',
+      );
+      final doc = yaml.loadYaml(text) as Map;
+      expect((doc['proxy-groups'] as List).first['name'], 'AUTO');
+      expect(doc['rules'], ['DOMAIN-SUFFIX,example.com,AUTO']);
+      expect((doc['tun'] as Map)['route-include-address'], ['192.168.0.0/16']);
+      expect((doc['dns'] as Map)['respect-rules'], isTrue);
+    });
+
+    test('omits dns and tun sections when empty', () {
+      final text = buildClashConfigFromProxies(
+        proxies: [
+          {'name': 'node1', 'type': 'ss'},
+        ],
+      );
+      final doc = yaml.loadYaml(text) as Map;
+      expect(doc.containsKey('dns'), isFalse);
+      expect(doc.containsKey('tun'), isFalse);
+      expect(doc.containsKey('ipv6'), isFalse);
     });
   });
 
