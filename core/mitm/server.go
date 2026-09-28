@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -159,7 +160,7 @@ func (w *connWriter) WriteHeader(status int) { w.status = status }
 
 func (w *connWriter) writeHead() {
 	w.wrote = true
-	_, _ = io.WriteString(w.conn, "HTTP/1.1 "+itoa(w.status)+" "+http.StatusText(w.status)+"\r\n")
+	_, _ = io.WriteString(w.conn, "HTTP/1.1 "+strconv.Itoa(w.status)+" "+http.StatusText(w.status)+"\r\n")
 	for k, vv := range w.header {
 		for _, v := range vv {
 			_, _ = io.WriteString(w.conn, k+": "+v+"\r\n")
@@ -173,18 +174,4 @@ func (w *connWriter) finish() error {
 		w.writeHead()
 	}
 	return nil
-}
-
-func itoa(n int) string {
-	if n == 0 {
-		return "0"
-	}
-	var b [4]byte
-	i := len(b)
-	for n > 0 {
-		i--
-		b[i] = byte('0' + n%10)
-		n /= 10
-	}
-	return string(b[i:])
 }
