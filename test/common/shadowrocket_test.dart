@@ -134,6 +134,9 @@ DOMAIN-SUFFIX,ads.example.com,REJECT
 example.com = 1.2.3.4
 [URL Rewrite]
 ^https://example.com/ad - reject
+[Header Rewrite]
+^https://example.com/ header-del "X-Unwanted"
+^https://example.com/ header-add "X-Custom: value"
 [Script]
 test.js = type=http-response,pattern=^https://example.com,requires-body=1,script-path=https://example.com/test.js
 [MITM]
@@ -151,8 +154,27 @@ hostname = %APPEND%,example.com,*.example.org
       expect(module.rules, ['DOMAIN-SUFFIX,ads.example.com,REJECT']);
       expect(module.hosts, {'example.com': '1.2.3.4'});
       expect(module.urlRewrites, hasLength(1));
+      expect(module.headerRewrites, hasLength(2));
       expect(module.scripts, hasLength(1));
       expect(module.needsMitm, isTrue);
+    });
+
+    test('parses header rewrite lines', () {
+      final parsed = parseHeaderRewriteLine(
+        '^https://example.com/ header-del "X-Unwanted"',
+      );
+      expect(parsed, isNotNull);
+      expect(parsed!.pattern, '^https://example.com/');
+      expect(parsed.action, 'header-del');
+      expect(parsed.args, ['X-Unwanted']);
+
+      final add = parseHeaderRewriteLine(
+        '^https://example.com/ header-add "X-Custom: value"',
+      );
+      expect(add!.action, 'header-add');
+      expect(add.args, ['X-Custom: value']);
+
+      expect(parseHeaderRewriteLine('garbage line'), isNull);
     });
 
     test('skips %APPEND% in mitm hostnames', () {

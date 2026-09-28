@@ -728,6 +728,7 @@ class Sgmodule {
   final List<String> rules;
   final Map<String, String> hosts;
   final List<String> urlRewrites;
+  final List<String> headerRewrites;
   final List<String> scripts;
   final List<String> mitmHostnames;
   final String raw;
@@ -739,15 +740,21 @@ class Sgmodule {
     this.rules = const [],
     this.hosts = const {},
     this.urlRewrites = const [],
+    this.headerRewrites = const [],
     this.scripts = const [],
     this.mitmHostnames = const [],
     this.raw = '',
   });
 
   bool get isEmpty =>
-      rules.isEmpty && hosts.isEmpty && urlRewrites.isEmpty && scripts.isEmpty;
+      rules.isEmpty &&
+      hosts.isEmpty &&
+      urlRewrites.isEmpty &&
+      headerRewrites.isEmpty &&
+      scripts.isEmpty;
 
-  bool get needsMitm => urlRewrites.isNotEmpty || scripts.isNotEmpty;
+  bool get needsMitm =>
+      urlRewrites.isNotEmpty || headerRewrites.isNotEmpty || scripts.isNotEmpty;
 }
 
 /// Parse a `.sgmodule` text.
@@ -758,6 +765,7 @@ Sgmodule parseSgmodule(String content) {
   final rules = <String>[];
   final hosts = <String, String>{};
   final urlRewrites = <String>[];
+  final headerRewrites = <String>[];
   final scripts = <String>[];
   final mitmHostnames = <String>[];
   var section = '';
@@ -798,6 +806,8 @@ Sgmodule parseSgmodule(String content) {
         }
       case 'url rewrite':
         urlRewrites.add(line);
+      case 'header rewrite':
+        headerRewrites.add(line);
       case 'script':
         scripts.add(line);
       case 'mitm':
@@ -817,10 +827,36 @@ Sgmodule parseSgmodule(String content) {
     rules: rules,
     hosts: hosts,
     urlRewrites: urlRewrites,
+    headerRewrites: headerRewrites,
     scripts: scripts,
     mitmHostnames: mitmHostnames,
     raw: content,
   );
+}
+
+/// Parse a `[Header Rewrite]` line into (pattern, action, args).
+/// Returns null if the line doesn't match the expected format.
+/// Format: `<url-pattern> <header-del|header-add|header-replace|header-replace-regex> <args...>`
+({String pattern, String action, List<String> args})? parseHeaderRewriteLine(
+  String line,
+) {
+  // Match: pattern followed by action and quoted args
+  // e.g.: ^https?://example.com/ header-del "X-Header"
+  final match = RegExp(
+    r'^(\S+)\s+(header-del|header-add|header-replace|header-replace-regex)\s+(.+)$',
+  ).firstMatch(line.trim());
+  if (match == null) return null;
+  final pattern = match.group(1)!;
+  final action = match.group(2)!;
+  final argsStr = match.group(3)!;
+  // Extract quoted strings
+  final args = <String>[];
+  final quoted = RegExp(r'"([^"]*)"').allMatches(argsStr);
+  for (final m in quoted) {
+    args.add(m.group(1)!);
+  }
+  if (args.isEmpty) return null;
+  return (pattern: pattern, action: action, args: args);
 }
 
 /// Build a minimal Clash config YAML from parsed proxies.
