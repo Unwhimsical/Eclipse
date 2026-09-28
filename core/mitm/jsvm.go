@@ -1,7 +1,6 @@
 package mitm
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/dop251/goja"
@@ -180,5 +179,3 @@ func headerMap(h map[string][]string) map[string]interface{} {
 	}
 	return out
 }
-
-var _ = fmt.Sprintf // keep fmt if unused in future edits
