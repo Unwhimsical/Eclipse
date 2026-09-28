@@ -1,5 +1,5 @@
 import 'package:fl_clash/common/shadowrocket.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
 void main() {
