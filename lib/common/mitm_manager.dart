@@ -70,6 +70,10 @@ class MitmManager {
             'type': parsed['type'],
             'pattern': parsed['pattern'],
             'requiresBody': parsed['requiresBody'],
+            'binaryBody': parsed['binaryBody'],
+            'timeout': parsed['timeout'],
+            'maxSize': parsed['maxSize'],
+            'argument': parsed['argument'],
             'scriptPath': scriptPath,
             'content': content,
           });
@@ -134,6 +138,10 @@ class MitmManager {
     String type = '';
     String pattern = '';
     bool requiresBody = false;
+    bool binaryBody = false;
+    int timeout = 20;
+    int maxSize = 10 * 1024 * 1024;
+    String argument = '';
     String? scriptPath;
     for (final part in rest.split(',')) {
       final kv = part.trim().split('=');
@@ -146,7 +154,16 @@ class MitmManager {
         case 'pattern':
           pattern = v;
         case 'requires-body':
-          requiresBody = v == '1' || v.toLowerCase() == 'true';
+          requiresBody =
+              v == '1' || v.toLowerCase() == 'true' || v.toLowerCase() == 'yes';
+        case 'binary-body-mode':
+          binaryBody = v == '1' || v.toLowerCase() == 'true';
+        case 'timeout':
+          timeout = int.tryParse(v) ?? 20;
+        case 'max-size':
+          maxSize = int.tryParse(v) ?? (10 * 1024 * 1024);
+        case 'argument':
+          argument = v;
         case 'script-path':
           scriptPath = v;
       }
@@ -156,6 +173,10 @@ class MitmManager {
       'type': type,
       'pattern': pattern,
       'requiresBody': requiresBody,
+      'binaryBody': binaryBody,
+      'timeout': timeout,
+      'maxSize': maxSize,
+      'argument': argument,
       'scriptPath': scriptPath,
     };
   }

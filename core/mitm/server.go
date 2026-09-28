@@ -79,6 +79,17 @@ func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
 		_ = w.finish()
 		return
 	}
+	// http-request scripts: may rewrite the request or synthesize a response.
+	if p.scripts != nil {
+		if done, handled := p.runRequestScripts(req, fullURL, isTLS); handled {
+			w := newConnWriter(conn, req)
+			if done != nil {
+				writeScriptResult(w, done)
+			}
+			_ = w.finish()
+			return
+		}
+	}
 	p.forward(conn, req, isTLS)
 }
 
@@ -168,6 +179,15 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 		return
 	}
 	defer resp.Body.Close()
+
+	// http-response scripts: may modify status/headers/body.
+	var scriptBody []byte
+	if p.scripts != nil {
+		// Reconstruct full URL for pattern matching.
+		scriptURL := out.URL.String()
+		scriptBody = p.runResponseScripts(scriptURL, resp)
+	}
+
 	w := newConnWriter(conn, req)
 	for k, vv := range resp.Header {
 		for _, v := range vv {
@@ -175,7 +195,15 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 		}
 	}
 	w.WriteHeader(resp.StatusCode)
-	_, _ = io.Copy(w, resp.Body)
+	if scriptBody != nil {
+		// Script provided a (possibly modified) body; fix framing.
+		w.Header().Set("Content-Length", strconv.Itoa(len(scriptBody)))
+		// Remove chunked encoding since we now know the length.
+		w.Header().Del("Transfer-Encoding")
+		_, _ = w.Write(scriptBody)
+	} else {
+		_, _ = io.Copy(w, resp.Body)
+	}
 	_ = w.finish()
 }
 

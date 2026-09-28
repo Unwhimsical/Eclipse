@@ -16,6 +16,7 @@ type Config struct {
 	CAKeyPEM   string
 	Hostnames  []string
 	Rewrites   []RewriteRule
+	Scripts    []*Script
 }
 
 type Proxy struct {
@@ -26,10 +27,12 @@ type Proxy struct {
 	listener  net.Listener
 	mu        sync.RWMutex
 	running   bool
+	scripts   *ScriptRegistry
 }
 
 func New(cfg Config) (*Proxy, error) {
-	p := &Proxy{config: cfg}
+	p := &Proxy{config: cfg, scripts: NewScriptRegistry()}
+	p.scripts.Set(cfg.Scripts)
 	if err := p.loadCA(); err != nil {
 		return nil, err
 	}
@@ -109,6 +112,10 @@ func (p *Proxy) UpdateConfig(cfg Config) {
 	p.config.Hostnames = cfg.Hostnames
 	p.config.Rewrites = cfg.Rewrites
 	p.config.Enabled = cfg.Enabled
+	p.config.Scripts = cfg.Scripts
+	if p.scripts != nil {
+		p.scripts.Set(cfg.Scripts)
+	}
 }
 
 func (p *Proxy) serve() {

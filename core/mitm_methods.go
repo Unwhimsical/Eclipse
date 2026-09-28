@@ -78,6 +78,17 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			cfg.Rewrites = append(cfg.Rewrites, *rule)
 		}
 	}
+	// Scripts: list of {name,type,pattern,requiresBody,binaryBody,
+	// timeout,maxSize,argument,content}.
+	if scripts, ok := args["scripts"].([]interface{}); ok {
+		for _, item := range scripts {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			cfg.Scripts = append(cfg.Scripts, mitm.ParseScriptEntry(m))
+		}
+	}
 	if cfg.CACertPEM == "" || cfg.CAKeyPEM == "" {
 		return cfg, fmt.Errorf("mitm: CA certificate and key are required")
 	}
