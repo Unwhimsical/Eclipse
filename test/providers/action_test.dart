@@ -391,6 +391,7 @@ void main() {
           overrides: [
             coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
+            currentProfileProvider.overrideWithValue(null),
           ],
         );
         addTearDown(container.dispose);
@@ -414,6 +415,7 @@ void main() {
         overrides: [
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
+          currentProfileProvider.overrideWithValue(null),
         ],
       );
       addTearDown(container.dispose);
@@ -684,6 +686,7 @@ void main() {
         late _RestartRecordingCoreAction coreAction;
         final container = ProviderContainer(
           overrides: [
+            currentProfileProvider.overrideWithValue(null),
             setupActionProvider.overrideWith(() {
               setupAction = _AuthorizationSetupAction([AuthorizeCode.success]);
               return setupAction;
