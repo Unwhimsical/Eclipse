@@ -56,6 +56,18 @@ void main() {
       expect(parseShareLink('ssr://%%invalid%%'), isNull);
     });
 
+    test('parses ssr link with obfsparam and protoparam', () {
+      final inner =
+          'example.com:8388:auth_aes128_md5:aes-256-cfb:tls1.2_ticket_auth:${_b64('test-password')}'
+          '/?obfsparam=${_b64('obfs-param-value')}'
+          '&protoparam=${_b64('proto-param-value')}'
+          '&remarks=${_b64('test-ssr-params')}';
+      final proxy = parseShareLink('ssr://${_b64(inner)}');
+      expect(proxy, isNotNull);
+      expect(proxy!['obfs-param'], 'obfs-param-value');
+      expect(proxy['protocol-param'], 'proto-param-value');
+    });
+
     test('parses vmess link with ws+tls', () {
       final json = jsonEncode({
         'ps': 'test-vmess',
@@ -387,6 +399,11 @@ hostname = %APPEND%,example.com,*.example.org
       expect(module.desc, 'A test module');
     });
 
+    test('parses author metadata', () {
+      final module = parseSgmodule('#!name=Test\n#!author=John Doe\n[Rule]\n');
+      expect(module.author, 'John Doe');
+    });
+
     test('parses rules, hosts, rewrites and scripts', () {
       final module = parseSgmodule(sample);
       expect(module.rules, ['DOMAIN-SUFFIX,ads.example.com,REJECT']);
@@ -551,6 +568,26 @@ tun-included-routes = 192.168.1.0/24, 10.0.0.0/8
       final conf = parseConf('[General]\n');
       expect(conf.tunIncludedRoutes, isEmpty);
       expect(conf.tunExcludedRoutes, isEmpty);
+    });
+
+    test('parses private-ip-answer', () {
+      expect(parseConf('[General]\n').privateIpAnswer, isTrue);
+      expect(
+        parseConf('[General]\nprivate-ip-answer = false\n').privateIpAnswer,
+        isFalse,
+      );
+      expect(
+        parseConf('[General]\nprivate-ip-answer = 0\n').privateIpAnswer,
+        isFalse,
+      );
+      expect(
+        parseConf('[General]\nprivate-ip-answer = no\n').privateIpAnswer,
+        isFalse,
+      );
+      expect(
+        parseConf('[General]\nprivate-ip-answer = true\n').privateIpAnswer,
+        isTrue,
+      );
     });
 
     test('parses Host section', () {
