@@ -2,11 +2,7 @@
 
 ## Building
 
-Update submodules first. The ClashMeta Go core lives in `core/Clash.Meta/`.
-
-```bash
-git submodule update --init --recursive
-```
+The ClashMeta Go core is vendored in-tree at `core/Clash.Meta/` (no submodules).
 
 Full package build, including Go core, Flutter, and packaging, runs through `setup.dart`:
 

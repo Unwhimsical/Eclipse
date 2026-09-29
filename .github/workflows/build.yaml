@@ -93,9 +93,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -270,9 +267,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
       - name: Setup Android Signing
         if: startsWith(matrix.platform,'android')
         run: |

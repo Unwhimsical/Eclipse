@@ -66,14 +66,9 @@ brew install --cask flclash
 
 ## Build
 
-1. 更新 submodules
-   ```bash
-   git submodule update --init --recursive
-   ```
+1. 安装 `Flutter` 以及 `Golang` 环境
 
-2. 安装 `Flutter` 以及 `Golang` 环境
-
-3. 构建应用
+2. 构建应用
 
     - android
 

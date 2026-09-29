@@ -64,14 +64,9 @@ brew install --cask flclash
 
 ## Build
 
-1. Update submodules
-   ```bash
-   git submodule update --init --recursive
-   ```
+1. Install `Flutter` and `Golang` environment
 
-2. Install `Flutter` and `Golang` environment
-
-3. Build Application
+2. Build Application
 
     - android
 
