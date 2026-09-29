@@ -217,6 +217,7 @@ void main() {
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
+          currentProfileProvider.overrideWithValue(null),
         ],
       );
       addTearDown(container.dispose);
@@ -241,6 +242,7 @@ void main() {
             coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
+            currentProfileProvider.overrideWithValue(null),
           ],
         );
         addTearDown(container.dispose);
@@ -267,6 +269,7 @@ void main() {
             coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
+            currentProfileProvider.overrideWithValue(null),
           ],
         );
         addTearDown(container.dispose);
@@ -293,6 +296,7 @@ void main() {
             coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
+            currentProfileProvider.overrideWithValue(null),
           ],
         );
         addTearDown(container.dispose);
@@ -322,6 +326,7 @@ void main() {
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
+          currentProfileProvider.overrideWithValue(null),
         ],
       );
       addTearDown(container.dispose);
@@ -356,6 +361,7 @@ void main() {
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
+          currentProfileProvider.overrideWithValue(null),
         ],
       );
       addTearDown(container.dispose);
@@ -433,6 +439,7 @@ void main() {
             coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
             coreActionProvider.overrideWith(_TestCoreAction.new),
             setupActionProvider.overrideWith(_TestSetupAction.new),
+            currentProfileProvider.overrideWithValue(null),
           ],
         );
         addTearDown(container.dispose);
@@ -465,6 +472,7 @@ void main() {
           coreHandlerProvider.overrideWithValue(CoreController.scoped(core)),
           coreActionProvider.overrideWith(_TestCoreAction.new),
           setupActionProvider.overrideWith(_TestSetupAction.new),
+          currentProfileProvider.overrideWithValue(null),
         ],
       );
       addTearDown(container.dispose);
