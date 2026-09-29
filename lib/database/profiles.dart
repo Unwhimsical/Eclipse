@@ -32,11 +32,17 @@ class Profiles extends Table {
 
   TextColumn get unfoldSet => text().map(const StringSetConverter())();
 
-  TextColumn get hosts => text().map(const StringMapConverter()).withDefault(const Constant('{}'))();
+  TextColumn get hosts => text()
+      .map(const StringMapConverter())
+      .withDefault(const Constant('{}'))();
 
-  TextColumn get urlRewrites => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get urlRewrites => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
 
-  TextColumn get headerRewrites => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get headerRewrites => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
 
   IntColumn get order => integer().nullable()();
 
