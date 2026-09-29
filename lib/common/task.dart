@@ -218,7 +218,9 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     rawConfig['hosts'] = {};
   }
   // Per-profile hosts take precedence; fall back to global patch config.
-  final profileHosts = data.hosts.isNotEmpty ? data.hosts : realPatchConfig.hosts;
+  final profileHosts = data.hosts.isNotEmpty
+      ? data.hosts
+      : realPatchConfig.hosts;
   for (final host in profileHosts.entries) {
     rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
   }

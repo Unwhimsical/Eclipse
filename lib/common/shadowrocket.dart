@@ -492,9 +492,7 @@ ConfData parseConf(String content) {
       case 'host':
         final eq = line.indexOf('=');
         if (eq > 0) {
-          hosts[line.substring(0, eq).trim()] = line
-              .substring(eq + 1)
-              .trim();
+          hosts[line.substring(0, eq).trim()] = line.substring(eq + 1).trim();
         }
       case 'url rewrite':
         urlRewrites.add(line);
