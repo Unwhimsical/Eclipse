@@ -355,6 +355,9 @@ abstract class MakeRealProfileState with _$MakeRealProfileState {
     required List<Rule> addedRules,
     required String defaultUA,
     @Default([]) List<String> authentication,
+    @Default({}) Map<String, String> hosts,
+    @Default([]) List<String> urlRewrites,
+    @Default([]) List<String> headerRewrites,
     String? matchTarget,
   }) = _MakeRealProfileState;
 }
@@ -383,6 +386,9 @@ abstract class SetupState with _$SetupState {
     required Script? script,
     required bool overrideDns,
     required Dns dns,
+    @Default({}) Map<String, String> hosts,
+    @Default([]) List<String> urlRewrites,
+    @Default([]) List<String> headerRewrites,
     String? matchTarget,
   }) = _SetupState;
 }

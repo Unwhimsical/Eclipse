@@ -142,6 +142,36 @@ class $ProfilesTable extends Profiles
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       ).withConverter<Set<String>>($ProfilesTable.$converterunfoldSet);
+  @override
+  late final GeneratedColumnWithTypeConverter<Map<String, String>, String>
+  hosts = GeneratedColumn<String>(
+    'hosts',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  ).withConverter<Map<String, String>>($ProfilesTable.$converterhosts);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String>
+  urlRewrites = GeneratedColumn<String>(
+    'url_rewrites',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  ).withConverter<List<String>>($ProfilesTable.$converterurlRewrites);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String>
+  headerRewrites = GeneratedColumn<String>(
+    'header_rewrites',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  ).withConverter<List<String>>($ProfilesTable.$converterheaderRewrites);
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
@@ -166,6 +196,9 @@ class $ProfilesTable extends Profiles
     autoUpdate,
     selectedMap,
     unfoldSet,
+    hosts,
+    urlRewrites,
+    headerRewrites,
     order,
   ];
   @override
@@ -326,6 +359,24 @@ class $ProfilesTable extends Profiles
           data['${effectivePrefix}unfold_set'],
         )!,
       ),
+      hosts: $ProfilesTable.$converterhosts.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}hosts'],
+        )!,
+      ),
+      urlRewrites: $ProfilesTable.$converterurlRewrites.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}url_rewrites'],
+        )!,
+      ),
+      headerRewrites: $ProfilesTable.$converterheaderRewrites.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}header_rewrites'],
+        )!,
+      ),
       order: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}order'],
@@ -348,6 +399,12 @@ class $ProfilesTable extends Profiles
       const StringMapConverter();
   static TypeConverter<Set<String>, String> $converterunfoldSet =
       const StringSetConverter();
+  static TypeConverter<Map<String, String>, String> $converterhosts =
+      const StringMapConverter();
+  static TypeConverter<List<String>, String> $converterurlRewrites =
+      const StringListConverter();
+  static TypeConverter<List<String>, String> $converterheaderRewrites =
+      const StringListConverter();
 }
 
 class RawProfile extends DataClass implements Insertable<RawProfile> {
@@ -364,6 +421,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   final bool autoUpdate;
   final Map<String, String> selectedMap;
   final Set<String> unfoldSet;
+  final Map<String, String> hosts;
+  final List<String> urlRewrites;
+  final List<String> headerRewrites;
   final int? order;
   const RawProfile({
     required this.id,
@@ -379,6 +439,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     required this.autoUpdate,
     required this.selectedMap,
     required this.unfoldSet,
+    required this.hosts,
+    required this.urlRewrites,
+    required this.headerRewrites,
     this.order,
   });
   @override
@@ -423,6 +486,21 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         $ProfilesTable.$converterunfoldSet.toSql(unfoldSet),
       );
     }
+    {
+      map['hosts'] = Variable<String>(
+        $ProfilesTable.$converterhosts.toSql(hosts),
+      );
+    }
+    {
+      map['url_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterurlRewrites.toSql(urlRewrites),
+      );
+    }
+    {
+      map['header_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites),
+      );
+    }
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
@@ -454,6 +532,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       autoUpdate: Value(autoUpdate),
       selectedMap: Value(selectedMap),
       unfoldSet: Value(unfoldSet),
+      hosts: Value(hosts),
+      urlRewrites: Value(urlRewrites),
+      headerRewrites: Value(headerRewrites),
       order: order == null && nullToAbsent
           ? const Value.absent()
           : Value(order),
@@ -487,6 +568,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         json['selectedMap'],
       ),
       unfoldSet: serializer.fromJson<Set<String>>(json['unfoldSet']),
+      hosts: serializer.fromJson<Map<String, String>>(json['hosts']),
+      urlRewrites: serializer.fromJson<List<String>>(json['urlRewrites']),
+      headerRewrites: serializer.fromJson<List<String>>(json['headerRewrites']),
       order: serializer.fromJson<int?>(json['order']),
     );
   }
@@ -513,6 +597,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       'autoUpdate': serializer.toJson<bool>(autoUpdate),
       'selectedMap': serializer.toJson<Map<String, String>>(selectedMap),
       'unfoldSet': serializer.toJson<Set<String>>(unfoldSet),
+      'hosts': serializer.toJson<Map<String, String>>(hosts),
+      'urlRewrites': serializer.toJson<List<String>>(urlRewrites),
+      'headerRewrites': serializer.toJson<List<String>>(headerRewrites),
       'order': serializer.toJson<int?>(order),
     };
   }
@@ -531,6 +618,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     bool? autoUpdate,
     Map<String, String>? selectedMap,
     Set<String>? unfoldSet,
+    Map<String, String>? hosts,
+    List<String>? urlRewrites,
+    List<String>? headerRewrites,
     Value<int?> order = const Value.absent(),
   }) => RawProfile(
     id: id ?? this.id,
@@ -553,6 +643,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     autoUpdate: autoUpdate ?? this.autoUpdate,
     selectedMap: selectedMap ?? this.selectedMap,
     unfoldSet: unfoldSet ?? this.unfoldSet,
+    hosts: hosts ?? this.hosts,
+    urlRewrites: urlRewrites ?? this.urlRewrites,
+    headerRewrites: headerRewrites ?? this.headerRewrites,
     order: order.present ? order.value : this.order,
   );
   RawProfile copyWithCompanion(ProfilesCompanion data) {
@@ -586,6 +679,13 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ? data.selectedMap.value
           : this.selectedMap,
       unfoldSet: data.unfoldSet.present ? data.unfoldSet.value : this.unfoldSet,
+      hosts: data.hosts.present ? data.hosts.value : this.hosts,
+      urlRewrites: data.urlRewrites.present
+          ? data.urlRewrites.value
+          : this.urlRewrites,
+      headerRewrites: data.headerRewrites.present
+          ? data.headerRewrites.value
+          : this.headerRewrites,
       order: data.order.present ? data.order.value : this.order,
     );
   }
@@ -606,6 +706,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ..write('autoUpdate: $autoUpdate, ')
           ..write('selectedMap: $selectedMap, ')
           ..write('unfoldSet: $unfoldSet, ')
+          ..write('hosts: $hosts, ')
+          ..write('urlRewrites: $urlRewrites, ')
+          ..write('headerRewrites: $headerRewrites, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -626,6 +729,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     autoUpdate,
     selectedMap,
     unfoldSet,
+    hosts,
+    urlRewrites,
+    headerRewrites,
     order,
   );
   @override
@@ -645,6 +751,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           other.autoUpdate == this.autoUpdate &&
           other.selectedMap == this.selectedMap &&
           other.unfoldSet == this.unfoldSet &&
+          other.hosts == this.hosts &&
+          other.urlRewrites == this.urlRewrites &&
+          other.headerRewrites == this.headerRewrites &&
           other.order == this.order);
 }
 
@@ -662,6 +771,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
   final Value<bool> autoUpdate;
   final Value<Map<String, String>> selectedMap;
   final Value<Set<String>> unfoldSet;
+  final Value<Map<String, String>> hosts;
+  final Value<List<String>> urlRewrites;
+  final Value<List<String>> headerRewrites;
   final Value<int?> order;
   const ProfilesCompanion({
     this.id = const Value.absent(),
@@ -677,6 +789,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.autoUpdate = const Value.absent(),
     this.selectedMap = const Value.absent(),
     this.unfoldSet = const Value.absent(),
+    this.hosts = const Value.absent(),
+    this.urlRewrites = const Value.absent(),
+    this.headerRewrites = const Value.absent(),
     this.order = const Value.absent(),
   });
   ProfilesCompanion.insert({
@@ -693,6 +808,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     required bool autoUpdate,
     required Map<String, String> selectedMap,
     required Set<String> unfoldSet,
+    this.hosts = const Value.absent(),
+    this.urlRewrites = const Value.absent(),
+    this.headerRewrites = const Value.absent(),
     this.order = const Value.absent(),
   }) : label = Value(label),
        url = Value(url),
@@ -715,6 +833,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Expression<bool>? autoUpdate,
     Expression<String>? selectedMap,
     Expression<String>? unfoldSet,
+    Expression<String>? hosts,
+    Expression<String>? urlRewrites,
+    Expression<String>? headerRewrites,
     Expression<int>? order,
   }) {
     return RawValuesInsertable({
@@ -732,6 +853,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       if (autoUpdate != null) 'auto_update': autoUpdate,
       if (selectedMap != null) 'selected_map': selectedMap,
       if (unfoldSet != null) 'unfold_set': unfoldSet,
+      if (hosts != null) 'hosts': hosts,
+      if (urlRewrites != null) 'url_rewrites': urlRewrites,
+      if (headerRewrites != null) 'header_rewrites': headerRewrites,
       if (order != null) 'order': order,
     });
   }
@@ -750,6 +874,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Value<bool>? autoUpdate,
     Value<Map<String, String>>? selectedMap,
     Value<Set<String>>? unfoldSet,
+    Value<Map<String, String>>? hosts,
+    Value<List<String>>? urlRewrites,
+    Value<List<String>>? headerRewrites,
     Value<int?>? order,
   }) {
     return ProfilesCompanion(
@@ -767,6 +894,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       autoUpdate: autoUpdate ?? this.autoUpdate,
       selectedMap: selectedMap ?? this.selectedMap,
       unfoldSet: unfoldSet ?? this.unfoldSet,
+      hosts: hosts ?? this.hosts,
+      urlRewrites: urlRewrites ?? this.urlRewrites,
+      headerRewrites: headerRewrites ?? this.headerRewrites,
       order: order ?? this.order,
     );
   }
@@ -823,6 +953,21 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
         $ProfilesTable.$converterunfoldSet.toSql(unfoldSet.value),
       );
     }
+    if (hosts.present) {
+      map['hosts'] = Variable<String>(
+        $ProfilesTable.$converterhosts.toSql(hosts.value),
+      );
+    }
+    if (urlRewrites.present) {
+      map['url_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterurlRewrites.toSql(urlRewrites.value),
+      );
+    }
+    if (headerRewrites.present) {
+      map['header_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites.value),
+      );
+    }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
@@ -845,6 +990,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
           ..write('autoUpdate: $autoUpdate, ')
           ..write('selectedMap: $selectedMap, ')
           ..write('unfoldSet: $unfoldSet, ')
+          ..write('hosts: $hosts, ')
+          ..write('urlRewrites: $urlRewrites, ')
+          ..write('headerRewrites: $headerRewrites, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -3534,6 +3682,9 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       required bool autoUpdate,
       required Map<String, String> selectedMap,
       required Set<String> unfoldSet,
+      Value<Map<String, String>> hosts,
+      Value<List<String>> urlRewrites,
+      Value<List<String>> headerRewrites,
       Value<int?> order,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
@@ -3551,6 +3702,9 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<bool> autoUpdate,
       Value<Map<String, String>> selectedMap,
       Value<Set<String>> unfoldSet,
+      Value<Map<String, String>> hosts,
+      Value<List<String>> urlRewrites,
+      Value<List<String>> headerRewrites,
       Value<int?> order,
     });
 
@@ -3676,6 +3830,28 @@ class $$ProfilesTableFilterComposer
   ColumnWithTypeConverterFilters<Set<String>, Set<String>, String>
   get unfoldSet => $composableBuilder(
     column: $table.unfoldSet,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    Map<String, String>,
+    Map<String, String>,
+    String
+  >
+  get hosts => $composableBuilder(
+    column: $table.hosts,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get urlRewrites => $composableBuilder(
+    column: $table.urlRewrites,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get headerRewrites => $composableBuilder(
+    column: $table.headerRewrites,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
@@ -3809,6 +3985,21 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get hosts => $composableBuilder(
+    column: $table.hosts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get urlRewrites => $composableBuilder(
+    column: $table.urlRewrites,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get headerRewrites => $composableBuilder(
+    column: $table.headerRewrites,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnOrderings(column),
@@ -3881,6 +4072,21 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<Set<String>, String> get unfoldSet =>
       $composableBuilder(column: $table.unfoldSet, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Map<String, String>, String> get hosts =>
+      $composableBuilder(column: $table.hosts, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get urlRewrites =>
+      $composableBuilder(
+        column: $table.urlRewrites,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get headerRewrites =>
+      $composableBuilder(
+        column: $table.headerRewrites,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<int> get order =>
       $composableBuilder(column: $table.order, builder: (column) => column);
@@ -3981,6 +4187,9 @@ class $$ProfilesTableTableManager
                 Value<bool> autoUpdate = const Value.absent(),
                 Value<Map<String, String>> selectedMap = const Value.absent(),
                 Value<Set<String>> unfoldSet = const Value.absent(),
+                Value<Map<String, String>> hosts = const Value.absent(),
+                Value<List<String>> urlRewrites = const Value.absent(),
+                Value<List<String>> headerRewrites = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
@@ -3996,6 +4205,9 @@ class $$ProfilesTableTableManager
                 autoUpdate: autoUpdate,
                 selectedMap: selectedMap,
                 unfoldSet: unfoldSet,
+                hosts: hosts,
+                urlRewrites: urlRewrites,
+                headerRewrites: headerRewrites,
                 order: order,
               ),
           createCompanionCallback:
@@ -4014,6 +4226,9 @@ class $$ProfilesTableTableManager
                 required bool autoUpdate,
                 required Map<String, String> selectedMap,
                 required Set<String> unfoldSet,
+                Value<Map<String, String>> hosts = const Value.absent(),
+                Value<List<String>> urlRewrites = const Value.absent(),
+                Value<List<String>> headerRewrites = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
@@ -4029,6 +4244,9 @@ class $$ProfilesTableTableManager
                 autoUpdate: autoUpdate,
                 selectedMap: selectedMap,
                 unfoldSet: unfoldSet,
+                hosts: hosts,
+                urlRewrites: urlRewrites,
+                headerRewrites: headerRewrites,
                 order: order,
               ),
           withReferenceMapper: (p0) => p0

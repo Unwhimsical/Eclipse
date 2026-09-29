@@ -179,9 +179,8 @@ class HostsItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final appLocalizations = context.appLocalizations;
-    final hosts = ref.watch(
-      patchClashConfigProvider.select((state) => state.hosts),
-    );
+    final currentProfile = ref.watch(currentProfileProvider);
+    final hosts = currentProfile?.hosts ?? {};
     return ListItem.open(
       leading: const Icon(Icons.view_list_outlined),
       title: const Text('Hosts'),
@@ -196,9 +195,11 @@ class HostsItem extends ConsumerWidget {
         subtitleBuilder: (item) => Text(item.value),
       ),
       onChanged: (value) {
+        final profile = currentProfile;
+        if (profile == null) return;
         ref
-            .read(patchClashConfigProvider.notifier)
-            .update((state) => state.copyWith(hosts: value));
+            .read(profilesActionProvider.notifier)
+            .putProfile(profile.copyWith(hosts: value));
       },
     );
   }

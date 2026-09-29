@@ -70,11 +70,15 @@ class CoreAction extends _$CoreAction {
     return true;
   }
 
-  /// Sync MITM proxy with enabled modules.
+  /// Sync MITM proxy with enabled modules and current profile rewrites.
   Future<void> _syncMitm(CoreController controller) async {
     try {
       final manager = MitmManager(controller);
-      await manager.syncAndStart();
+      final profile = ref.read(currentProfileProvider);
+      await manager.syncAndStart(
+        profileUrlRewrites: profile?.urlRewrites ?? [],
+        profileHeaderRewrites: profile?.headerRewrites ?? [],
+      );
     } catch (_) {}
   }
 

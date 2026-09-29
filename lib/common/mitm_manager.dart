@@ -21,10 +21,16 @@ class MitmManager {
 
   /// Build MITM config from all enabled modules and start the proxy.
   /// Returns true if the proxy was started (at least one module needs MITM).
-  Future<bool> syncAndStart() async {
+  Future<bool> syncAndStart({
+    List<String> profileUrlRewrites = const [],
+    List<String> profileHeaderRewrites = const [],
+  }) async {
     final modules = await _moduleStore.list();
     final enabled = modules.where((m) => m.enabled).toList();
-    if (enabled.isEmpty) {
+    // Start MITM if modules OR profile have rewrites/scripts.
+    if (enabled.isEmpty &&
+        profileUrlRewrites.isEmpty &&
+        profileHeaderRewrites.isEmpty) {
       await stop();
       return false;
     }
@@ -32,6 +38,17 @@ class MitmManager {
     final hosts = <String>{};
     final rewrites = <Map<String, String>>[];
     final scripts = <Map<String, dynamic>>[];
+
+    // Profile rewrites come first (they're part of the config).
+    for (final line in profileUrlRewrites) {
+      final parts = line.trim().split(RegExp(r'\s+'));
+      if (parts.length < 2) continue;
+      rewrites.add({
+        'pattern': parts[0],
+        'target': parts[1],
+        'status': parts.length >= 3 ? parts[2] : '302',
+      });
+    }
 
     for (final module in enabled) {
       try {

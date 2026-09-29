@@ -71,6 +71,9 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
     script: script,
     overrideDns: overrideDns,
     dns: dns,
+    hosts: profile?.hosts ?? {},
+    urlRewrites: profile?.urlRewrites ?? [],
+    headerRewrites: profile?.headerRewrites ?? [],
     matchTarget: overwriteType == OverwriteType.standard
         ? profile?.matchTarget
         : null,

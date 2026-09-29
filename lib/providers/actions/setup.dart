@@ -365,6 +365,9 @@ class SetupAction extends _$SetupAction {
         addedRules: addedRules,
         defaultUA: defaultUA,
         authentication: networkSetting.authentication.credentials,
+        hosts: setupState.hosts,
+        urlRewrites: setupState.urlRewrites,
+        headerRewrites: setupState.headerRewrites,
         matchTarget: setupState.matchTarget,
       ),
     );

@@ -71,6 +71,9 @@ class ShadowrocketImport {
         ref,
         yamlText,
         fileName?.replaceAll('.conf', '') ?? '导入配置 (${conf.proxies.length})',
+        hosts: conf.hosts,
+        urlRewrites: conf.urlRewrites,
+        headerRewrites: conf.headerRewrites,
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -199,13 +202,22 @@ class ShadowrocketImport {
   static Future<String?> _createProfileFromYaml(
     WidgetRef ref,
     String yamlText,
-    String label,
-  ) async {
+    String label, {
+    Map<String, String> hosts = const {},
+    List<String> urlRewrites = const [],
+    List<String> headerRewrites = const [],
+  }) async {
     final core = ref.read(coreHandlerProvider);
-    final profile = await Profile.normal(label: label).saveFile(
-      Uint8List.fromList(utf8.encode(yamlText)),
-      validate: (path) => core.validateConfig(path),
-    );
+    final profile = await Profile.normal(label: label)
+        .copyWith(
+          hosts: hosts,
+          urlRewrites: urlRewrites,
+          headerRewrites: headerRewrites,
+        )
+        .saveFile(
+          Uint8List.fromList(utf8.encode(yamlText)),
+          validate: (path) => core.validateConfig(path),
+        );
     ref.read(profilesActionProvider.notifier).putProfile(profile);
     return label;
   }

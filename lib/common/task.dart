@@ -217,7 +217,9 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   if (rawConfig['hosts'] == null) {
     rawConfig['hosts'] = {};
   }
-  for (final host in realPatchConfig.hosts.entries) {
+  // Per-profile hosts take precedence; fall back to global patch config.
+  final profileHosts = data.hosts.isNotEmpty ? data.hosts : realPatchConfig.hosts;
+  for (final host in profileHosts.entries) {
     rawConfig['hosts'][host.key] = host.value.splitByMultipleSeparators;
   }
   final rawDns = rawConfig['dns'] is Map
@@ -300,7 +302,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   }
   await _orderRulesByModules(rules);
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
-  await _injectMitmProxy(rawConfig, rules);
+  await _injectMitmProxy(rawConfig, rules, data.urlRewrites);
   await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
@@ -391,7 +393,11 @@ Future<void> _injectModuleHosts(Map rawConfig) async {
 /// Inject the local MITM proxy and routing rules for MITM hostnames.
 /// The Go MITM proxy listens on 127.0.0.1:9092; traffic to MITM hosts is
 /// routed through it so scripts/rewrites can run on decrypted traffic.
-Future<void> _injectMitmProxy(Map rawConfig, List<String> rules) async {
+Future<void> _injectMitmProxy(
+  Map rawConfig,
+  List<String> rules,
+  List<String> profileUrlRewrites,
+) async {
   try {
     final moduleStore = ModuleStore();
     final modules = await moduleStore.list();
@@ -407,6 +413,21 @@ Future<void> _injectMitmProxy(Map rawConfig, List<String> rules) async {
         // their patterns may still need interception. Skip for now;
         // hostname list drives interception.
       } catch (_) {}
+    }
+    // Profile URL rewrites also need MITM interception. Extract hostnames
+    // from rewrite patterns (simple heuristic: try to parse as URL).
+    if (profileUrlRewrites.isNotEmpty && hosts.isEmpty) {
+      for (final line in profileUrlRewrites) {
+        final parts = line.trim().split(RegExp(r'\s+'));
+        if (parts.isEmpty) continue;
+        final pattern = parts[0];
+        try {
+          final uri = Uri.parse(pattern);
+          if (uri.host.isNotEmpty) hosts.add(uri.host);
+        } catch (_) {
+          // Pattern is not a URL, skip hostname extraction.
+        }
+      }
     }
     if (hosts.isEmpty) return;
     // Add MITM proxy.

@@ -32,6 +32,12 @@ class Profiles extends Table {
 
   TextColumn get unfoldSet => text().map(const StringSetConverter())();
 
+  TextColumn get hosts => text().map(const StringMapConverter()).withDefault(const Constant('{}'))();
+
+  TextColumn get urlRewrites => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+
+  TextColumn get headerRewrites => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+
   IntColumn get order => integer().nullable()();
 
   @override
@@ -119,6 +125,9 @@ extension RawProfilExt on RawProfile {
       autoUpdate: autoUpdate,
       selectedMap: selectedMap,
       unfoldSet: unfoldSet,
+      hosts: hosts,
+      urlRewrites: urlRewrites,
+      headerRewrites: headerRewrites,
       overwriteType: overwriteType,
       scriptId: scriptId,
       matchTarget: matchTarget,
@@ -140,6 +149,9 @@ extension ProfilesCompanionExt on Profile {
       autoUpdate: autoUpdate,
       selectedMap: selectedMap,
       unfoldSet: unfoldSet,
+      hosts: Value(hosts),
+      urlRewrites: Value(urlRewrites),
+      headerRewrites: Value(headerRewrites),
       overwriteType: overwriteType,
       scriptId: Value(scriptId),
       matchTarget: Value(matchTarget),

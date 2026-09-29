@@ -47,6 +47,21 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
   unfoldSet:
       (json['unfoldSet'] as List<dynamic>?)?.map((e) => e as String).toSet() ??
       const {},
+  hosts:
+      (json['hosts'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ) ??
+      const {},
+  urlRewrites:
+      (json['urlRewrites'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  headerRewrites:
+      (json['headerRewrites'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   overwriteType:
       $enumDecodeNullable(_$OverwriteTypeEnumMap, json['overwriteType']) ??
       OverwriteType.standard,
@@ -66,6 +81,9 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'autoUpdate': instance.autoUpdate,
   'selectedMap': instance.selectedMap,
   'unfoldSet': instance.unfoldSet.toList(),
+  'hosts': instance.hosts,
+  'urlRewrites': instance.urlRewrites,
+  'headerRewrites': instance.headerRewrites,
   'overwriteType': _$OverwriteTypeEnumMap[instance.overwriteType]!,
   'scriptId': instance.scriptId,
   'matchTarget': instance.matchTarget,

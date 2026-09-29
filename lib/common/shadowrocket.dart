@@ -339,19 +339,28 @@ class ConfData {
   final List<Map<String, dynamic>> proxyGroups;
   final List<String> rules;
   final Map<String, String> general;
+  final Map<String, String> hosts;
+  final List<String> urlRewrites;
+  final List<String> headerRewrites;
 
   const ConfData({
     this.proxies = const [],
     this.proxyGroups = const [],
     this.rules = const [],
     this.general = const {},
+    this.hosts = const {},
+    this.urlRewrites = const [],
+    this.headerRewrites = const [],
   });
 
   bool get isEmpty =>
       proxies.isEmpty &&
       proxyGroups.isEmpty &&
       rules.isEmpty &&
-      general.isEmpty;
+      general.isEmpty &&
+      hosts.isEmpty &&
+      urlRewrites.isEmpty &&
+      headerRewrites.isEmpty;
 
   /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
   List<String> get dnsServers {
@@ -449,6 +458,9 @@ ConfData parseConf(String content) {
   final proxyGroups = <Map<String, dynamic>>[];
   final rules = <String>[];
   final general = <String, String>{};
+  final hosts = <String, String>{};
+  final urlRewrites = <String>[];
+  final headerRewrites = <String>[];
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -477,6 +489,17 @@ ConfData parseConf(String content) {
       case 'rule':
         final rule = _normalizeConfRule(line);
         if (rule != null) rules.add(rule);
+      case 'host':
+        final eq = line.indexOf('=');
+        if (eq > 0) {
+          hosts[line.substring(0, eq).trim()] = line
+              .substring(eq + 1)
+              .trim();
+        }
+      case 'url rewrite':
+        urlRewrites.add(line);
+      case 'header rewrite':
+        headerRewrites.add(line);
     }
   }
   return ConfData(
@@ -484,6 +507,9 @@ ConfData parseConf(String content) {
     proxyGroups: proxyGroups,
     rules: rules,
     general: general,
+    hosts: hosts,
+    urlRewrites: urlRewrites,
+    headerRewrites: headerRewrites,
   );
 }
 
