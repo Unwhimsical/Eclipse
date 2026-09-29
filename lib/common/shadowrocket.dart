@@ -342,6 +342,7 @@ class ConfData {
   final Map<String, String> hosts;
   final List<String> urlRewrites;
   final List<String> headerRewrites;
+  final Map<String, String> mitm;
 
   const ConfData({
     this.proxies = const [],
@@ -351,6 +352,7 @@ class ConfData {
     this.hosts = const {},
     this.urlRewrites = const [],
     this.headerRewrites = const [],
+    this.mitm = const {},
   });
 
   bool get isEmpty =>
@@ -360,7 +362,8 @@ class ConfData {
       general.isEmpty &&
       hosts.isEmpty &&
       urlRewrites.isEmpty &&
-      headerRewrites.isEmpty;
+      headerRewrites.isEmpty &&
+      mitm.isEmpty;
 
   /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
   List<String> get dnsServers {
@@ -461,6 +464,7 @@ ConfData parseConf(String content) {
   final hosts = <String, String>{};
   final urlRewrites = <String>[];
   final headerRewrites = <String>[];
+  final mitm = <String, String>{};
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -498,6 +502,13 @@ ConfData parseConf(String content) {
         urlRewrites.add(line);
       case 'header rewrite':
         headerRewrites.add(line);
+      case 'mitm':
+        final eq = line.indexOf('=');
+        if (eq > 0) {
+          mitm[line.substring(0, eq).trim().toLowerCase()] = line
+              .substring(eq + 1)
+              .trim();
+        }
     }
   }
   return ConfData(
@@ -508,6 +519,7 @@ ConfData parseConf(String content) {
     hosts: hosts,
     urlRewrites: urlRewrites,
     headerRewrites: headerRewrites,
+    mitm: mitm,
   );
 }
 
