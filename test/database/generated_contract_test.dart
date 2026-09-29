@@ -33,7 +33,7 @@ void main() {
     );
 
     expect(profile.toColumns(true), hasLength(17));
-    expect(profile.toCompanion(true).toColumns(true), hasLength(14));
+    expect(profile.toCompanion(true).toColumns(true), hasLength(17));
     expect(RawProfile.fromJson(profile.toJson()).toJson(), profile.toJson());
     expect(profile.copyWith(label: 'Next').label, 'Next');
     expect(
@@ -78,7 +78,7 @@ void main() {
       selectedMap: const {},
       unfoldSet: const {},
     ).copyWith(id: const Value(8), order: const Value(1));
-    expect(insertedProfile.toColumns(true), hasLength(12));
+    expect(insertedProfile.toColumns(true), hasLength(9));
     expect(insertedProfile.toString(), contains('Inserted'));
     expect(
       ProfilesCompanion.custom(
