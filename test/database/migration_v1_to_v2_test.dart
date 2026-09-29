@@ -32,6 +32,14 @@ void _downgradeToV2(Database raw) {
   raw.execute('PRAGMA user_version = 2');
 }
 
+/// Schema version 3 had no per-profile `hosts`/`url_rewrites`/`header_rewrites`.
+void _downgradeToV3(Database raw) {
+  raw.execute('ALTER TABLE profiles DROP COLUMN hosts');
+  raw.execute('ALTER TABLE profiles DROP COLUMN url_rewrites');
+  raw.execute('ALTER TABLE profiles DROP COLUMN header_rewrites');
+  raw.execute('PRAGMA user_version = 3');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -76,7 +84,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 3);
+    expect(_userVersion(raw), 4);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -86,7 +94,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 3);
+    expect(_userVersion(raw), 4);
   });
 
   test(
@@ -98,7 +106,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 3);
+      expect(_userVersion(raw), 4);
     },
   );
 
@@ -173,7 +181,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 3);
+    expect(_userVersion(raw), 4);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -183,7 +191,41 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 3);
+    expect(_userVersion(raw), 4);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
+  });
+
+  test('the v4 upgrade adds per-profile hosts and rewrite columns', () async {
+    _downgradeToV3(raw);
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('hosts')));
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('url_rewrites')));
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('header_rewrites')));
+
+    await openAndMigrate();
+
+    expect(
+      _columnsOf(raw, 'profiles'),
+      containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
+    );
+    expect(_userVersion(raw), 4);
+  });
+
+  test('the v4 upgrade preserves existing profile rows', () async {
+    _downgradeToV3(raw);
+    raw.execute(
+      'INSERT INTO profiles (id, label, url, overwrite_type, '
+      'auto_update_duration_millis, auto_update, selected_map, unfold_set) '
+      "VALUES (1, 'keep me', '', 'none', 0, 0, '{}', '[]')",
+    );
+
+    await openAndMigrate();
+
+    final rows = await raw.select(
+      'SELECT id, label, hosts, url_rewrites, header_rewrites '
+      'FROM profiles WHERE id = ?',
+      [1],
+    );
+    expect(rows, hasLength(1));
+    expect(rows.single['label'], 'keep me');
   });
 }

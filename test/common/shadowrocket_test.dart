@@ -552,6 +552,47 @@ tun-included-routes = 192.168.1.0/24, 10.0.0.0/8
       expect(conf.tunIncludedRoutes, isEmpty);
       expect(conf.tunExcludedRoutes, isEmpty);
     });
+
+    test('parses Host section', () {
+      final conf = parseConf('''
+[Host]
+example.com = 1.2.3.4
+*.example.org = 5.6.7.8, 9.10.11.12
+''');
+      expect(conf.hosts, {
+        'example.com': '1.2.3.4',
+        '*.example.org': '5.6.7.8, 9.10.11.12',
+      });
+    });
+
+    test('parses URL Rewrite section', () {
+      final conf = parseConf('''
+[URL Rewrite]
+^https?://example.com/ad - reject
+^https?://example.org/(.*) https://example.net/\$1 302
+''');
+      expect(conf.urlRewrites, hasLength(2));
+      expect(conf.urlRewrites[0], contains('reject'));
+      expect(conf.urlRewrites[1], contains('302'));
+    });
+
+    test('parses Header Rewrite section', () {
+      final conf = parseConf('''
+[Header Rewrite]
+^https?://example.com header-add X-Test 1
+^https?://example.org header-del X-Remove
+''');
+      expect(conf.headerRewrites, hasLength(2));
+      expect(conf.headerRewrites[0], contains('header-add'));
+      expect(conf.headerRewrites[1], contains('header-del'));
+    });
+
+    test('isEmpty accounts for hosts and rewrites', () {
+      expect(parseConf('[General]\n').isEmpty, isTrue);
+      expect(parseConf('[Host]\na = b\n').isEmpty, isFalse);
+      expect(parseConf('[URL Rewrite]\na b\n').isEmpty, isFalse);
+      expect(parseConf('[Header Rewrite]\na b\n').isEmpty, isFalse);
+    });
   });
 
   group('parseShareLink edge cases', () {
