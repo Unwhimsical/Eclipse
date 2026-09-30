@@ -75,13 +75,13 @@ class CoreAction extends _$CoreAction {
     try {
       final manager = MitmManager(controller);
       final profile = ref.read(currentProfileProvider);
+      final mitmHostnames = (profile?.mitmEnabled ?? false)
+          ? (profile?.mitmHostnames ?? <String>[])
+          : <String>[];
       await manager.syncAndStart(
         profileUrlRewrites: profile?.urlRewrites ?? [],
         profileHeaderRewrites: profile?.headerRewrites ?? [],
-        profileMitmHostnames:
-            (profile?.mitmEnabled ?? false)
-                ? (profile?.mitmHostnames ?? [])
-                : [],
+        profileMitmHostnames: mitmHostnames,
       );
     } catch (_) {}
   }
