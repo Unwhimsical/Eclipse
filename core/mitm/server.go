@@ -80,6 +80,13 @@ func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
 		_ = w.finish()
 		return
 	}
+	if res := p.applyMapLocal(fullURL); res != nil {
+		w := newConnWriter(conn, req)
+		writeMapLocalResult(w, req, res)
+		_ = w.finish()
+		return
+	}
+	p.applyRequestBodyRewrites(fullURL, req)
 	// http-request scripts: may rewrite the request or synthesize a response.
 	if p.scripts != nil {
 		if done, handled := p.runRequestScripts(req, fullURL, isTLS); handled {
@@ -206,6 +213,13 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 		scriptBody = p.runResponseScripts(scriptURL, resp)
 	}
 
+	finalBody, haveFinal := scriptBody, scriptBody != nil
+	if responseHasBody(resp.StatusCode, req.Method) {
+		if rb, ok := p.applyResponseBodyRewrites(out.URL.String(), resp, finalBody, haveFinal); ok {
+			finalBody, haveFinal = rb, true
+		}
+	}
+
 	w := newConnWriter(conn, req)
 	for k, vv := range resp.Header {
 		for _, v := range vv {
@@ -214,11 +228,10 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 	}
 	w.Header().Del("Transfer-Encoding")
 	w.WriteHeader(resp.StatusCode)
-	if scriptBody != nil {
-		// Script provided a (possibly modified) body; fix framing.
-		w.Header().Set("Content-Length", strconv.Itoa(len(scriptBody)))
+	if haveFinal {
+		w.Header().Set("Content-Length", strconv.Itoa(len(finalBody)))
 		if responseHasBody(resp.StatusCode, req.Method) {
-			_, _ = w.Write(scriptBody)
+			_, _ = w.Write(finalBody)
 		}
 	} else if !responseHasBody(resp.StatusCode, req.Method) {
 	} else if resp.ContentLength >= 0 {

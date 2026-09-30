@@ -116,6 +116,61 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			cfg.Scripts = append(cfg.Scripts, mitm.ParseScriptEntry(m))
 		}
 	}
+	// Map Local: list of {pattern,dataType,data,statusCode,headers}.
+	if v, ok := args["mapLocal"].([]interface{}); ok {
+		for _, item := range v {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			pattern, _ := m["pattern"].(string)
+			dataType, _ := m["dataType"].(string)
+			data, _ := m["data"].(string)
+			status := 200
+			switch s := m["statusCode"].(type) {
+			case float64:
+				status = int(s)
+			case int:
+				status = s
+			case string:
+				if n, err := strconv.Atoi(strings.TrimSpace(s)); err == nil {
+					status = n
+				}
+			}
+			headers := map[string]string{}
+			if raw, ok := m["headers"].(map[string]interface{}); ok {
+				for k, hv := range raw {
+					if s, ok := hv.(string); ok {
+						headers[k] = s
+					}
+				}
+			}
+			rule, err := mitm.CompileMapLocal(pattern, dataType, data, status, headers)
+			if err != nil {
+				continue
+			}
+			cfg.MapLocal = append(cfg.MapLocal, *rule)
+		}
+	}
+	// Body rewrites: list of {type,pattern,regex,replacement,jq}.
+	if v, ok := args["bodyRewrites"].([]interface{}); ok {
+		for _, item := range v {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			typ, _ := m["type"].(string)
+			pattern, _ := m["pattern"].(string)
+			regex, _ := m["regex"].(string)
+			replacement, _ := m["replacement"].(string)
+			jq, _ := m["jq"].(string)
+			rule, err := mitm.CompileBodyRewrite(typ, pattern, regex, replacement, jq)
+			if err != nil {
+				continue
+			}
+			cfg.BodyRewrites = append(cfg.BodyRewrites, *rule)
+		}
+	}
 	if cfg.CACertPEM == "" || cfg.CAKeyPEM == "" {
 		return cfg, fmt.Errorf("mitm: CA certificate and key are required")
 	}

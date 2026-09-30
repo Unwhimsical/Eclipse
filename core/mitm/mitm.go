@@ -20,6 +20,8 @@ type Config struct {
 	Rewrites       []RewriteRule
 	HeaderRewrites []HeaderRewriteRule
 	Scripts        []*Script
+	MapLocal       []MapLocalRule
+	BodyRewrites   []BodyRewriteRule
 }
 
 type Proxy struct {
@@ -120,6 +122,8 @@ func (p *Proxy) UpdateConfig(cfg Config) {
 	p.config.HeaderRewrites = cfg.HeaderRewrites
 	p.config.Enabled = cfg.Enabled
 	p.config.Scripts = cfg.Scripts
+	p.config.MapLocal = cfg.MapLocal
+	p.config.BodyRewrites = cfg.BodyRewrites
 	if p.scripts != nil {
 		p.scripts.Set(cfg.Scripts)
 	}
