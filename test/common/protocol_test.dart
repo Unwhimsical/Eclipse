@@ -27,28 +27,28 @@ void main() {
     test('writes a hidden desktop entry claiming every scheme', () {
       expect(
         plan.desktopPath,
-        '/home/me/.local/share/applications/pigcat-url-handler.desktop',
+        '/home/me/.local/share/applications/eclipse-url-handler.desktop',
       );
       expect(
         plan.desktopEntry,
         '[Desktop Entry]\n'
         'Type=Application\n'
-        'Name=PigCat\n'
+        'Name=Eclipse\n'
         'NoDisplay=true\n'
         'Exec="/home/me/Apps/FlClash.AppImage" %u\n'
         'MimeType=x-scheme-handler/clash;x-scheme-handler/clashmeta;'
-        'x-scheme-handler/flclash;x-scheme-handler/pigcat;\n',
+        'x-scheme-handler/flclash;x-scheme-handler/eclipse;\n',
       );
     });
 
     test('makes the entry the default handler for every scheme', () {
       expect(plan.xdgMimeArguments, [
         'default',
-        'pigcat-url-handler.desktop',
+        'eclipse-url-handler.desktop',
         'x-scheme-handler/clash',
         'x-scheme-handler/clashmeta',
         'x-scheme-handler/flclash',
-        'x-scheme-handler/pigcat',
+        'x-scheme-handler/eclipse',
       ]);
     });
 

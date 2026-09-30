@@ -86,9 +86,9 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin url_launcher_android, io.flutter.plugins.urllauncher.UrlLauncherPlugin", e);
     }
     try {
-      flutterEngine.getPlugins().add(new com.pigcat.clash.wifi_ssid.WifiSsidPlugin());
+      flutterEngine.getPlugins().add(new com.eclipse.clash.wifi_ssid.WifiSsidPlugin());
     } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin wifi_ssid, com.pigcat.clash.wifi_ssid.WifiSsidPlugin", e);
+      Log.e(TAG, "Error registering plugin wifi_ssid, com.eclipse.clash.wifi_ssid.WifiSsidPlugin", e);
     }
   }
 }

@@ -21,8 +21,8 @@ use tokio_stream::Stream;
 
 const SERVICE_NAME: &str = "flclash-helper";
 const UNIT_PATH: &str = "/etc/systemd/system/flclash-helper.service";
-const RUNTIME_DIR_NAME: &str = "pigcat";
-const SOCKET_PATH: &str = "/run/pigcat/helper.sock";
+const RUNTIME_DIR_NAME: &str = "eclipse";
+const SOCKET_PATH: &str = "/run/eclipse/helper.sock";
 const OWNER_UID_ENV: &str = "FLCLASH_HELPER_OWNER_UID";
 const OWNER_GID_ENV: &str = "FLCLASH_HELPER_OWNER_GID";
 const SOCKET_MODE: u32 = 0o660;
@@ -211,7 +211,7 @@ fn ensure_unit_is_free_for(owner: Owner) -> Result<()> {
     match installed_owner_uid(&existing) {
         Some(uid) if uid != owner.uid => bail!(
             "the Helper is already installed for UID {uid}; \
-             run `PigCatHelperService uninstall` as that user first"
+             run `EclipseHelperService uninstall` as that user first"
         ),
         _ => Ok(()),
     }
@@ -393,7 +393,7 @@ mod tests {
         assert!(unit.contains("Group=1001\n"));
         assert!(unit.contains("Environment=FLCLASH_HELPER_OWNER_UID=1000\n"));
         assert!(unit.contains("Environment=FLCLASH_HELPER_OWNER_GID=1001\n"));
-        assert!(unit.contains("RuntimeDirectory=pigcat\n"));
+        assert!(unit.contains("RuntimeDirectory=eclipse\n"));
         assert!(unit.contains("Restart=on-failure\n"));
         assert!(unit.contains("StartLimitBurst=5\n"));
     }

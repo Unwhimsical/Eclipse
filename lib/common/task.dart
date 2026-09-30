@@ -236,7 +236,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     for (final entry in dns.nameserverPolicy.entries) {
       nameserverPolicy[entry.key] = entry.value.splitByMultipleSeparators;
     }
-    // Merged, not assigned: the model only covers the keys PigCat can edit.
+    // Merged, not assigned: the model only covers the keys Eclipse can edit.
     rawConfig['dns'] = {
       ...rawDns,
       ...dns.toJson(),
@@ -466,7 +466,7 @@ Future<void> _injectMitmProxy(
             ),
           )
         : <Map<String, dynamic>>[];
-    const mitmProxyName = 'PigCat-MITM';
+    const mitmProxyName = 'Eclipse-MITM';
     if (!proxies.any((p) => p['name'] == mitmProxyName)) {
       proxies.add({
         'name': mitmProxyName,
@@ -543,7 +543,7 @@ String? extractBodyRewriteHostname(String line) {
 /// Exclusions (`-`, `!`) and directives (`%`) never become rules.
 @visibleForTesting
 List<String> mitmRulesForHosts(Set<String> hosts) {
-  const mitmProxyName = 'PigCat-MITM';
+  const mitmProxyName = 'Eclipse-MITM';
   final mitmRules = <String>[];
   for (final host in hosts) {
     if (host.startsWith('-') || host.startsWith('!') || host.startsWith('%')) {

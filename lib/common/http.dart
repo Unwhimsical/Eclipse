@@ -7,10 +7,10 @@ import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PigCatHttpOverrides extends HttpOverrides {
+class EclipseHttpOverrides extends HttpOverrides {
   final ProviderContainer _container;
 
-  PigCatHttpOverrides(this._container);
+  EclipseHttpOverrides(this._container);
 
   static String findProxyFor(ProviderContainer container, Uri url) {
     return findProxyForReader(container.read, url);

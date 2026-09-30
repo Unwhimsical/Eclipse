@@ -12,13 +12,13 @@ const changelogFrozenNote =
     '<!-- Entries below predate the structured pipeline. Their wording is kept as '
     'written; only the heading and list style were normalized. -->';
 
-const releaseBeginMarker = '<!-- pigcat:changelog:begin -->';
-const releaseEndMarker = '<!-- pigcat:changelog:end -->';
+const releaseBeginMarker = '<!-- eclipse:changelog:begin -->';
+const releaseEndMarker = '<!-- eclipse:changelog:end -->';
 
 /// Opens the HTML comment that carries the structured entries to the app. The
 /// update dialog reads them from the release GitHub already returns, so the
 /// notes cost no request of their own and stay invisible on the release page.
-const releaseJsonBeginMarker = '<!-- pigcat:changelog:json';
+const releaseJsonBeginMarker = '<!-- eclipse:changelog:json';
 const releaseJsonEndMarker = '-->';
 
 const telegramLimit = 900;

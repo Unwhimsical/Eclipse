@@ -22,7 +22,7 @@ void main() {
       final adapter = _ResponseAdapter((options) {
         expect(options.path, endsWith('/start'));
         expect(options.data, {
-          'address': r'\\.\pipe\PigCatCore_abc',
+          'address': r'\\.\pipe\EclipseCore_abc',
           'sessionId': _sessionId,
         });
         return _jsonResponse({'sessionId': _sessionId, 'pid': 6456});
@@ -30,7 +30,7 @@ void main() {
       final client = _client(adapter);
 
       final response = await client.start(
-        address: r'\\.\pipe\PigCatCore_abc',
+        address: r'\\.\pipe\EclipseCore_abc',
         sessionId: _sessionId,
       );
 

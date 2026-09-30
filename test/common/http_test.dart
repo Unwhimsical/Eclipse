@@ -61,7 +61,7 @@ void main() {
     final container = buildContainer();
 
     expect(
-      PigCatHttpOverrides.findProxyFor(
+      EclipseHttpOverrides.findProxyFor(
         container,
         Uri.parse('http://$localhost:9090/ui'),
       ),
@@ -73,7 +73,7 @@ void main() {
     final container = buildContainer(mixedPort: 7891);
 
     expect(
-      PigCatHttpOverrides.findProxyFor(container, remote),
+      EclipseHttpOverrides.findProxyFor(container, remote),
       'PROXY localhost:7891',
     );
   });
@@ -90,7 +90,7 @@ void main() {
         );
 
     expect(
-      PigCatHttpOverrides.findProxyFor(container, remote),
+      EclipseHttpOverrides.findProxyFor(container, remote),
       'PROXY user:pass@localhost:7890',
     );
 
@@ -102,7 +102,7 @@ void main() {
           ),
         );
     expect(
-      PigCatHttpOverrides.findProxyFor(container, remote),
+      EclipseHttpOverrides.findProxyFor(container, remote),
       'PROXY localhost:7890',
     );
   });
@@ -110,7 +110,7 @@ void main() {
   test('bypasses the proxy when the core is not running', () {
     final container = buildContainer(running: false);
 
-    expect(PigCatHttpOverrides.findProxyFor(container, remote), 'DIRECT');
+    expect(EclipseHttpOverrides.findProxyFor(container, remote), 'DIRECT');
   });
 
   test('bypasses the proxy on an excluded SSID', () {
@@ -119,7 +119,7 @@ void main() {
       excludeSSIDs: const ['Office Wi-Fi'],
     );
 
-    expect(PigCatHttpOverrides.findProxyFor(container, remote), 'DIRECT');
+    expect(EclipseHttpOverrides.findProxyFor(container, remote), 'DIRECT');
   });
 
   test('keeps proxying when the current SSID is not excluded', () {
@@ -129,7 +129,7 @@ void main() {
     );
 
     expect(
-      PigCatHttpOverrides.findProxyFor(container, remote),
+      EclipseHttpOverrides.findProxyFor(container, remote),
       'PROXY localhost:7890',
     );
   });
@@ -138,7 +138,7 @@ void main() {
     final container = buildContainer();
 
     expect(
-      PigCatHttpOverrides.allowBadCertificate(
+      EclipseHttpOverrides.allowBadCertificate(
         container,
         _FakeCertificate(),
         'example.com',
@@ -152,7 +152,7 @@ void main() {
     final container = buildContainer(checkCertificate: false);
 
     expect(
-      PigCatHttpOverrides.allowBadCertificate(
+      EclipseHttpOverrides.allowBadCertificate(
         container,
         _FakeCertificate(),
         'example.com',

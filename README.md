@@ -4,7 +4,7 @@
 
 </div>
 
-## PigCat
+## Eclipse
 
 A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.
 

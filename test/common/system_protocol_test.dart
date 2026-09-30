@@ -78,14 +78,14 @@ void main() {
   group('ProtocolRegistrationPlan', () {
     test('builds registry keys and values', () {
       const plan = ProtocolRegistrationPlan(
-        scheme: 'pigcat',
-        executable: r'C:\apps\pigcat.exe',
+        scheme: 'eclipse',
+        executable: r'C:\apps\eclipse.exe',
       );
-      expect(plan.protocolKey, r'Software\Classes\pigcat');
+      expect(plan.protocolKey, r'Software\Classes\eclipse');
       expect(plan.commandKey, r'shell\open\command');
       expect(plan.protocolValueName, 'URL Protocol');
       expect(plan.protocolValue, '');
-      expect(plan.command, r'"C:\apps\pigcat.exe" "%1"');
+      expect(plan.command, r'"C:\apps\eclipse.exe" "%1"');
     });
 
     test('supports all protocol schemes', () {
@@ -93,7 +93,7 @@ void main() {
         final plan = ProtocolRegistrationPlan(scheme: scheme, executable: 'y');
         expect(plan.protocolKey, contains(scheme));
       }
-      expect(protocolSchemes, contains('pigcat'));
+      expect(protocolSchemes, contains('eclipse'));
       expect(protocolSchemes, contains('clash'));
     });
   });
@@ -101,44 +101,44 @@ void main() {
   group('LinuxProtocolRegistrationPlan', () {
     test('builds desktop entry paths', () {
       const plan = LinuxProtocolRegistrationPlan(
-        schemes: ['pigcat', 'clash'],
-        executable: '/usr/bin/pigcat',
+        schemes: ['eclipse', 'clash'],
+        executable: '/usr/bin/eclipse',
         applicationsDir: '/home/user/.local/share/applications',
       );
-      expect(plan.desktopId, 'pigcat-url-handler.desktop');
+      expect(plan.desktopId, 'eclipse-url-handler.desktop');
       expect(
         plan.desktopPath,
-        '/home/user/.local/share/applications/pigcat-url-handler.desktop',
+        '/home/user/.local/share/applications/eclipse-url-handler.desktop',
       );
       expect(plan.mimeTypes, [
-        'x-scheme-handler/pigcat',
+        'x-scheme-handler/eclipse',
         'x-scheme-handler/clash',
       ]);
       expect(plan.xdgMimeArguments, [
         'default',
-        'pigcat-url-handler.desktop',
-        'x-scheme-handler/pigcat',
+        'eclipse-url-handler.desktop',
+        'x-scheme-handler/eclipse',
         'x-scheme-handler/clash',
       ]);
     });
 
     test('builds desktop entry content', () {
       const plan = LinuxProtocolRegistrationPlan(
-        schemes: ['pigcat'],
-        executable: '/usr/bin/pigcat',
+        schemes: ['eclipse'],
+        executable: '/usr/bin/eclipse',
         applicationsDir: '/tmp',
       );
       final entry = plan.desktopEntry;
       expect(entry, contains('[Desktop Entry]'));
       expect(entry, contains('Type=Application'));
-      expect(entry, contains('Name=PigCat'));
+      expect(entry, contains('Name=Eclipse'));
       expect(entry, contains('NoDisplay=true'));
-      expect(entry, contains('MimeType=x-scheme-handler/pigcat;'));
+      expect(entry, contains('MimeType=x-scheme-handler/eclipse;'));
     });
 
     test('quotes executable with special characters', () {
       const plan = LinuxProtocolRegistrationPlan(
-        schemes: ['pigcat'],
+        schemes: ['eclipse'],
         executable: r'/path/with $pecial "chars"',
         applicationsDir: '/tmp',
       );
@@ -150,7 +150,7 @@ void main() {
 
     test('escapes backslashes and backticks', () {
       const plan = LinuxProtocolRegistrationPlan(
-        schemes: ['pigcat'],
+        schemes: ['eclipse'],
         executable: r'C:\path`with`',
         applicationsDir: '/tmp',
       );
@@ -161,7 +161,7 @@ void main() {
 
     test('escapes percent signs', () {
       const plan = LinuxProtocolRegistrationPlan(
-        schemes: ['pigcat'],
+        schemes: ['eclipse'],
         executable: '/path/100%',
         applicationsDir: '/tmp',
       );

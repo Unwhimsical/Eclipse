@@ -14,7 +14,7 @@ val coreAbis =
         ?: coreAbiByPlatform.values.toList()
 
 android {
-    namespace = "com.pigcat.clash.core"
+    namespace = "com.eclipse.clash.core"
     compileSdk = libs.versions.compileSdk.get().toInt()
     ndkVersion = libs.versions.ndkVersion.get()
 

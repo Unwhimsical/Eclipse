@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('Windows Core pipe uses a 128-bit random suffix', () {
-    const prefix = r'\\.\pipe\PigCatCore_';
+    const prefix = r'\\.\pipe\EclipseCore_';
     expect(windowsPipeName, startsWith(prefix));
     expect(
       windowsPipeName.substring(prefix.length),

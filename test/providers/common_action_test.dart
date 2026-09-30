@@ -26,8 +26,8 @@ void main() {
   setUpAll(() {
     core = MockCoreHandlerInterface();
     globalState.packageInfo = PackageInfo(
-      appName: 'PigCat',
-      packageName: 'com.pigcat.clash',
+      appName: 'Eclipse',
+      packageName: 'com.eclipse.clash',
       version: runningVersion,
       buildNumber: '1',
     );

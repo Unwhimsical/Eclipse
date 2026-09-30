@@ -13,7 +13,7 @@ import (
 
 // mitmProxyName is the http outbound Dart injects for MITM domains.
 // pickProxy skips it so MITM upstream traffic never loops back into MITM.
-const mitmProxyName = "PigCat-MITM"
+const mitmProxyName = "Eclipse-MITM"
 
 // pickProxy selects an outbound for MITM upstream traffic by replaying
 // mihomo's rule matching. The MITM proxy itself is skipped to avoid loops.

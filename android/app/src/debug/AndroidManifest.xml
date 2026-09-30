@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools">
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="PigCat Debug"
+        android:label="Eclipse Debug"
         tools:replace="android:label">
         <service
             android:name=".TileService"
-            android:label="PigCat Debug"
+            android:label="Eclipse Debug"
             tools:replace="android:label" />
     </application>
 </manifest>

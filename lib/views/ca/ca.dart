@@ -87,7 +87,7 @@ class _CaViewState extends ConsumerState<CaView> {
     final cert = await caStore.readCert();
     if (cert == null) return;
     final uri = await picker.saveFile(
-      'PigCat-CA.crt',
+      'Eclipse-CA.crt',
       Uint8List.fromList(cert.codeUnits),
     );
     if (uri != null && mounted) {
@@ -98,7 +98,7 @@ class _CaViewState extends ConsumerState<CaView> {
   List<String> _installSteps() {
     if (system.isAndroid) {
       return [
-        '点击下方「导出证书」，保存 PigCat-CA.crt',
+        '点击下方「导出证书」，保存 Eclipse-CA.crt',
         '打开系统设置 → 安全 → 加密与凭据 → 安装证书 → CA 证书',
         '选择刚导出的证书并确认安装',
         'Android 7+ 应用默认不信任用户证书，解密仅对目标应用生效需配合 VPN 抓包',
@@ -109,7 +109,7 @@ class _CaViewState extends ConsumerState<CaView> {
         '点击下方「导出证书」，通过隔空投送/文件发送到 iPhone',
         '在 iPhone 上打开证书文件，按提示安装描述文件',
         '前往 设置 → 通用 → 关于本机 → 证书信任设置',
-        '开启 PigCat MITM CA 的完全信任',
+        '开启 Eclipse MITM CA 的完全信任',
       ];
     }
     return ['当前平台暂无安装引导，可导出证书后手动安装。'];

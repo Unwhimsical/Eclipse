@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
   static String m0(code) =>
-      "Windows refused to run PigCatCore.exe (error ${code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow PigCat in that policy or turn it off, then try again.";
+      "Windows refused to run EclipseCore.exe (error ${code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow Eclipse in that policy or turn it off, then try again.";
 
   static String m1(name) =>
       "The app failed to finish launching twice in a row. To break the loop, the profile ${name} has been deselected and automatic setup was skipped. You can select it again at any time.";
@@ -326,7 +326,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "core": MessageLookupByLibrary.simpleMessage("Core"),
     "coreBlockedByPolicyTip": m0,
     "coreBlockedBySmartAppControlTip": MessageLookupByLibrary.simpleMessage(
-      "Windows Smart App Control blocked PigCatCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start PigCat again. Smart App Control cannot be turned back on without reinstalling Windows.",
+      "Windows Smart App Control blocked EclipseCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start Eclipse again. Smart App Control cannot be turned back on without reinstalling Windows.",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("Core status"),
     "country": MessageLookupByLibrary.simpleMessage("Region"),
@@ -501,7 +501,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Cache the changes?",
     ),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
-      "Helper service unavailable; TUN mode cannot be enabled. Reinstall PigCat to restore it.",
+      "Helper service unavailable; TUN mode cannot be enabled. Reinstall Eclipse to restore it.",
     ),
     "hideFromList": MessageLookupByLibrary.simpleMessage("Hide from list"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("Hide password"),

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>PigCat</string>
+	<string>Eclipse</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -50,11 +50,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>PigCat requests this permission to scan QR code.</string>
+	<string>Eclipse requests this permission to scan QR code.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>PigCat requests this permission to connect with servers on your local network.</string>
+	<string>Eclipse requests this permission to connect with servers on your local network.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>PigCat requests this permission to fetch Wi-Fi SSID.</string>
+	<string>Eclipse requests this permission to fetch Wi-Fi SSID.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

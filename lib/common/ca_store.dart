@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'path.dart';
 
-const _caMetaKey = 'pigcat_ca_meta';
+const _caMetaKey = 'eclipse_ca_meta';
 
 /// CA certificate metadata.
 class CaMeta {

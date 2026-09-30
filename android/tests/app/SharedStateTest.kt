@@ -1,6 +1,6 @@
-package com.pigcat.clash.models
+package com.eclipse.clash.models
 
-import com.pigcat.clash.common.AccessControlMode
+import com.eclipse.clash.common.AccessControlMode
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -93,7 +93,7 @@ class SharedStateTest {
     fun `the constructed default keeps every fallback Flutter relies on`() {
         val defaults = SharedState()
 
-        assertEquals("PigCat", defaults.currentProfileName)
+        assertEquals("Eclipse", defaults.currentProfileName)
         assertEquals("Stop", defaults.stopText)
         assertEquals(true, defaults.crashlytics)
         assertEquals(false, defaults.onlyStatisticsProxy)
@@ -111,7 +111,7 @@ class SharedStateTest {
 
         assertNotNull(state)
         assertEquals("Starting VPN...", state.startTip)
-        assertEquals("PigCat", state.currentProfileName)
+        assertEquals("Eclipse", state.currentProfileName)
         assertEquals(true, state.crashlytics)
         assertNull(state.vpnOptions)
         assertNull(state.setupParams)

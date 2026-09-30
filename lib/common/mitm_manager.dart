@@ -14,7 +14,7 @@ final _whitespacePattern = RegExp(r'\s+');
 /// proxy.
 class MitmManager {
   static const listenAddr = '127.0.0.1:9092';
-  static const proxyName = 'PigCat-MITM';
+  static const proxyName = 'Eclipse-MITM';
 
   final CoreController _controller;
   final ModuleStore _moduleStore;

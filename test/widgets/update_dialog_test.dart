@@ -20,12 +20,12 @@ const _payload =
     '"Override scripts"}]}]}]}';
 
 const _bulletsOnly =
-    '<!-- pigcat:changelog:begin -->\n'
+    '<!-- eclipse:changelog:begin -->\n'
     '- Override scripts\n'
-    '<!-- pigcat:changelog:end -->\n';
+    '<!-- eclipse:changelog:end -->\n';
 
 String _bodyWith(String payload) =>
-    '$_bulletsOnly\n<!-- pigcat:changelog:json\n$payload\n-->\n';
+    '$_bulletsOnly\n<!-- eclipse:changelog:json\n$payload\n-->\n';
 
 Map<String, dynamic> release(String? body) => <String, dynamic>{
   'tag_name': 'v0.8.96',
@@ -66,8 +66,8 @@ Future<void> tapCancel(WidgetTester tester) async {
 void main() {
   setUpAll(() {
     globalState.packageInfo = PackageInfo(
-      appName: 'PigCat',
-      packageName: 'com.pigcat.clash',
+      appName: 'Eclipse',
+      packageName: 'com.eclipse.clash',
       version: _runningVersion,
       buildNumber: '1',
     );

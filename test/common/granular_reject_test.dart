@@ -129,15 +129,15 @@ void main() {
 
   group('mitmRulesForHosts', () {
     test('maps keyword patterns to DOMAIN-KEYWORD', () {
-      expect(mitmRulesForHosts({'*ads*'}), ['DOMAIN-KEYWORD,ads,PigCat-MITM']);
+      expect(mitmRulesForHosts({'*ads*'}), ['DOMAIN-KEYWORD,ads,Eclipse-MITM']);
     });
 
     test('keeps suffix and exact mappings', () {
       expect(
         mitmRulesForHosts({'*.example.com', 'exact.example.com'}),
         unorderedEquals([
-          'DOMAIN-SUFFIX,example.com,PigCat-MITM',
-          'DOMAIN,exact.example.com,PigCat-MITM',
+          'DOMAIN-SUFFIX,example.com,Eclipse-MITM',
+          'DOMAIN,exact.example.com,Eclipse-MITM',
         ]),
       );
     });

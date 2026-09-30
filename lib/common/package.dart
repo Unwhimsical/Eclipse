@@ -39,8 +39,8 @@ int compareVersions(String version1, String version2) {
   return build1.compareTo(build2);
 }
 
-const releaseNotesBeginMarker = '<!-- pigcat:changelog:begin -->';
-const releaseNotesEndMarker = '<!-- pigcat:changelog:end -->';
+const releaseNotesBeginMarker = '<!-- eclipse:changelog:begin -->';
+const releaseNotesEndMarker = '<!-- eclipse:changelog:end -->';
 
 List<String> parseReleaseBody(String? body) {
   if (body == null) return [];

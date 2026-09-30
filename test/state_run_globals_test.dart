@@ -8,8 +8,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:riverpod/riverpod.dart';
 
 final _packageInfo = PackageInfo(
-  appName: 'PigCat',
-  packageName: 'com.pigcat.clash',
+  appName: 'Eclipse',
+  packageName: 'com.eclipse.clash',
   version: '1.2.3',
   buildNumber: '1',
 );
@@ -44,7 +44,7 @@ void main() {
       setGlobalUa('');
 
       expect(globalState.ua, _packageInfo.ua);
-      expect(globalState.ua, contains('PigCat/v1.2.3'));
+      expect(globalState.ua, contains('Eclipse/v1.2.3'));
     });
 
     test('prefers the configured global user agent', () {

@@ -32,7 +32,7 @@ class Request {
           if (read == null) {
             return 'DIRECT';
           }
-          return PigCatHttpOverrides.findProxyForReader(read, uri);
+          return EclipseHttpOverrides.findProxyForReader(read, uri);
         };
         return client;
       },

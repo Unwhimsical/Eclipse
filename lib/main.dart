@@ -31,7 +31,7 @@ void main(List<String> args) {
         await RustLib.init();
         final version = await system.init();
         final container = await bootstrap.init(version);
-        HttpOverrides.global = PigCatHttpOverrides(container);
+        HttpOverrides.global = EclipseHttpOverrides(container);
         request.attach(container.read);
         runApp(
           UncontrolledProviderScope(

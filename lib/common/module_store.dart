@@ -9,7 +9,7 @@ import 'path.dart';
 import 'shadowrocket.dart';
 import 'yaml.dart';
 
-const _modulesIndexKey = 'pigcat_modules_index';
+const _modulesIndexKey = 'eclipse_modules_index';
 
 /// Above this many rules, a module uses file-based `rule-providers` instead
 /// of inlining every rule into global rules.

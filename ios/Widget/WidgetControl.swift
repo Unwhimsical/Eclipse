@@ -12,7 +12,7 @@ struct WidgetControl: ControlWidget {
       provider: VPNStatusProvider()
     ) { isOn in
       ControlWidgetToggle(
-        "PigCat",
+        "Eclipse",
         isOn: isOn,
         action: SetVPNIntent()
       ) { isRunning in
@@ -20,11 +20,11 @@ struct WidgetControl: ControlWidget {
           isRunning
             ? String(localized: "connected")
             : String(localized: "disconnected"),
-          image: "PigCat"
+          image: "Eclipse"
         )
       }
     }
-    .displayName("PigCat")
+    .displayName("Eclipse")
     .description(LocalizedStringResource("toggleVPNDescription"))
   }
 }

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.pigcat.clash.service"
+    namespace = "com.eclipse.clash.service"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

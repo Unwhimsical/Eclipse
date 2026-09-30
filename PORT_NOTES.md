@@ -1,7 +1,7 @@
 # iOS Port Notes / 移植说明
 
 目标：把 `chenx-dust/flclash-patched` 的完整 iOS 实现，以最小改动移植到
-当前 FlClash 上游代码基，App 名 PigCat，bundle `com.pigcat.clash`，
+当前 FlClash 上游代码基，App 名 Eclipse，bundle `com.eclipse.clash`，
 并在 GitHub Actions（macOS runner）上产出**未签名 IPA**。
 
 > 本目录按仓库相对路径组织。`lib/**`、`core/**`、`android/**`、
@@ -31,7 +31,7 @@
 | `core/tun/tun_ios.go` | 新增：iOS TUN 实现（dup fd + sing-tun，`AutoRoute=false`） |
 | `core/tun/tun_android.go` | 由 `tun.go` 重命名并适配新 `t.Options` 接口 |
 | `android/core/.../Core.kt` | 新增 `TunOptions` data class；`startTun` 改传 JSON |
-| `android/core/.../core.cpp` | JNI 签名适配（包名 `com.pigcat.clash`） |
+| `android/core/.../core.cpp` | JNI 签名适配（包名 `com.eclipse.clash`） |
 | `android/service/.../VpnOptions.kt` | 新增 `mtu`（默认 9000）、`disableIcmpForwarding`、`endpointIndependentNat` |
 | `android/service/.../VpnService.kt` | `Core.startTun` 改传 `Core.TunOptions(...)`；`setMtu(options.mtu)` |
 | `plugins/setup/setup_hooks/` | 新增 `bin/build_ios.dart`、`lib/src/ios_build.dart`；`target.dart`/`go_builder.dart`/`build.dart` 支持 `ios/arm64`（含 lowmem 变体） |
@@ -39,7 +39,7 @@
 | `tool/geodata.dart` | `setup.dart` 依赖的 geo 数据下载 |
 | `pubspec.yaml` | 新增 `path_provider_foundation`、`xml` |
 | `.gitignore` | 新增 `ios/Flutter/GeneratedBundleConfig.xcconfig` 等 |
-| `.github/workflows/ipa.yaml` | macOS 上 `flutter build ios --no-codesign` → `PigCat-unsigned.ipa` |
+| `.github/workflows/ipa.yaml` | macOS 上 `flutter build ios --no-codesign` → `Eclipse-unsigned.ipa` |
 | `ATTRIBUTION.md` | GPL 归属 |
 
 ## 与参考实现的关键差异（有意为之）
@@ -60,7 +60,7 @@
 
 `.github/workflows/ipa.yaml`：macOS runner，Flutter 3.47.1 + Go 1.26.4，
 `flutter pub get` → `flutter build ios --release --no-codesign` →
-`ditto` 打包 `Payload/Runner.app` → 上传 `PigCat-unsigned.ipa`。
+`ditto` 打包 `Payload/Runner.app` → 上传 `Eclipse-unsigned.ipa`。
 Xcode 的 Run Script 阶段会自动调用 `build_ios.dart` 编译 Go 静态库，
 无需手工先编 core。**不使用任何签名 secrets。**
 
@@ -69,11 +69,11 @@ Xcode 的 Run Script 阶段会自动调用 `build_ios.dart` 编译 Go 静态库�
 - 未签名 IPA **不能直接安装**，需用自己的 Apple ID / 证书重签
   **App + NECore.appex + Widget.appex** 三个 bundle。
 - 重签时必须开启 capabilities：**Network Extensions（Packet Tunnel）**、
-  **App Groups**（`group.com.pigcat.clash`）。
+  **App Groups**（`group.com.eclipse.clash`）。
 - 免费 Apple ID 通常无法签发 Packet Tunnel 的 NetworkExtension entitlement，
   一般需要 Apple Developer Program（付费）账号。
 - 签名用的 bundle ID / App Group 必须与 `ios/Flutter/*.xcconfig` 中的
-  `APP_BUNDLE_ID = com.pigcat.clash` 一致，否则隧道无法启动。
+  `APP_BUNDLE_ID = com.eclipse.clash` 一致，否则隧道无法启动。
 
 ## 已知限制 / 风险
 

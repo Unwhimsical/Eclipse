@@ -56,7 +56,7 @@ final class CoreNotificationCoordinator {
 
   private let sendMessage: SendMessage
   private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.pigcat.clash",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.eclipse.clash",
     category: "CoreNotificationCoordinator"
   )
   private let maxMigrationRetryCount = 1

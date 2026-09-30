@@ -1,4 +1,4 @@
-package com.pigcat.clash.service.models
+package com.eclipse.clash.service.models
 
 import java.util.Locale
 import org.junit.After

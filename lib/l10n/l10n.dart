@@ -65,56 +65,6 @@ class AppLocalizations {
     return Intl.message('Rules', name: 'rules', desc: '', args: []);
   }
 
-  /// `Subscriptions`
-  String get subscriptions {
-    return Intl.message(
-      'Subscriptions',
-      name: 'subscriptions',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Modules`
-  String get modules {
-    return Intl.message('Modules', name: 'modules', desc: '', args: []);
-  }
-
-  /// `Module`
-  String get module {
-    return Intl.message('Module', name: 'module', desc: '', args: []);
-  }
-
-  /// `Import subscription`
-  String get importSubscription {
-    return Intl.message(
-      'Import subscription',
-      name: 'importSubscription',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Import module`
-  String get importModule {
-    return Intl.message(
-      'Import module',
-      name: 'importModule',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `Add subscription`
-  String get addSubscription {
-    return Intl.message(
-      'Add subscription',
-      name: 'addSubscription',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Global`
   String get global {
     return Intl.message('Global', name: 'global', desc: '', args: []);
@@ -3790,30 +3740,30 @@ class AppLocalizations {
     );
   }
 
-  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall PigCat to restore it.`
+  /// `Helper service unavailable; TUN mode cannot be enabled. Reinstall Eclipse to restore it.`
   String get helperCorruptTip {
     return Intl.message(
-      'Helper service unavailable; TUN mode cannot be enabled. Reinstall PigCat to restore it.',
+      'Helper service unavailable; TUN mode cannot be enabled. Reinstall Eclipse to restore it.',
       name: 'helperCorruptTip',
       desc: '',
       args: [],
     );
   }
 
-  /// `Windows refused to run PigCatCore.exe (error {code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow PigCat in that policy or turn it off, then try again.`
+  /// `Windows refused to run EclipseCore.exe (error {code}). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow Eclipse in that policy or turn it off, then try again.`
   String coreBlockedByPolicyTip(Object code) {
     return Intl.message(
-      'Windows refused to run PigCatCore.exe (error $code). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow PigCat in that policy or turn it off, then try again.',
+      'Windows refused to run EclipseCore.exe (error $code). An app control policy such as Smart App Control or AppLocker blocks unsigned programs; allow Eclipse in that policy or turn it off, then try again.',
       name: 'coreBlockedByPolicyTip',
       desc: '',
       args: [code],
     );
   }
 
-  /// `Windows Smart App Control blocked PigCatCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start PigCat again. Smart App Control cannot be turned back on without reinstalling Windows.`
+  /// `Windows Smart App Control blocked EclipseCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start Eclipse again. Smart App Control cannot be turned back on without reinstalling Windows.`
   String get coreBlockedBySmartAppControlTip {
     return Intl.message(
-      'Windows Smart App Control blocked PigCatCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start PigCat again. Smart App Control cannot be turned back on without reinstalling Windows.',
+      'Windows Smart App Control blocked EclipseCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start Eclipse again. Smart App Control cannot be turned back on without reinstalling Windows.',
       name: 'coreBlockedBySmartAppControlTip',
       desc: '',
       args: [],
@@ -5160,6 +5110,56 @@ class AppLocalizations {
     return Intl.message(
       'The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.',
       name: 'installedAppsPermissionDeniedMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subscriptions`
+  String get subscriptions {
+    return Intl.message(
+      'Subscriptions',
+      name: 'subscriptions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modules`
+  String get modules {
+    return Intl.message('Modules', name: 'modules', desc: '', args: []);
+  }
+
+  /// `Module`
+  String get module {
+    return Intl.message('Module', name: 'module', desc: '', args: []);
+  }
+
+  /// `Import subscription`
+  String get importSubscription {
+    return Intl.message(
+      'Import subscription',
+      name: 'importSubscription',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import module`
+  String get importModule {
+    return Intl.message(
+      'Import module',
+      name: 'importModule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add subscription`
+  String get addSubscription {
+    return Intl.message(
+      'Add subscription',
+      name: 'addSubscription',
       desc: '',
       args: [],
     );

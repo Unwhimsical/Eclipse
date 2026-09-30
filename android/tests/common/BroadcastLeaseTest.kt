@@ -1,4 +1,4 @@
-package com.pigcat.clash.common
+package com.eclipse.clash.common
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors

@@ -1,6 +1,6 @@
-package com.pigcat.clash.service.models
+package com.eclipse.clash.service.models
 
-import com.pigcat.clash.common.AccessControlMode
+import com.eclipse.clash.common.AccessControlMode
 import java.net.Inet4Address
 import java.net.Inet6Address
 import org.junit.Assert.assertEquals

@@ -19,7 +19,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.pigcat.clash.wifi_ssid
+        package: com.eclipse.clash.wifi_ssid
         pluginClass: WifiSsidPlugin
       macos:
         pluginClass: WifiSsidPlugin

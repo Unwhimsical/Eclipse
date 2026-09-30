@@ -55,14 +55,14 @@ jobs:
 
       - name: Package unsigned IPA
         run: |
-          rm -rf Payload PigCat-unsigned.ipa
+          rm -rf Payload Eclipse-unsigned.ipa
           mkdir Payload
           ditto "build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app" Payload/Runner.app
-          ditto -c -k --sequesterRsrc --keepParent Payload PigCat-unsigned.ipa
+          ditto -c -k --sequesterRsrc --keepParent Payload Eclipse-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: ipa
-          path: PigCat-unsigned.ipa
+          path: Eclipse-unsigned.ipa
           overwrite: true

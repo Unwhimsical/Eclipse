@@ -613,8 +613,8 @@ void main() {
           return '';
         });
         globalState.packageInfo = PackageInfo(
-          appName: 'PigCat',
-          packageName: 'com.pigcat.clash',
+          appName: 'Eclipse',
+          packageName: 'com.eclipse.clash',
           version: '0.0.0',
           buildNumber: '0',
         );

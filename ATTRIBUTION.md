@@ -18,11 +18,11 @@ GNU General Public License v3.0 (GPL-3.0) 保持开源：
 
 身份适配（本移植所做的修改）：
 
-- App 显示名：FlClash → **PigCat**
-- Bundle ID：`com.follow.clash` → **`com.pigcat.clash`**
-- 扩展：`com.pigcat.clash.NECore`、`com.pigcat.clash.Widget`
-- App Group：`group.com.pigcat.clash`
-- Android JNI / Kotlin 包名：`com.follow.clash` → `com.pigcat.clash`
+- App 显示名：FlClash → **Eclipse**
+- Bundle ID：`com.follow.clash` → **`com.eclipse.clash`**
+- 扩展：`com.eclipse.clash.NECore`、`com.eclipse.clash.Widget`
+- App Group：`group.com.eclipse.clash`
+- Android JNI / Kotlin 包名：`com.follow.clash` → `com.eclipse.clash`
 - `VpnOptions.captureDns` 回退为上游字段名 `dnsHijacking`
   （Swift 解码器兼容两种拼写，见 `ios/NECore/PacketTunnelSharedStateStore.swift`）
 

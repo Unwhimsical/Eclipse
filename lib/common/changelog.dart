@@ -6,7 +6,7 @@ import 'package:fl_clash/models/changelog.dart';
 
 import 'common.dart';
 
-const releaseChangelogJsonMarker = '<!-- pigcat:changelog:json';
+const releaseChangelogJsonMarker = '<!-- eclipse:changelog:json';
 
 const _releaseChangelogJsonEndMarker = '-->';
 

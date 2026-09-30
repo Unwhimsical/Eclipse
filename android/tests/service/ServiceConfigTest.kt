@@ -1,9 +1,9 @@
-package com.pigcat.clash.service
+package com.eclipse.clash.service
 
-import com.pigcat.clash.common.AccessControlMode
-import com.pigcat.clash.service.models.AccessControlProps
-import com.pigcat.clash.service.models.NotificationParams
-import com.pigcat.clash.service.models.VpnOptions
+import com.eclipse.clash.common.AccessControlMode
+import com.eclipse.clash.service.models.AccessControlProps
+import com.eclipse.clash.service.models.NotificationParams
+import com.eclipse.clash.service.models.VpnOptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotSame
@@ -33,7 +33,7 @@ class ServiceConfigTest {
     fun `notification params default to the app name and stop label`() {
         val defaults = NotificationParams()
 
-        assertEquals("PigCat", defaults.title)
+        assertEquals("Eclipse", defaults.title)
         assertEquals("STOP", defaults.stopText)
         assertEquals(false, defaults.onlyStatisticsProxy)
         assertEquals(true, defaults.showStopAction)

@@ -1,4 +1,4 @@
-package com.pigcat.clash.packages
+package com.eclipse.clash.packages
 
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertEquals

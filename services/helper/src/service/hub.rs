@@ -37,12 +37,12 @@ use windows_sys::Win32::System::JobObjects::{
 #[cfg(not(target_os = "linux"))]
 const LISTEN_PORT: u16 = 47890;
 #[cfg(not(target_os = "linux"))]
-const CORE_PIPE_PREFIX: &str = r"\\.\pipe\PigCatCore_";
+const CORE_PIPE_PREFIX: &str = r"\\.\pipe\EclipseCore_";
 #[cfg(target_os = "linux")]
-const CORE_SOCKET_PREFIX: &str = "/tmp/PigCatSocket_";
+const CORE_SOCKET_PREFIX: &str = "/tmp/EclipseSocket_";
 #[cfg(target_os = "linux")]
 const CORE_SOCKET_SUFFIX: &str = ".sock";
-const PROTOCOL_VERSION_HEADER: &str = "x-pigcat-helper-protocol";
+const PROTOCOL_VERSION_HEADER: &str = "x-eclipse-helper-protocol";
 const PROTOCOL_VERSION: &str = "6";
 const EXPECTED_CORE_SHA256: &str = env!("CORE_SHA256");
 const LOG_CAPACITY: usize = 100;
@@ -763,9 +763,9 @@ mod tests {
     }
 
     #[cfg(not(target_os = "linux"))]
-    const ALLOWED_CORE_ADDRESS: &str = r"\\.\pipe\PigCatCore_0123456789abcdef0123456789abcdef";
+    const ALLOWED_CORE_ADDRESS: &str = r"\\.\pipe\EclipseCore_0123456789abcdef0123456789abcdef";
     #[cfg(target_os = "linux")]
-    const ALLOWED_CORE_ADDRESS: &str = "/tmp/PigCatSocket_4821.sock";
+    const ALLOWED_CORE_ADDRESS: &str = "/tmp/EclipseSocket_4821.sock";
 
     fn spawn_placeholder_core() -> Child {
         #[cfg(windows)]
@@ -834,7 +834,7 @@ mod tests {
 
     #[tokio::test]
     async fn ping_returns_running_helper_path_for_verified_core() {
-        let response = ping_response(Ok(PathBuf::from("PigCatHelperService.exe")));
+        let response = ping_response(Ok(PathBuf::from("EclipseHelperService.exe")));
 
         assert_eq!(response.status(), StatusCode::OK);
         assert_eq!(
@@ -845,7 +845,7 @@ mod tests {
             warp::hyper::body::to_bytes(response.into_body())
                 .await
                 .unwrap(),
-            "PigCatHelperService.exe"
+            "EclipseHelperService.exe"
         );
     }
 
@@ -1271,33 +1271,33 @@ mod tests {
     #[test]
     fn only_accepts_random_core_pipe_namespace() {
         assert!(is_allowed_core_address(
-            r"\\.\pipe\PigCatCore_0123456789abcdef0123456789abcdef"
+            r"\\.\pipe\EclipseCore_0123456789abcdef0123456789abcdef"
         ));
         assert!(!is_allowed_core_address(r"\\.\pipe\FlClashCore"));
         assert!(!is_allowed_core_address(
             r"\\.\pipe\Other_0123456789abcdef0123456789abcdef"
         ));
         assert!(!is_allowed_core_address(
-            r"\\.\pipe\PigCatCore_0123456789abcdef"
+            r"\\.\pipe\EclipseCore_0123456789abcdef"
         ));
         assert!(!is_allowed_core_address(
-            r"\\.\pipe\PigCatCore_0123456789abcdef0123456789abcdeg"
+            r"\\.\pipe\EclipseCore_0123456789abcdef0123456789abcdeg"
         ));
         assert!(!is_allowed_core_address(
-            r"\\.\pipe\PigCatCore_ABCDEF0123456789abcdef0123456789"
+            r"\\.\pipe\EclipseCore_ABCDEF0123456789abcdef0123456789"
         ));
     }
 
     #[cfg(target_os = "linux")]
     #[test]
     fn only_accepts_random_core_socket_namespace() {
-        assert!(is_allowed_core_address("/tmp/PigCatSocket_4821.sock"));
-        assert!(!is_allowed_core_address("/tmp/PigCatSocket_.sock"));
-        assert!(!is_allowed_core_address("/tmp/PigCatSocket_4821"));
+        assert!(is_allowed_core_address("/tmp/EclipseSocket_4821.sock"));
+        assert!(!is_allowed_core_address("/tmp/EclipseSocket_.sock"));
+        assert!(!is_allowed_core_address("/tmp/EclipseSocket_4821"));
         assert!(!is_allowed_core_address("/tmp/Other_4821.sock"));
-        assert!(!is_allowed_core_address("/tmp/PigCatSocket_../x.sock"));
+        assert!(!is_allowed_core_address("/tmp/EclipseSocket_../x.sock"));
         assert!(!is_allowed_core_address(
-            "/tmp/PigCatSocket_12345678901.sock"
+            "/tmp/EclipseSocket_12345678901.sock"
         ));
     }
 

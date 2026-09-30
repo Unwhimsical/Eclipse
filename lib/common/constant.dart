@@ -9,18 +9,18 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:material_ui/material_ui.dart';
 
-const appName = 'PigCat';
-const appHelperService = 'PigCatHelperService';
+const appName = 'Eclipse';
+const appHelperService = 'EclipseHelperService';
 const coreManifestName = 'manifest.json';
 const coreName = 'clash.meta';
 const browserUa =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
-const packageName = 'com.pigcat.clash';
-final unixSocketPath = '/tmp/PigCatSocket_${Random().nextInt(10000)}.sock';
-final windowsPipeName = '\\\\.\\pipe\\PigCatCore_${_randomPipeId()}';
+const packageName = 'com.eclipse.clash';
+final unixSocketPath = '/tmp/EclipseSocket_${Random().nextInt(10000)}.sock';
+final windowsPipeName = '\\\\.\\pipe\\EclipseCore_${_randomPipeId()}';
 const helperPort = 47890;
-const helperSocketPath = '/run/pigcat/helper.sock';
-const helperProtocolVersionHeader = 'x-pigcat-helper-protocol';
+const helperSocketPath = '/run/eclipse/helper.sock';
+const helperProtocolVersionHeader = 'x-eclipse-helper-protocol';
 const helperProtocolVersion = '6';
 const maxTextScale = 1.4;
 const minTextScale = 0.8;

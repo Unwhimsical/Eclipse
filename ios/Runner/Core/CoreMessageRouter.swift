@@ -44,7 +44,7 @@ final class CoreMessageRouter {
     }
   )
   private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.pigcat.clash",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.eclipse.clash",
     category: "CoreMessageRouter"
   )
 

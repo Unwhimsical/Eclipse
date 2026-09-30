@@ -1,11 +1,11 @@
-package com.pigcat.clash
+package com.eclipse.clash
 
-import com.pigcat.clash.common.AccessControlMode
-import com.pigcat.clash.models.SetupParams
-import com.pigcat.clash.models.SharedState
-import com.pigcat.clash.service.models.AccessControlProps
-import com.pigcat.clash.service.models.NotificationParams
-import com.pigcat.clash.service.models.VpnOptions
+import com.eclipse.clash.common.AccessControlMode
+import com.eclipse.clash.models.SetupParams
+import com.eclipse.clash.models.SharedState
+import com.eclipse.clash.service.models.AccessControlProps
+import com.eclipse.clash.service.models.NotificationParams
+import com.eclipse.clash.service.models.VpnOptions
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -95,7 +95,7 @@ private class FakeHost(override val scope: CoroutineScope) : ServiceStateHost {
     var beforeStartService: (() -> Unit)? = null
 
     override var runTimeMillis = 0L
-    override val homeDirPath = "/data/user/0/com.pigcat.clash/files"
+    override val homeDirPath = "/data/user/0/com.eclipse.clash/files"
     override val sdkInt = 34
 
     val toasts = mutableListOf<String>()

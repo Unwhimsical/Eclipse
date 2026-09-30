@@ -21,7 +21,7 @@ class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'ja';
 
   static String m0(code) =>
-      "Windows が PigCatCore.exe の実行を拒否しました（エラー ${code}）。スマート アプリ コントロールや AppLocker などのアプリ制御ポリシーは未署名のプログラムをブロックします。ポリシーで PigCat を許可するか、ポリシーを無効にしてから再試行してください。";
+      "Windows が EclipseCore.exe の実行を拒否しました（エラー ${code}）。スマート アプリ コントロールや AppLocker などのアプリ制御ポリシーは未署名のプログラムをブロックします。ポリシーで Eclipse を許可するか、ポリシーを無効にしてから再試行してください。";
 
   static String m1(name) =>
       "アプリの起動が2回連続で完了しませんでした。クラッシュループを断ち切るため、プロファイル ${name} の選択を解除し、今回の自動セットアップをスキップしました。いつでも選択し直せます。";
@@ -260,7 +260,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "core": MessageLookupByLibrary.simpleMessage("コア"),
     "coreBlockedByPolicyTip": m0,
     "coreBlockedBySmartAppControlTip": MessageLookupByLibrary.simpleMessage(
-      "Windows のスマート アプリ コントロールが、署名されていない PigCatCore.exe をブロックしました。Windows セキュリティ → アプリとブラウザーの制御 → スマート アプリ コントロールの設定で「オフ」を選び、PigCat を再起動してください。一度オフにすると、Windows を再インストールしない限り再度オンにはできません。",
+      "Windows のスマート アプリ コントロールが、署名されていない EclipseCore.exe をブロックしました。Windows セキュリティ → アプリとブラウザーの制御 → スマート アプリ コントロールの設定で「オフ」を選び、Eclipse を再起動してください。一度オフにすると、Windows を再インストールしない限り再度オンにはできません。",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("コアの状態"),
     "country": MessageLookupByLibrary.simpleMessage("地域"),
@@ -407,7 +407,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "goToConfigureScript": MessageLookupByLibrary.simpleMessage("スクリプト設定へ移動"),
     "hasCacheChange": MessageLookupByLibrary.simpleMessage("変更をキャッシュしますか？"),
     "helperCorruptTip": MessageLookupByLibrary.simpleMessage(
-      "Helper サービスが利用できないため、TUN モードを有効にできません。PigCat を再インストールしてください。",
+      "Helper サービスが利用できないため、TUN モードを有効にできません。Eclipse を再インストールしてください。",
     ),
     "hideFromList": MessageLookupByLibrary.simpleMessage("リストから隠す"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("パスワードを隠す"),

@@ -20,7 +20,7 @@ void main() {
         arguments = valueArguments;
         return process;
       },
-      corePath: 'PigCatCore',
+      corePath: 'EclipseCore',
     );
 
     final lease = await launcher.start(
@@ -31,7 +31,7 @@ void main() {
 
     expect(lease.owner, CoreProcessOwner.direct);
     expect(lease.pid, 42);
-    expect(executable, 'PigCatCore');
+    expect(executable, 'EclipseCore');
     expect(arguments, ['test-address']);
     expect(process.killed, isTrue);
     expect(
@@ -44,7 +44,7 @@ void main() {
     final process = _FakeProcess(pid: 42, exitCode: Completer<int>().future);
     final launcher = DirectCoreLauncher(
       startProcess: (_, _) async => process,
-      corePath: 'PigCatCore',
+      corePath: 'EclipseCore',
     );
     final lease = await launcher.start(
       sessionId: '0123456789abcdef0123456789abcdef',
@@ -62,7 +62,7 @@ void main() {
     final process = _FakeProcess(pid: 42, exitCode: exitCode.future);
     final launcher = DirectCoreLauncher(
       startProcess: (_, _) async => process,
-      corePath: 'PigCatCore',
+      corePath: 'EclipseCore',
     );
     final lease = await launcher.start(
       sessionId: '0123456789abcdef0123456789abcdef',

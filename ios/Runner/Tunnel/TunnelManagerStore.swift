@@ -39,7 +39,7 @@ final class TunnelManagerStore {
   private let networkExtensionIdentifier: String
   private let localizedDescription: String
   private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.pigcat.clash",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.eclipse.clash",
     category: "TunnelManagerStore"
   )
   private let loadTimeout: TimeInterval = 5

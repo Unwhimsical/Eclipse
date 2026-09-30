@@ -12,7 +12,7 @@ final class TunnelController {
   private var tunnelStatusObserver: NSObjectProtocol?
   private var appActiveObserver: NSObjectProtocol?
   private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.pigcat.clash",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.eclipse.clash",
     category: "TunnelController"
   )
 
@@ -27,7 +27,7 @@ final class TunnelController {
     let managerStore = TunnelManagerStore(
       sharedStateStore: sharedStateStore,
       networkExtensionIdentifier: networkExtensionIdentifier,
-      localizedDescription: "PigCat"
+      localizedDescription: "Eclipse"
     )
     self.sharedStateStore = sharedStateStore
     self.managerStore = managerStore

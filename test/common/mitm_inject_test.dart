@@ -148,8 +148,8 @@ void main() {
       expect(
         rules,
         containsAll([
-          'DOMAIN,example.com,PigCat-MITM',
-          'DOMAIN-SUFFIX,example.org,PigCat-MITM',
+          'DOMAIN,example.com,Eclipse-MITM',
+          'DOMAIN-SUFFIX,example.org,Eclipse-MITM',
         ]),
       );
       expect(rules, hasLength(2));
@@ -162,7 +162,7 @@ void main() {
         '%APPEND%',
         'kept.com',
       });
-      expect(rules, ['DOMAIN,kept.com,PigCat-MITM']);
+      expect(rules, ['DOMAIN,kept.com,Eclipse-MITM']);
     });
 
     test('returns empty for empty hosts', () {

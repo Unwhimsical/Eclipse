@@ -1,4 +1,4 @@
-package com.pigcat.clash.common
+package com.eclipse.clash.common
 
 import com.google.gson.Gson
 import org.junit.Assert.assertEquals

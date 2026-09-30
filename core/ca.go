@@ -24,8 +24,8 @@ func handleGenerateCA() (map[string]string, error) {
 	template := x509.Certificate{
 		SerialNumber: serial,
 		Subject: pkix.Name{
-			CommonName:   "PigCat MITM CA",
-			Organization: []string{"PigCat"},
+			CommonName:   "Eclipse MITM CA",
+			Organization: []string{"Eclipse"},
 		},
 		NotBefore:             time.Now().Add(-time.Hour),
 		NotAfter:              time.Now().AddDate(10, 0, 0),

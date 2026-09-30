@@ -83,7 +83,7 @@ static dispatch_queue_t NECoreCallbackQueue(void) {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
     callbackQueue = dispatch_queue_create(
-        "com.pigcat.clash.ne-core.callback",
+        "com.eclipse.clash.ne-core.callback",
         DISPATCH_QUEUE_SERIAL);
     dispatch_queue_set_specific(
         callbackQueue,

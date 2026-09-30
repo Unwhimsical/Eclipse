@@ -291,7 +291,7 @@ Future<int> _package(
   if (platform == 'ios' && iosNoSign) {
     return packageIOSNoSign(
       rootDir: rootDir,
-      appBundleId: iosBundleId ?? 'com.pigcat.clash',
+      appBundleId: iosBundleId ?? 'com.eclipse.clash',
       iosDevelopmentTeam: iosDevelopmentTeam,
       verbose: verbose,
     );
@@ -482,7 +482,7 @@ Future<int> packageIOSNoSign({
     final outputDir = Directory(p.join(rootDir, 'dist'));
     await outputDir.create(recursive: true);
     final output = File(
-      p.join(outputDir.path, 'PigCat-$version-ios-arm64-unsigned.ipa'),
+      p.join(outputDir.path, 'Eclipse-$version-ios-arm64-unsigned.ipa'),
     );
     if (await output.exists()) {
       await output.delete();
