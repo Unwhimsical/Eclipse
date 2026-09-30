@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0573B366304032E200768CF4 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 0573B365304032E200768CF4 /* AppIcon.icon */; };
+		A4BB5B20AD7F3178E76BDC7F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 53E189F4335A3359F3255CA5 /* PrivacyInfo.xcprivacy */; };
 		0590E25F2FFA555500321CD8 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0590E25C2FFA53B300321CD8 /* Localizable.xcstrings */; };
 		0590E2622FFA577300321CD8 /* ShortcutProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0590E2612FFA576B00321CD8 /* ShortcutProvider.swift */; };
 		0590E2652FFA580200321CD8 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0590E2632FFA580000321CD8 /* InfoPlist.xcstrings */; };
@@ -145,6 +146,7 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		53E189F4335A3359F3255CA5 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -331,6 +333,7 @@
 			isa = PBXGroup;
 			children = (
 				0598528D2FF1736400620D82 /* Runner.entitlements */,
+				53E189F4335A3359F3255CA5 /* PrivacyInfo.xcprivacy */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				0573B365304032E200768CF4 /* AppIcon.icon */,
@@ -560,6 +563,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0590E25F2FFA555500321CD8 /* Localizable.xcstrings in Resources */,
+				A4BB5B20AD7F3178E76BDC7F /* PrivacyInfo.xcprivacy in Resources */,
 				0573B366304032E200768CF4 /* AppIcon.icon in Resources */,
 				0590E2652FFA580200321CD8 /* InfoPlist.xcstrings in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
