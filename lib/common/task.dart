@@ -309,6 +309,8 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     rules,
     data.urlRewrites,
     data.mitmHostnames,
+    data.mapLocal,
+    data.bodyRewrites,
   );
   await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
@@ -416,6 +418,8 @@ Future<void> _injectMitmProxy(
   List<String> rules,
   List<String> profileUrlRewrites,
   List<String> profileMitmHostnames,
+  List<String> profileMapLocal,
+  List<String> profileBodyRewrites,
 ) async {
   final parsedModules = <Sgmodule>[];
   try {
@@ -439,6 +443,8 @@ Future<void> _injectMitmProxy(
     modules: parsedModules,
     profileMitmHostnames: profileMitmHostnames,
     profileUrlRewrites: profileUrlRewrites,
+    profileMapLocal: profileMapLocal,
+    profileBodyRewrites: profileBodyRewrites,
   );
   if (hosts.isEmpty) return;
   try {
@@ -468,6 +474,8 @@ Set<String> collectMitmHostnames({
   required List<Sgmodule> modules,
   required List<String> profileMitmHostnames,
   required List<String> profileUrlRewrites,
+  List<String> profileMapLocal = const [],
+  List<String> profileBodyRewrites = const [],
 }) {
   final hosts = <String>{};
   void addHost(String? value) {
@@ -487,11 +495,30 @@ Set<String> collectMitmHostnames({
     for (final line in sg.urlRewrites) {
       addHost(extractRewriteHostname(line));
     }
+    for (final line in sg.mapLocal) {
+      addHost(extractRewriteHostname(line));
+    }
+    for (final line in sg.bodyRewrites) {
+      addHost(extractBodyRewriteHostname(line));
+    }
   }
   for (final line in profileUrlRewrites) {
     addHost(extractRewriteHostname(line));
   }
+  for (final line in profileMapLocal) {
+    addHost(extractRewriteHostname(line));
+  }
+  for (final line in profileBodyRewrites) {
+    addHost(extractBodyRewriteHostname(line));
+  }
   return hosts;
+}
+
+/// A `[Body Rewrite]` line starts with the type; the URL pattern is the second token.
+String? extractBodyRewriteHostname(String line) {
+  final parts = line.trim().split(RegExp(r'\s+'));
+  if (parts.length < 2) return null;
+  return extractRewriteHostname(parts[1]);
 }
 
 /// Exclusions (`-`, `!`) and directives (`%`) never become rules.

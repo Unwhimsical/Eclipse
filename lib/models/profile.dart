@@ -57,6 +57,8 @@ abstract class Profile with _$Profile {
     @Default({}) Map<String, String> hosts,
     @Default([]) List<String> urlRewrites,
     @Default([]) List<String> headerRewrites,
+    @Default([]) List<String> mapLocal,
+    @Default([]) List<String> bodyRewrites,
     @Default(false) bool mitmEnabled,
     @Default([]) List<String> mitmHostnames,
     @Default(OverwriteType.standard) OverwriteType overwriteType,

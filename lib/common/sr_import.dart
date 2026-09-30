@@ -87,6 +87,8 @@ class ShadowrocketImport {
         hosts: conf.hosts,
         urlRewrites: conf.urlRewrites,
         headerRewrites: conf.headerRewrites,
+        mapLocal: conf.mapLocal,
+        bodyRewrites: conf.bodyRewrites,
         mitmEnabled: parseMitmEnabled(conf.mitm),
         mitmHostnames: parseMitmHostnames(conf.mitm),
       );
@@ -336,6 +338,8 @@ class ShadowrocketImport {
     Map<String, String> hosts = const {},
     List<String> urlRewrites = const [],
     List<String> headerRewrites = const [],
+    List<String> mapLocal = const [],
+    List<String> bodyRewrites = const [],
     bool mitmEnabled = false,
     List<String> mitmHostnames = const [],
   }) async {
@@ -345,6 +349,8 @@ class ShadowrocketImport {
           hosts: hosts,
           urlRewrites: urlRewrites,
           headerRewrites: headerRewrites,
+          mapLocal: mapLocal,
+          bodyRewrites: bodyRewrites,
           mitmEnabled: mitmEnabled,
           mitmHostnames: mitmHostnames,
         )

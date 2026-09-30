@@ -88,6 +88,58 @@ void main() {
       );
       expect(hosts, {'*.example.com', '-foo.example.com', '!bar.example.com'});
     });
+
+    test('derives hosts from map local lines', () {
+      final hosts = collectMitmHostnames(
+        modules: [
+          _module(
+            '[Map Local]\n'
+            r'^https://ads\.example\.com/pixel data-type=tiny-gif'
+            '\n',
+          ),
+        ],
+        profileMitmHostnames: [],
+        profileUrlRewrites: [],
+        profileMapLocal: [
+          r'^https://cdn\.example\.net/lib.js data-type=text data=""',
+        ],
+      );
+      expect(hosts, {'ads.example.com', 'cdn.example.net'});
+    });
+
+    test('derives hosts from body rewrite patterns', () {
+      final hosts = collectMitmHostnames(
+        modules: [
+          _module(
+            '[Body Rewrite]\n'
+            r'http-response-jq ^https://api\.example\.com/feed del(.ads)'
+            '\n',
+          ),
+        ],
+        profileMitmHostnames: [],
+        profileUrlRewrites: [],
+        profileBodyRewrites: [
+          r'http-request ^https://up\.example\.org/submit token SECRET',
+        ],
+      );
+      expect(hosts, {'api.example.com', 'up.example.org'});
+    });
+  });
+
+  group('extractBodyRewriteHostname', () {
+    test('uses the URL pattern token, not the type', () {
+      expect(
+        extractBodyRewriteHostname(
+          r'http-response-jq ^https://api\.example\.com/feed del(.ads)',
+        ),
+        'api.example.com',
+      );
+    });
+
+    test('returns null for short lines', () {
+      expect(extractBodyRewriteHostname('http-response'), isNull);
+      expect(extractBodyRewriteHostname(''), isNull);
+    });
   });
 
   group('mitmRulesForHosts', () {

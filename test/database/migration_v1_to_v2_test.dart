@@ -47,6 +47,13 @@ void _downgradeToV4(Database raw) {
   raw.execute('PRAGMA user_version = 4');
 }
 
+/// Schema version 5 had no per-profile `map_local`/`body_rewrites`.
+void _downgradeToV5(Database raw) {
+  raw.execute('ALTER TABLE profiles DROP COLUMN map_local');
+  raw.execute('ALTER TABLE profiles DROP COLUMN body_rewrites');
+  raw.execute('PRAGMA user_version = 5');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -91,7 +98,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -101,7 +108,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
   });
 
   test(
@@ -113,7 +120,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 5);
+      expect(_userVersion(raw), 6);
     },
   );
 
@@ -188,7 +195,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -198,7 +205,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
   });
 
@@ -214,7 +221,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
     );
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
   });
 
   test('the v4 upgrade preserves existing profile rows', () async {
@@ -247,7 +254,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['mitm_enabled', 'mitm_hostnames']),
     );
-    expect(_userVersion(raw), 5);
+    expect(_userVersion(raw), 6);
   });
 
   test('the v5 upgrade preserves existing profile rows', () async {
@@ -276,7 +283,54 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('mitm_hostnames'));
-      expect(_userVersion(raw), 5);
+      expect(_userVersion(raw), 6);
+    },
+  );
+
+  test(
+    'the v6 upgrade adds per-profile map local and body rewrite columns',
+    () async {
+      _downgradeToV5(raw);
+      expect(_columnsOf(raw, 'profiles'), isNot(contains('map_local')));
+      expect(_columnsOf(raw, 'profiles'), isNot(contains('body_rewrites')));
+
+      await openAndMigrate();
+
+      expect(
+        _columnsOf(raw, 'profiles'),
+        containsAll(<String>['map_local', 'body_rewrites']),
+      );
+      expect(_userVersion(raw), 6);
+    },
+  );
+
+  test('the v6 upgrade preserves existing profile rows', () async {
+    _downgradeToV5(raw);
+    raw.execute(
+      'INSERT INTO profiles (id, label, url, overwrite_type, '
+      'auto_update_duration_millis, auto_update, selected_map, unfold_set) '
+      "VALUES (1, 'keep me', '', 'standard', 0, 0, '{}', '[]')",
+    );
+
+    final database = await openAndMigrate();
+
+    final profiles = await database.profilesDao.query().get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.label, 'keep me');
+    expect(profiles.single.mapLocal, isEmpty);
+    expect(profiles.single.bodyRewrites, isEmpty);
+  });
+
+  test(
+    'a v5 user_version with map local columns already present still opens',
+    () async {
+      raw.execute('PRAGMA user_version = 5');
+      expect(_columnsOf(raw, 'profiles'), contains('map_local'));
+
+      await openAndMigrate();
+
+      expect(_columnsOf(raw, 'profiles'), contains('body_rewrites'));
+      expect(_userVersion(raw), 6);
     },
   );
 }

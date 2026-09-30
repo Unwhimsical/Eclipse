@@ -82,6 +82,8 @@ class CoreAction extends _$CoreAction {
         profileMitmHostnames: (profile?.mitmEnabled ?? false)
             ? (profile?.mitmHostnames ?? [])
             : [],
+        profileMapLocal: profile?.mapLocal ?? [],
+        profileBodyRewrites: profile?.bodyRewrites ?? [],
       );
     } catch (_) {}
   }

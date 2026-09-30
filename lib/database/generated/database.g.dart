@@ -172,6 +172,26 @@ class $ProfilesTable extends Profiles
     requiredDuringInsert: false,
     defaultValue: const Constant('[]'),
   ).withConverter<List<String>>($ProfilesTable.$converterheaderRewrites);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String> mapLocal =
+      GeneratedColumn<String>(
+        'map_local',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      ).withConverter<List<String>>($ProfilesTable.$convertermapLocal);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String>
+  bodyRewrites = GeneratedColumn<String>(
+    'body_rewrites',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  ).withConverter<List<String>>($ProfilesTable.$converterbodyRewrites);
   static const VerificationMeta _mitmEnabledMeta = const VerificationMeta(
     'mitmEnabled',
   );
@@ -224,6 +244,8 @@ class $ProfilesTable extends Profiles
     hosts,
     urlRewrites,
     headerRewrites,
+    mapLocal,
+    bodyRewrites,
     mitmEnabled,
     mitmHostnames,
     order,
@@ -413,6 +435,18 @@ class $ProfilesTable extends Profiles
           data['${effectivePrefix}header_rewrites'],
         )!,
       ),
+      mapLocal: $ProfilesTable.$convertermapLocal.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}map_local'],
+        )!,
+      ),
+      bodyRewrites: $ProfilesTable.$converterbodyRewrites.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}body_rewrites'],
+        )!,
+      ),
       mitmEnabled: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}mitm_enabled'],
@@ -451,6 +485,10 @@ class $ProfilesTable extends Profiles
       const StringListConverter();
   static TypeConverter<List<String>, String> $converterheaderRewrites =
       const StringListConverter();
+  static TypeConverter<List<String>, String> $convertermapLocal =
+      const StringListConverter();
+  static TypeConverter<List<String>, String> $converterbodyRewrites =
+      const StringListConverter();
   static TypeConverter<List<String>, String> $convertermitmHostnames =
       const StringListConverter();
 }
@@ -472,6 +510,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   final Map<String, String> hosts;
   final List<String> urlRewrites;
   final List<String> headerRewrites;
+  final List<String> mapLocal;
+  final List<String> bodyRewrites;
   final bool mitmEnabled;
   final List<String> mitmHostnames;
   final int? order;
@@ -492,6 +532,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     required this.hosts,
     required this.urlRewrites,
     required this.headerRewrites,
+    required this.mapLocal,
+    required this.bodyRewrites,
     required this.mitmEnabled,
     required this.mitmHostnames,
     this.order,
@@ -553,6 +595,16 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites),
       );
     }
+    {
+      map['map_local'] = Variable<String>(
+        $ProfilesTable.$convertermapLocal.toSql(mapLocal),
+      );
+    }
+    {
+      map['body_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterbodyRewrites.toSql(bodyRewrites),
+      );
+    }
     map['mitm_enabled'] = Variable<bool>(mitmEnabled);
     {
       map['mitm_hostnames'] = Variable<String>(
@@ -593,6 +645,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       hosts: Value(hosts),
       urlRewrites: Value(urlRewrites),
       headerRewrites: Value(headerRewrites),
+      mapLocal: Value(mapLocal),
+      bodyRewrites: Value(bodyRewrites),
       mitmEnabled: Value(mitmEnabled),
       mitmHostnames: Value(mitmHostnames),
       order: order == null && nullToAbsent
@@ -631,6 +685,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       hosts: serializer.fromJson<Map<String, String>>(json['hosts']),
       urlRewrites: serializer.fromJson<List<String>>(json['urlRewrites']),
       headerRewrites: serializer.fromJson<List<String>>(json['headerRewrites']),
+      mapLocal: serializer.fromJson<List<String>>(json['mapLocal']),
+      bodyRewrites: serializer.fromJson<List<String>>(json['bodyRewrites']),
       mitmEnabled: serializer.fromJson<bool>(json['mitmEnabled']),
       mitmHostnames: serializer.fromJson<List<String>>(json['mitmHostnames']),
       order: serializer.fromJson<int?>(json['order']),
@@ -662,6 +718,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       'hosts': serializer.toJson<Map<String, String>>(hosts),
       'urlRewrites': serializer.toJson<List<String>>(urlRewrites),
       'headerRewrites': serializer.toJson<List<String>>(headerRewrites),
+      'mapLocal': serializer.toJson<List<String>>(mapLocal),
+      'bodyRewrites': serializer.toJson<List<String>>(bodyRewrites),
       'mitmEnabled': serializer.toJson<bool>(mitmEnabled),
       'mitmHostnames': serializer.toJson<List<String>>(mitmHostnames),
       'order': serializer.toJson<int?>(order),
@@ -685,6 +743,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     Map<String, String>? hosts,
     List<String>? urlRewrites,
     List<String>? headerRewrites,
+    List<String>? mapLocal,
+    List<String>? bodyRewrites,
     bool? mitmEnabled,
     List<String>? mitmHostnames,
     Value<int?> order = const Value.absent(),
@@ -712,6 +772,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     hosts: hosts ?? this.hosts,
     urlRewrites: urlRewrites ?? this.urlRewrites,
     headerRewrites: headerRewrites ?? this.headerRewrites,
+    mapLocal: mapLocal ?? this.mapLocal,
+    bodyRewrites: bodyRewrites ?? this.bodyRewrites,
     mitmEnabled: mitmEnabled ?? this.mitmEnabled,
     mitmHostnames: mitmHostnames ?? this.mitmHostnames,
     order: order.present ? order.value : this.order,
@@ -754,6 +816,10 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       headerRewrites: data.headerRewrites.present
           ? data.headerRewrites.value
           : this.headerRewrites,
+      mapLocal: data.mapLocal.present ? data.mapLocal.value : this.mapLocal,
+      bodyRewrites: data.bodyRewrites.present
+          ? data.bodyRewrites.value
+          : this.bodyRewrites,
       mitmEnabled: data.mitmEnabled.present
           ? data.mitmEnabled.value
           : this.mitmEnabled,
@@ -783,6 +849,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ..write('hosts: $hosts, ')
           ..write('urlRewrites: $urlRewrites, ')
           ..write('headerRewrites: $headerRewrites, ')
+          ..write('mapLocal: $mapLocal, ')
+          ..write('bodyRewrites: $bodyRewrites, ')
           ..write('mitmEnabled: $mitmEnabled, ')
           ..write('mitmHostnames: $mitmHostnames, ')
           ..write('order: $order')
@@ -791,7 +859,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     label,
     currentGroupName,
@@ -808,10 +876,12 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     hosts,
     urlRewrites,
     headerRewrites,
+    mapLocal,
+    bodyRewrites,
     mitmEnabled,
     mitmHostnames,
     order,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -832,6 +902,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           other.hosts == this.hosts &&
           other.urlRewrites == this.urlRewrites &&
           other.headerRewrites == this.headerRewrites &&
+          other.mapLocal == this.mapLocal &&
+          other.bodyRewrites == this.bodyRewrites &&
           other.mitmEnabled == this.mitmEnabled &&
           other.mitmHostnames == this.mitmHostnames &&
           other.order == this.order);
@@ -854,6 +926,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
   final Value<Map<String, String>> hosts;
   final Value<List<String>> urlRewrites;
   final Value<List<String>> headerRewrites;
+  final Value<List<String>> mapLocal;
+  final Value<List<String>> bodyRewrites;
   final Value<bool> mitmEnabled;
   final Value<List<String>> mitmHostnames;
   final Value<int?> order;
@@ -874,6 +948,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.hosts = const Value.absent(),
     this.urlRewrites = const Value.absent(),
     this.headerRewrites = const Value.absent(),
+    this.mapLocal = const Value.absent(),
+    this.bodyRewrites = const Value.absent(),
     this.mitmEnabled = const Value.absent(),
     this.mitmHostnames = const Value.absent(),
     this.order = const Value.absent(),
@@ -895,6 +971,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.hosts = const Value.absent(),
     this.urlRewrites = const Value.absent(),
     this.headerRewrites = const Value.absent(),
+    this.mapLocal = const Value.absent(),
+    this.bodyRewrites = const Value.absent(),
     this.mitmEnabled = const Value.absent(),
     this.mitmHostnames = const Value.absent(),
     this.order = const Value.absent(),
@@ -922,6 +1000,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Expression<String>? hosts,
     Expression<String>? urlRewrites,
     Expression<String>? headerRewrites,
+    Expression<String>? mapLocal,
+    Expression<String>? bodyRewrites,
     Expression<bool>? mitmEnabled,
     Expression<String>? mitmHostnames,
     Expression<int>? order,
@@ -944,6 +1024,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       if (hosts != null) 'hosts': hosts,
       if (urlRewrites != null) 'url_rewrites': urlRewrites,
       if (headerRewrites != null) 'header_rewrites': headerRewrites,
+      if (mapLocal != null) 'map_local': mapLocal,
+      if (bodyRewrites != null) 'body_rewrites': bodyRewrites,
       if (mitmEnabled != null) 'mitm_enabled': mitmEnabled,
       if (mitmHostnames != null) 'mitm_hostnames': mitmHostnames,
       if (order != null) 'order': order,
@@ -967,6 +1049,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Value<Map<String, String>>? hosts,
     Value<List<String>>? urlRewrites,
     Value<List<String>>? headerRewrites,
+    Value<List<String>>? mapLocal,
+    Value<List<String>>? bodyRewrites,
     Value<bool>? mitmEnabled,
     Value<List<String>>? mitmHostnames,
     Value<int?>? order,
@@ -989,6 +1073,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       hosts: hosts ?? this.hosts,
       urlRewrites: urlRewrites ?? this.urlRewrites,
       headerRewrites: headerRewrites ?? this.headerRewrites,
+      mapLocal: mapLocal ?? this.mapLocal,
+      bodyRewrites: bodyRewrites ?? this.bodyRewrites,
       mitmEnabled: mitmEnabled ?? this.mitmEnabled,
       mitmHostnames: mitmHostnames ?? this.mitmHostnames,
       order: order ?? this.order,
@@ -1062,6 +1148,16 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
         $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites.value),
       );
     }
+    if (mapLocal.present) {
+      map['map_local'] = Variable<String>(
+        $ProfilesTable.$convertermapLocal.toSql(mapLocal.value),
+      );
+    }
+    if (bodyRewrites.present) {
+      map['body_rewrites'] = Variable<String>(
+        $ProfilesTable.$converterbodyRewrites.toSql(bodyRewrites.value),
+      );
+    }
     if (mitmEnabled.present) {
       map['mitm_enabled'] = Variable<bool>(mitmEnabled.value);
     }
@@ -1095,6 +1191,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
           ..write('hosts: $hosts, ')
           ..write('urlRewrites: $urlRewrites, ')
           ..write('headerRewrites: $headerRewrites, ')
+          ..write('mapLocal: $mapLocal, ')
+          ..write('bodyRewrites: $bodyRewrites, ')
           ..write('mitmEnabled: $mitmEnabled, ')
           ..write('mitmHostnames: $mitmHostnames, ')
           ..write('order: $order')
@@ -3789,6 +3887,8 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<Map<String, String>> hosts,
       Value<List<String>> urlRewrites,
       Value<List<String>> headerRewrites,
+      Value<List<String>> mapLocal,
+      Value<List<String>> bodyRewrites,
       Value<bool> mitmEnabled,
       Value<List<String>> mitmHostnames,
       Value<int?> order,
@@ -3811,6 +3911,8 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<Map<String, String>> hosts,
       Value<List<String>> urlRewrites,
       Value<List<String>> headerRewrites,
+      Value<List<String>> mapLocal,
+      Value<List<String>> bodyRewrites,
       Value<bool> mitmEnabled,
       Value<List<String>> mitmHostnames,
       Value<int?> order,
@@ -3960,6 +4062,18 @@ class $$ProfilesTableFilterComposer
   ColumnWithTypeConverterFilters<List<String>, List<String>, String>
   get headerRewrites => $composableBuilder(
     column: $table.headerRewrites,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get mapLocal => $composableBuilder(
+    column: $table.mapLocal,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get bodyRewrites => $composableBuilder(
+    column: $table.bodyRewrites,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
@@ -4119,6 +4233,16 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get mapLocal => $composableBuilder(
+    column: $table.mapLocal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bodyRewrites => $composableBuilder(
+    column: $table.bodyRewrites,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get mitmEnabled => $composableBuilder(
     column: $table.mitmEnabled,
     builder: (column) => ColumnOrderings(column),
@@ -4214,6 +4338,15 @@ class $$ProfilesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get headerRewrites =>
       $composableBuilder(
         column: $table.headerRewrites,
+        builder: (column) => column,
+      );
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get mapLocal =>
+      $composableBuilder(column: $table.mapLocal, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get bodyRewrites =>
+      $composableBuilder(
+        column: $table.bodyRewrites,
         builder: (column) => column,
       );
 
@@ -4330,6 +4463,8 @@ class $$ProfilesTableTableManager
                 Value<Map<String, String>> hosts = const Value.absent(),
                 Value<List<String>> urlRewrites = const Value.absent(),
                 Value<List<String>> headerRewrites = const Value.absent(),
+                Value<List<String>> mapLocal = const Value.absent(),
+                Value<List<String>> bodyRewrites = const Value.absent(),
                 Value<bool> mitmEnabled = const Value.absent(),
                 Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<int?> order = const Value.absent(),
@@ -4350,6 +4485,8 @@ class $$ProfilesTableTableManager
                 hosts: hosts,
                 urlRewrites: urlRewrites,
                 headerRewrites: headerRewrites,
+                mapLocal: mapLocal,
+                bodyRewrites: bodyRewrites,
                 mitmEnabled: mitmEnabled,
                 mitmHostnames: mitmHostnames,
                 order: order,
@@ -4373,6 +4510,8 @@ class $$ProfilesTableTableManager
                 Value<Map<String, String>> hosts = const Value.absent(),
                 Value<List<String>> urlRewrites = const Value.absent(),
                 Value<List<String>> headerRewrites = const Value.absent(),
+                Value<List<String>> mapLocal = const Value.absent(),
+                Value<List<String>> bodyRewrites = const Value.absent(),
                 Value<bool> mitmEnabled = const Value.absent(),
                 Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<int?> order = const Value.absent(),
@@ -4393,6 +4532,8 @@ class $$ProfilesTableTableManager
                 hosts: hosts,
                 urlRewrites: urlRewrites,
                 headerRewrites: headerRewrites,
+                mapLocal: mapLocal,
+                bodyRewrites: bodyRewrites,
                 mitmEnabled: mitmEnabled,
                 mitmHostnames: mitmHostnames,
                 order: order,

@@ -29,13 +29,19 @@ void main() {
       hosts: const {},
       urlRewrites: const [],
       headerRewrites: const [],
+      mapLocal: const [
+        r'^https://ads\.example\.com/pixel data-type=text data="" status-code=204',
+      ],
+      bodyRewrites: const [
+        r'http-response-jq ^https://api\.example\.com/feed del(.ads)',
+      ],
       mitmEnabled: true,
       mitmHostnames: const ['mitm.example.com'],
       order: 3,
     );
 
-    expect(profile.toColumns(true), hasLength(19));
-    expect(profile.toCompanion(true).toColumns(true), hasLength(19));
+    expect(profile.toColumns(true), hasLength(21));
+    expect(profile.toCompanion(true).toColumns(true), hasLength(21));
     expect(RawProfile.fromJson(profile.toJson()).toJson(), profile.toJson());
     expect(profile.copyWith(label: 'Next').label, 'Next');
     expect(
@@ -66,12 +72,14 @@ void main() {
       hosts: {},
       urlRewrites: [],
       headerRewrites: [],
+      mapLocal: [],
+      bodyRewrites: [],
       mitmEnabled: false,
       mitmHostnames: [],
     );
-    expect(emptyProfile.toColumns(true), hasLength(13));
-    expect(emptyProfile.toColumns(false), hasLength(19));
-    expect(emptyProfile.toCompanion(true).toColumns(true), hasLength(13));
+    expect(emptyProfile.toColumns(true), hasLength(15));
+    expect(emptyProfile.toColumns(false), hasLength(21));
+    expect(emptyProfile.toCompanion(true).toColumns(true), hasLength(15));
 
     final insertedProfile = ProfilesCompanion.insert(
       label: 'Inserted',

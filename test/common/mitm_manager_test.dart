@@ -259,6 +259,46 @@ void main() {
       expect(hr[0]['action'], 'header-del');
       expect(hr[0]['args'], ['X-Unwanted']);
     });
+
+    test(
+      'passes parsed map local and body rewrites to the core config',
+      () async {
+        final handler = mockHandler();
+        when(
+          () => handler.mitmUpdateConfig(any()),
+        ).thenAnswer((_) async => {'running': false});
+        Map<String, dynamic>? startedConfig;
+        when(() => handler.mitmStart(any())).thenAnswer((invocation) async {
+          startedConfig = Map<String, dynamic>.from(
+            invocation.positionalArguments.first as Map,
+          );
+          return <String, dynamic>{};
+        });
+        final manager = MitmManager(CoreController.scoped(handler));
+
+        final started = await manager.syncAndStart(
+          profileMapLocal: [
+            r'^https://ads\.example\.com/pixel data-type=text data="" status-code=204',
+            'garbage without data-type',
+          ],
+          profileBodyRewrites: [
+            r'http-response-jq ^https://api\.example\.com/feed del(.ads)',
+            'garbage line',
+          ],
+        );
+
+        expect(started, isTrue);
+        final ml = startedConfig!['mapLocal'] as List;
+        expect(ml, hasLength(1));
+        expect(ml[0]['pattern'], r'^https://ads\.example\.com/pixel');
+        expect(ml[0]['dataType'], 'text');
+        expect(ml[0]['statusCode'], 204);
+        final br = startedConfig!['bodyRewrites'] as List;
+        expect(br, hasLength(1));
+        expect(br[0]['type'], 'http-response-jq');
+        expect(br[0]['jq'], 'del(.ads)');
+      },
+    );
   });
 
   group('parseHeaderRewriteRules', () {

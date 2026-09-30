@@ -44,6 +44,14 @@ class Profiles extends Table {
       .map(const StringListConverter())
       .withDefault(const Constant('[]'))();
 
+  TextColumn get mapLocal => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
+
+  TextColumn get bodyRewrites => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
+
   BoolColumn get mitmEnabled => boolean().withDefault(const Constant(false))();
 
   TextColumn get mitmHostnames => text()
@@ -140,6 +148,8 @@ extension RawProfilExt on RawProfile {
       hosts: hosts,
       urlRewrites: urlRewrites,
       headerRewrites: headerRewrites,
+      mapLocal: mapLocal,
+      bodyRewrites: bodyRewrites,
       mitmEnabled: mitmEnabled,
       mitmHostnames: mitmHostnames,
       overwriteType: overwriteType,
@@ -166,6 +176,8 @@ extension ProfilesCompanionExt on Profile {
       hosts: Value(hosts),
       urlRewrites: Value(urlRewrites),
       headerRewrites: Value(headerRewrites),
+      mapLocal: Value(mapLocal),
+      bodyRewrites: Value(bodyRewrites),
       mitmEnabled: Value(mitmEnabled),
       mitmHostnames: Value(mitmHostnames),
       overwriteType: overwriteType,

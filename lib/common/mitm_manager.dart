@@ -26,6 +26,8 @@ class MitmManager {
     List<String> profileUrlRewrites = const [],
     List<String> profileHeaderRewrites = const [],
     List<String> profileMitmHostnames = const [],
+    List<String> profileMapLocal = const [],
+    List<String> profileBodyRewrites = const [],
   }) async {
     final modules = await _moduleStore.list();
     final enabled = modules.where((m) => m.enabled).toList();
@@ -33,7 +35,9 @@ class MitmManager {
     if (enabled.isEmpty &&
         profileUrlRewrites.isEmpty &&
         profileHeaderRewrites.isEmpty &&
-        profileMitmHostnames.isEmpty) {
+        profileMitmHostnames.isEmpty &&
+        profileMapLocal.isEmpty &&
+        profileBodyRewrites.isEmpty) {
       await stop();
       return false;
     }
@@ -42,6 +46,8 @@ class MitmManager {
     final rewrites = <Map<String, String>>[];
     final scripts = <Map<String, dynamic>>[];
     final headerRewriteLines = <String>[...profileHeaderRewrites];
+    final mapLocalLines = <String>[...profileMapLocal];
+    final bodyRewriteLines = <String>[...profileBodyRewrites];
 
     // DNS hostnames are case-insensitive; normalize so differently-cased
     // spellings of the same host do not become separate entries.
@@ -92,6 +98,8 @@ class MitmManager {
         }
 
         headerRewriteLines.addAll(sg.headerRewrites);
+        mapLocalLines.addAll(sg.mapLocal);
+        bodyRewriteLines.addAll(sg.bodyRewrites);
 
         // Scripts: parse and download content.
         for (final line in sg.scripts) {
@@ -124,10 +132,14 @@ class MitmManager {
 
     // No MITM features needed.
     final headerRewrites = parseHeaderRewriteRules(headerRewriteLines);
+    final mapLocal = parseMapLocalRules(mapLocalLines);
+    final bodyRewrites = parseBodyRewriteRules(bodyRewriteLines);
     if (hosts.isEmpty &&
         rewrites.isEmpty &&
         scripts.isEmpty &&
-        headerRewrites.isEmpty) {
+        headerRewrites.isEmpty &&
+        mapLocal.isEmpty &&
+        bodyRewrites.isEmpty) {
       await stop();
       return false;
     }
@@ -151,6 +163,8 @@ class MitmManager {
       'hosts': hosts.toList(),
       'rewrites': rewrites,
       'headerRewrites': headerRewrites,
+      'mapLocal': mapLocal,
+      'bodyRewrites': bodyRewrites,
       'scripts': scripts,
       // Upstream: forward through Mihomo's HTTP proxy if available.
       // Empty means direct.
@@ -252,6 +266,40 @@ List<Map<String, dynamic>> parseHeaderRewriteRules(Iterable<String> lines) {
       'pattern': parsed.pattern,
       'action': parsed.action,
       'args': parsed.args,
+    });
+  }
+  return rules;
+}
+
+@visibleForTesting
+List<Map<String, dynamic>> parseMapLocalRules(Iterable<String> lines) {
+  final rules = <Map<String, dynamic>>[];
+  for (final line in lines) {
+    final parsed = parseMapLocalLine(line);
+    if (parsed == null) continue;
+    rules.add({
+      'pattern': parsed.pattern,
+      'dataType': parsed.dataType,
+      'data': parsed.data,
+      'statusCode': parsed.statusCode,
+      'headers': parsed.headers,
+    });
+  }
+  return rules;
+}
+
+@visibleForTesting
+List<Map<String, dynamic>> parseBodyRewriteRules(Iterable<String> lines) {
+  final rules = <Map<String, dynamic>>[];
+  for (final line in lines) {
+    final parsed = parseBodyRewriteLine(line);
+    if (parsed == null) continue;
+    rules.add({
+      'type': parsed.type,
+      'pattern': parsed.pattern,
+      'regex': parsed.regex,
+      'replacement': parsed.replacement,
+      'jq': parsed.jq,
     });
   }
   return rules;

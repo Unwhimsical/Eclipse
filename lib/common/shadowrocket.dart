@@ -342,6 +342,8 @@ class ConfData {
   final Map<String, String> hosts;
   final List<String> urlRewrites;
   final List<String> headerRewrites;
+  final List<String> mapLocal;
+  final List<String> bodyRewrites;
   final Map<String, String> mitm;
 
   const ConfData({
@@ -352,6 +354,8 @@ class ConfData {
     this.hosts = const {},
     this.urlRewrites = const [],
     this.headerRewrites = const [],
+    this.mapLocal = const [],
+    this.bodyRewrites = const [],
     this.mitm = const {},
   });
 
@@ -363,6 +367,8 @@ class ConfData {
       hosts.isEmpty &&
       urlRewrites.isEmpty &&
       headerRewrites.isEmpty &&
+      mapLocal.isEmpty &&
+      bodyRewrites.isEmpty &&
       mitm.isEmpty;
 
   /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
@@ -464,6 +470,8 @@ ConfData parseConf(String content) {
   final hosts = <String, String>{};
   final urlRewrites = <String>[];
   final headerRewrites = <String>[];
+  final mapLocal = <String>[];
+  final bodyRewrites = <String>[];
   final mitm = <String, String>{};
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
@@ -502,6 +510,10 @@ ConfData parseConf(String content) {
         urlRewrites.add(line);
       case 'header rewrite':
         headerRewrites.add(line);
+      case 'map local':
+        mapLocal.add(line);
+      case 'body rewrite':
+        bodyRewrites.add(line);
       case 'mitm':
         final eq = line.indexOf('=');
         if (eq > 0) {
@@ -519,6 +531,8 @@ ConfData parseConf(String content) {
     hosts: hosts,
     urlRewrites: urlRewrites,
     headerRewrites: headerRewrites,
+    mapLocal: mapLocal,
+    bodyRewrites: bodyRewrites,
     mitm: mitm,
   );
 }
@@ -794,6 +808,8 @@ class Sgmodule {
   final Map<String, String> hosts;
   final List<String> urlRewrites;
   final List<String> headerRewrites;
+  final List<String> mapLocal;
+  final List<String> bodyRewrites;
   final List<String> scripts;
   final List<String> mitmHostnames;
   final String raw;
@@ -812,6 +828,8 @@ class Sgmodule {
     this.hosts = const {},
     this.urlRewrites = const [],
     this.headerRewrites = const [],
+    this.mapLocal = const [],
+    this.bodyRewrites = const [],
     this.scripts = const [],
     this.mitmHostnames = const [],
     this.raw = '',
@@ -825,10 +843,16 @@ class Sgmodule {
       hosts.isEmpty &&
       urlRewrites.isEmpty &&
       headerRewrites.isEmpty &&
+      mapLocal.isEmpty &&
+      bodyRewrites.isEmpty &&
       scripts.isEmpty;
 
   bool get needsMitm =>
-      urlRewrites.isNotEmpty || headerRewrites.isNotEmpty || scripts.isNotEmpty;
+      urlRewrites.isNotEmpty ||
+      headerRewrites.isNotEmpty ||
+      mapLocal.isNotEmpty ||
+      bodyRewrites.isNotEmpty ||
+      scripts.isNotEmpty;
 }
 
 /// Parse a `.sgmodule` text.
@@ -840,6 +864,8 @@ Sgmodule parseSgmodule(String content) {
   final hosts = <String, String>{};
   final urlRewrites = <String>[];
   final headerRewrites = <String>[];
+  final mapLocal = <String>[];
+  final bodyRewrites = <String>[];
   final scripts = <String>[];
   final mitmHostnames = <String>[];
   var rulesAppend = false;
@@ -893,6 +919,10 @@ Sgmodule parseSgmodule(String content) {
         urlRewrites.add(line);
       case 'header rewrite':
         headerRewrites.add(line);
+      case 'map local':
+        mapLocal.add(line);
+      case 'body rewrite':
+        bodyRewrites.add(line);
       case 'script':
         scripts.add(line);
       case 'mitm':
@@ -913,6 +943,8 @@ Sgmodule parseSgmodule(String content) {
     hosts: hosts,
     urlRewrites: urlRewrites,
     headerRewrites: headerRewrites,
+    mapLocal: mapLocal,
+    bodyRewrites: bodyRewrites,
     scripts: scripts,
     mitmHostnames: mitmHostnames,
     rulesAppend: rulesAppend,
@@ -1033,6 +1065,128 @@ Sgmodule parseSgmoduleWithArguments(
   }
   if (args.isEmpty) return null;
   return (pattern: pattern, action: action, args: args);
+}
+
+List<String> _splitQuoted(String line) {
+  final tokens = <String>[];
+  final buf = StringBuffer();
+  var inQuotes = false;
+  for (var i = 0; i < line.length; i++) {
+    final c = line[i];
+    if (c == '"') {
+      inQuotes = !inQuotes;
+      buf.write(c);
+    } else if ((c == ' ' || c == '\t') && !inQuotes) {
+      if (buf.isNotEmpty) {
+        tokens.add(buf.toString());
+        buf.clear();
+      }
+    } else {
+      buf.write(c);
+    }
+  }
+  if (buf.isNotEmpty) tokens.add(buf.toString());
+  return tokens;
+}
+
+String _unquote(String s) {
+  final v = s.trim();
+  if (v.length >= 2 && v.startsWith('"') && v.endsWith('"')) {
+    return v.substring(1, v.length - 1);
+  }
+  return v;
+}
+
+/// Parse a `[Map Local]` line. Format:
+/// `<url-pattern> data-type=<text|file|tiny-gif|base64> data=<data> [status-code=<n>] [Extra-Header=<v> ...]`
+({
+  String pattern,
+  String dataType,
+  String data,
+  int statusCode,
+  Map<String, String> headers,
+})?
+parseMapLocalLine(String line) {
+  final tokens = _splitQuoted(line.trim());
+  if (tokens.isEmpty) return null;
+  final pattern = _unquote(tokens.first);
+  if (pattern.isEmpty) return null;
+  var dataType = '';
+  var data = '';
+  var statusCode = 200;
+  final headers = <String, String>{};
+  for (final token in tokens.skip(1)) {
+    final eq = token.indexOf('=');
+    if (eq <= 0) continue;
+    final key = token.substring(0, eq).trim().toLowerCase();
+    final value = _unquote(token.substring(eq + 1));
+    switch (key) {
+      case 'data-type':
+        dataType = value.toLowerCase();
+      case 'data':
+        data = value;
+      case 'status-code':
+        statusCode = int.tryParse(value) ?? 200;
+      default:
+        final name = token.substring(0, eq).trim();
+        if (name.isNotEmpty) headers[name] = value;
+    }
+  }
+  // data-type is required; without it a stray line could become a rule whose
+  // pattern accidentally matches real URLs.
+  switch (dataType) {
+    case 'text':
+    case 'file':
+    case 'tiny-gif':
+    case 'base64':
+      break;
+    default:
+      return null;
+  }
+  return (
+    pattern: pattern,
+    dataType: dataType,
+    data: data,
+    statusCode: statusCode,
+    headers: headers,
+  );
+}
+
+/// Parse a `[Body Rewrite]` line. Format:
+/// `<http-request|http-response> <url-pattern> <regex> <replacement>` or `<http-request-jq|http-response-jq> <url-pattern> <jq>`
+({String type, String pattern, String regex, String replacement, String jq})?
+parseBodyRewriteLine(String line) {
+  final match = RegExp(r'^(\S+)\s+(\S+)\s+(.+)$').firstMatch(line.trim());
+  if (match == null) return null;
+  final type = match.group(1)!.toLowerCase();
+  final pattern = match.group(2)!;
+  final rest = match.group(3)!.trim();
+  switch (type) {
+    case 'http-request-jq':
+    case 'http-response-jq':
+      if (rest.isEmpty) return null;
+      return (
+        type: type,
+        pattern: pattern,
+        regex: '',
+        replacement: '',
+        jq: rest,
+      );
+    case 'http-request':
+    case 'http-response':
+      break;
+    default:
+      return null;
+  }
+  final expr = RegExp(r'^(\S+)\s+(.+)$').firstMatch(rest);
+  if (expr == null) return null;
+  return (
+    type: type,
+    pattern: pattern,
+    regex: expr.group(1)!,
+    replacement: expr.group(2)!,
+    jq: '',
+  );
 }
 
 /// Build a minimal Clash config YAML from parsed proxies.
