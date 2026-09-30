@@ -90,6 +90,8 @@ func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
 			return
 		}
 	}
+	// Header rewrites: modify request headers before forwarding upstream.
+	p.applyHeaderRewrites(req, fullURL)
 	p.forward(conn, req, isTLS)
 }
 

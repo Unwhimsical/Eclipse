@@ -11,13 +11,14 @@ import (
 )
 
 type Config struct {
-	Enabled    bool
-	ListenAddr string
-	CACertPEM  string
-	CAKeyPEM   string
-	Hostnames  []string
-	Rewrites   []RewriteRule
-	Scripts    []*Script
+	Enabled        bool
+	ListenAddr     string
+	CACertPEM      string
+	CAKeyPEM       string
+	Hostnames      []string
+	Rewrites       []RewriteRule
+	HeaderRewrites []HeaderRewriteRule
+	Scripts        []*Script
 }
 
 type Proxy struct {
@@ -112,6 +113,7 @@ func (p *Proxy) UpdateConfig(cfg Config) {
 	defer p.mu.Unlock()
 	p.config.Hostnames = cfg.Hostnames
 	p.config.Rewrites = cfg.Rewrites
+	p.config.HeaderRewrites = cfg.HeaderRewrites
 	p.config.Enabled = cfg.Enabled
 	p.config.Scripts = cfg.Scripts
 	if p.scripts != nil {
@@ -129,6 +131,23 @@ func (p *Proxy) serve() {
 	}
 }
 
+func matchPattern(pat, host string) bool {
+	if pat == "" {
+		return false
+	}
+	if pat == host {
+		return true
+	}
+	if len(pat) > 2 && pat[:2] == "*." {
+		suffix := pat[1:]
+		return len(host) > len(suffix) && host[len(host)-len(suffix):] == suffix
+	}
+	if len(pat) > 1 && pat[len(pat)-1] == '*' {
+		return len(host) >= len(pat)-1 && host[:len(pat)-1] == pat[:len(pat)-1]
+	}
+	return false
+}
+
 func (p *Proxy) matchHostname(host string) bool {
 	p.mu.RLock()
 	patterns := p.config.Hostnames
@@ -142,25 +161,23 @@ func (p *Proxy) matchHostname(host string) bool {
 	}
 	// DNS names are case-insensitive; match without regard to case.
 	host = strings.ToLower(host)
+	// Exclusions ("-"/"!") win over inclusions; directives ("%") never match.
 	for _, pat := range patterns {
-		if pat == "" {
+		pat = strings.ToLower(strings.TrimSpace(pat))
+		if len(pat) < 2 || (pat[0] != '-' && pat[0] != '!') {
 			continue
 		}
-		pat = strings.ToLower(pat)
-		if pat == host {
+		if matchPattern(pat[1:], host) {
+			return false
+		}
+	}
+	for _, pat := range patterns {
+		pat = strings.ToLower(strings.TrimSpace(pat))
+		if pat == "" || pat[0] == '-' || pat[0] == '!' || pat[0] == '%' {
+			continue
+		}
+		if matchPattern(pat, host) {
 			return true
-		}
-		if len(pat) > 2 && pat[:2] == "*." {
-			suffix := pat[1:]
-			if len(host) > len(suffix) && host[len(host)-len(suffix):] == suffix {
-				return true
-			}
-			continue
-		}
-		if len(pat) > 1 && pat[len(pat)-1] == '*' {
-			if len(host) >= len(pat)-1 && host[:len(pat)-1] == pat[:len(pat)-1] {
-				return true
-			}
 		}
 	}
 	return false

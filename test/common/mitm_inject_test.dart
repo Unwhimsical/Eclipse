@@ -77,6 +77,17 @@ void main() {
       );
       expect(hosts, ['example.com']);
     });
+
+    test('preserves exclusion entries for the Go matcher', () {
+      final hosts = collectMitmHostnames(
+        modules: [
+          _module('[MITM]\nhostname = *.example.com, -Foo.Example.COM\n'),
+        ],
+        profileMitmHostnames: ['!Bar.Example.COM'],
+        profileUrlRewrites: [],
+      );
+      expect(hosts, {'*.example.com', '-foo.example.com', '!bar.example.com'});
+    });
   });
 
   group('mitmRulesForHosts', () {

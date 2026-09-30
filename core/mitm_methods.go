@@ -78,6 +78,33 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			cfg.Rewrites = append(cfg.Rewrites, *rule)
 		}
 	}
+	// Header rewrites: list of {pattern,action,args}.
+	if hr, ok := args["headerRewrites"].([]interface{}); ok {
+		for _, item := range hr {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			pattern, _ := m["pattern"].(string)
+			action, _ := m["action"].(string)
+			var hargs []string
+			if raw, ok := m["args"].([]interface{}); ok {
+				for _, a := range raw {
+					if s, ok := a.(string); ok {
+						hargs = append(hargs, s)
+					}
+				}
+			}
+			if pattern == "" || action == "" {
+				continue
+			}
+			rule, err := mitm.CompileHeaderRewrite(pattern, action, hargs)
+			if err != nil {
+				continue
+			}
+			cfg.HeaderRewrites = append(cfg.HeaderRewrites, *rule)
+		}
+	}
 	// Scripts: list of {name,type,pattern,requiresBody,binaryBody,
 	// timeout,maxSize,argument,content}.
 	if scripts, ok := args["scripts"].([]interface{}); ok {

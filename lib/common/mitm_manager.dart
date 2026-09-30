@@ -5,6 +5,7 @@ import 'package:fl_clash/common/ca_store.dart';
 import 'package:fl_clash/common/module_store.dart';
 import 'package:fl_clash/common/shadowrocket.dart';
 import 'package:fl_clash/core/controller.dart';
+import 'package:flutter/foundation.dart';
 
 /// Manages the MITM proxy lifecycle: collects hosts/rewrites/scripts from
 /// enabled modules, downloads remote scripts, and starts/stops the Go MITM
@@ -40,6 +41,7 @@ class MitmManager {
     final hosts = <String>{};
     final rewrites = <Map<String, String>>[];
     final scripts = <Map<String, dynamic>>[];
+    final headerRewriteLines = <String>[...profileHeaderRewrites];
 
     // DNS hostnames are case-insensitive; normalize so differently-cased
     // spellings of the same host do not become separate entries.
@@ -86,6 +88,8 @@ class MitmManager {
           });
         }
 
+        headerRewriteLines.addAll(sg.headerRewrites);
+
         // Scripts: parse and download content.
         for (final line in sg.scripts) {
           final parsed = parseScriptLine(line);
@@ -116,7 +120,11 @@ class MitmManager {
     }
 
     // No MITM features needed.
-    if (hosts.isEmpty && rewrites.isEmpty && scripts.isEmpty) {
+    final headerRewrites = parseHeaderRewriteRules(headerRewriteLines);
+    if (hosts.isEmpty &&
+        rewrites.isEmpty &&
+        scripts.isEmpty &&
+        headerRewrites.isEmpty) {
       await stop();
       return false;
     }
@@ -139,6 +147,7 @@ class MitmManager {
       'caKey': keyPem,
       'hosts': hosts.toList(),
       'rewrites': rewrites,
+      'headerRewrites': headerRewrites,
       'scripts': scripts,
       // Upstream: forward through Mihomo's HTTP proxy if available.
       // Empty means direct.
@@ -146,7 +155,11 @@ class MitmManager {
     };
 
     try {
-      await _controller.mitmStart(config);
+      // A running proxy ignores mitmStart, so update its config in place.
+      final updated = await _controller.mitmUpdateConfig(config);
+      if (updated['running'] != true) {
+        await _controller.mitmStart(config);
+      }
       return true;
     } catch (_) {
       return false;
@@ -224,4 +237,19 @@ class MitmManager {
       return '';
     }
   }
+}
+
+@visibleForTesting
+List<Map<String, dynamic>> parseHeaderRewriteRules(Iterable<String> lines) {
+  final rules = <Map<String, dynamic>>[];
+  for (final line in lines) {
+    final parsed = parseHeaderRewriteLine(line);
+    if (parsed == null) continue;
+    rules.add({
+      'pattern': parsed.pattern,
+      'action': parsed.action,
+      'args': parsed.args,
+    });
+  }
+  return rules;
 }

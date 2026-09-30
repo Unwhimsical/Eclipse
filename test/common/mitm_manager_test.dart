@@ -144,7 +144,7 @@ void main() {
     });
   });
 
-  group('MitmManager.syncAndStart profile hostnames', () {
+  group('MitmManager.syncAndStart', () {
     late Directory root;
 
     setUpAll(() async {
@@ -171,6 +171,9 @@ void main() {
 
     test('starts with profile MITM hostnames and no modules', () async {
       final handler = mockHandler();
+      when(
+        () => handler.mitmUpdateConfig(any()),
+      ).thenAnswer((_) async => {'running': false});
       Map<String, dynamic>? startedConfig;
       when(() => handler.mitmStart(any())).thenAnswer((invocation) async {
         startedConfig = Map<String, dynamic>.from(
@@ -194,12 +197,95 @@ void main() {
 
     test('stops when nothing needs MITM', () async {
       final handler = mockHandler();
+      when(
+        () => handler.mitmUpdateConfig(any()),
+      ).thenAnswer((_) async => {'running': false});
       final manager = MitmManager(CoreController.scoped(handler));
 
       final started = await manager.syncAndStart();
 
       expect(started, isFalse);
       verify(() => handler.mitmStop()).called(1);
+    });
+
+    test('updates the running proxy instead of restarting it', () async {
+      final handler = mockHandler();
+      Map<String, dynamic>? updatedConfig;
+      when(() => handler.mitmUpdateConfig(any())).thenAnswer((
+        invocation,
+      ) async {
+        updatedConfig = Map<String, dynamic>.from(
+          invocation.positionalArguments.first as Map,
+        );
+        return <String, dynamic>{'running': true};
+      });
+      final manager = MitmManager(CoreController.scoped(handler));
+
+      final started = await manager.syncAndStart(
+        profileMitmHostnames: const ['new.example.com'],
+      );
+
+      expect(started, isTrue);
+      verify(() => handler.mitmUpdateConfig(any())).called(1);
+      verifyNever(() => handler.mitmStart(any()));
+      expect((updatedConfig!['hosts'] as List), ['new.example.com']);
+    });
+
+    test('passes parsed header rewrites to the core config', () async {
+      final handler = mockHandler();
+      when(
+        () => handler.mitmUpdateConfig(any()),
+      ).thenAnswer((_) async => {'running': false});
+      Map<String, dynamic>? startedConfig;
+      when(() => handler.mitmStart(any())).thenAnswer((invocation) async {
+        startedConfig = Map<String, dynamic>.from(
+          invocation.positionalArguments.first as Map,
+        );
+        return <String, dynamic>{};
+      });
+      final manager = MitmManager(CoreController.scoped(handler));
+
+      final started = await manager.syncAndStart(
+        profileHeaderRewrites: [
+          '^https://example.com/ header-del "X-Unwanted"',
+          'not a valid line',
+        ],
+      );
+
+      expect(started, isTrue);
+      final hr = startedConfig!['headerRewrites'] as List;
+      expect(hr, hasLength(1));
+      expect(hr[0]['pattern'], '^https://example.com/');
+      expect(hr[0]['action'], 'header-del');
+      expect(hr[0]['args'], ['X-Unwanted']);
+    });
+  });
+
+  group('parseHeaderRewriteRules', () {
+    test('parses valid lines into config maps', () {
+      final rules = parseHeaderRewriteRules([
+        '^https://example.com/ header-del "X-Unwanted"',
+        '^https://example.com/ header-add "X-Custom: value"',
+      ]);
+      expect(rules, hasLength(2));
+      expect(rules[0]['pattern'], '^https://example.com/');
+      expect(rules[0]['action'], 'header-del');
+      expect(rules[0]['args'], ['X-Unwanted']);
+      expect(rules[1]['action'], 'header-add');
+      expect(rules[1]['args'], ['X-Custom: value']);
+    });
+
+    test('drops malformed lines', () {
+      final rules = parseHeaderRewriteRules([
+        'garbage line',
+        '^https://example.com/ header-del "X-Ok"',
+      ]);
+      expect(rules, hasLength(1));
+      expect(rules[0]['action'], 'header-del');
+    });
+
+    test('returns empty for empty input', () {
+      expect(parseHeaderRewriteRules([]), isEmpty);
     });
   });
 }
