@@ -335,7 +335,9 @@ Future<void> _orderRulesByModules(List<String> rules) async {
         final raw = await moduleStore.readRaw(module.id);
         if (raw != null) {
           try {
-            ruleSet.addAll(parseSgmodule(raw).rules);
+            ruleSet.addAll(
+              parseSgmoduleWithArguments(raw, module.argumentValues).rules,
+            );
           } catch (_) {}
         }
       }
@@ -395,7 +397,10 @@ Future<void> _injectModuleHosts(Map rawConfig) async {
         final path = await moduleStore.moduleFilePath(module.id);
         final file = File(path);
         if (!await file.exists()) continue;
-        final Sgmodule sg = parseSgmodule(await file.readAsString());
+        final Sgmodule sg = parseSgmoduleWithArguments(
+          await file.readAsString(),
+          module.argumentValues,
+        );
         for (final entry in sg.hosts.entries) {
           // Shadowrocket: `domain = ip` or `domain = server:port`.
           hosts[entry.key] = entry.value;
@@ -421,7 +426,12 @@ Future<void> _injectMitmProxy(
         final path = await moduleStore.moduleFilePath(module.id);
         final file = File(path);
         if (!await file.exists()) continue;
-        parsedModules.add(parseSgmodule(await file.readAsString()));
+        parsedModules.add(
+          parseSgmoduleWithArguments(
+            await file.readAsString(),
+            module.argumentValues,
+          ),
+        );
       } catch (_) {}
     }
   } catch (_) {}

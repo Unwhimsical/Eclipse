@@ -21,6 +21,10 @@ class ModuleInfo {
   /// to the config's rules instead of replacing them.
   final bool rulesAppend;
 
+  /// User-filled values for the module's `#!arguments=` parameters.
+  /// Kept when the module file is updated.
+  final Map<String, String> argumentValues;
+
   const ModuleInfo({
     required this.id,
     required this.name,
@@ -35,6 +39,7 @@ class ModuleInfo {
     required this.importDate,
     this.ruleSetRules = const [],
     this.rulesAppend = true,
+    this.argumentValues = const {},
   });
 
   ModuleInfo copyWith({
@@ -49,6 +54,7 @@ class ModuleInfo {
     bool? needsMitm,
     List<String>? ruleSetRules,
     bool? rulesAppend,
+    Map<String, String>? argumentValues,
   }) {
     return ModuleInfo(
       id: id,
@@ -64,6 +70,7 @@ class ModuleInfo {
       importDate: importDate,
       ruleSetRules: ruleSetRules ?? this.ruleSetRules,
       rulesAppend: rulesAppend ?? this.rulesAppend,
+      argumentValues: argumentValues ?? this.argumentValues,
     );
   }
 
@@ -82,6 +89,7 @@ class ModuleInfo {
       'importDate': importDate.toIso8601String(),
       'ruleSetRules': ruleSetRules,
       'rulesAppend': rulesAppend,
+      'argumentValues': argumentValues,
     };
   }
 
@@ -104,6 +112,11 @@ class ModuleInfo {
           const [],
       // Modules imported before the flag existed behave as before (append).
       rulesAppend: json['rulesAppend'] as bool? ?? true,
+      argumentValues:
+          (json['argumentValues'] as Map?)?.map(
+            (key, value) => MapEntry('$key', '$value'),
+          ) ??
+          const {},
     );
   }
 }

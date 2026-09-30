@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/clash_config.dart';
@@ -121,6 +121,13 @@ class ShadowrocketImport {
     required String raw,
     String? fileName,
   }) async {
+    final name = parseSgmodule(raw).name;
+    if (name.isNotEmpty) {
+      final existing = await moduleStore.findByName(name);
+      if (existing != null) {
+        return updateModule(ref, existing.id, raw);
+      }
+    }
     final info = await moduleStore.import(raw, fileName: fileName);
     if (info.ruleSetRules.isNotEmpty) {
       await _addGlobalRules(ref, info.ruleSetRules);
@@ -129,12 +136,115 @@ class ShadowrocketImport {
         await _addGlobalRules(ref, inline);
       }
     } else {
-      final Sgmodule parsed = parseSgmodule(raw);
-      if (parsed.rules.isNotEmpty) {
-        await _addGlobalRules(ref, parsed.rules);
+      final rules = parseSgmoduleWithArguments(raw, const {}).rules;
+      if (rules.isNotEmpty) {
+        await _addGlobalRules(ref, rules);
       }
     }
     return info;
+  }
+
+  static Future<ModuleInfo?> updateModule(
+    WidgetRef ref,
+    String id,
+    String newRaw,
+  ) async {
+    final oldInfo = (await moduleStore.list()).where((e) => e.id == id);
+    if (oldInfo.isEmpty) return null;
+    final info = oldInfo.first;
+    final oldRaw = await moduleStore.readRaw(id);
+    if (oldInfo.first.ruleSetRules.isNotEmpty) {
+      await _removeGlobalRules(ref, info.ruleSetRules);
+      final oldInline = await moduleStore.readInlineRules(id);
+      if (oldInline.isNotEmpty) {
+        await _removeGlobalRules(ref, oldInline);
+      }
+    } else if (oldRaw != null) {
+      await _removeGlobalRules(
+        ref,
+        parseSgmoduleWithArguments(oldRaw, info.argumentValues).rules,
+      );
+    }
+    final updated = await moduleStore.updateContent(id, newRaw);
+    if (updated == null) return null;
+    if (updated.ruleSetRules.isNotEmpty) {
+      await _addGlobalRules(ref, updated.ruleSetRules);
+      final inline = await moduleStore.readInlineRules(id);
+      if (inline.isNotEmpty) {
+        await _addGlobalRules(ref, inline);
+      }
+    } else {
+      final rules = parseSgmoduleWithArguments(
+        newRaw,
+        updated.argumentValues,
+      ).rules;
+      if (rules.isNotEmpty) {
+        await _addGlobalRules(ref, rules);
+      }
+    }
+    await _syncMitm(ref);
+    return updated;
+  }
+
+  static Future<void> setModuleArgumentValues(
+    WidgetRef ref,
+    ModuleInfo info,
+    Map<String, String> values,
+  ) async {
+    final modules = await moduleStore.list();
+    final current = modules.where((e) => e.id == info.id).firstOrNull ?? info;
+    final raw = await moduleStore.readRaw(current.id);
+    if (raw == null) return;
+    if (current.ruleSetRules.isNotEmpty) {
+      await _removeGlobalRules(ref, current.ruleSetRules);
+      final oldInline = await moduleStore.readInlineRules(current.id);
+      if (oldInline.isNotEmpty) {
+        await _removeGlobalRules(ref, oldInline);
+      }
+      await moduleStore.setArgumentValues(current.id, values);
+      final substituted = parseSgmoduleWithArguments(raw, values).rules;
+      final ruleSetRules = await moduleStore.rewriteRuleProviders(
+        current.id,
+        substituted,
+      );
+      await _addGlobalRules(ref, ruleSetRules);
+      final inline = await moduleStore.readInlineRules(current.id);
+      if (inline.isNotEmpty) {
+        await _addGlobalRules(ref, inline);
+      }
+    } else {
+      final diff = moduleRulesDiff(
+        oldRaw: raw,
+        oldValues: current.argumentValues,
+        newRaw: raw,
+        newValues: values,
+      );
+      await _removeGlobalRules(ref, diff.remove);
+      await moduleStore.setArgumentValues(current.id, values);
+      await _addGlobalRules(ref, diff.add);
+    }
+    await _syncMitm(ref);
+  }
+
+  @visibleForTesting
+  static ({List<String> remove, List<String> add}) moduleRulesDiff({
+    required String? oldRaw,
+    required Map<String, String> oldValues,
+    required String newRaw,
+    required Map<String, String> newValues,
+  }) {
+    final remove = oldRaw == null
+        ? const <String>[]
+        : parseSgmoduleWithArguments(oldRaw, oldValues).rules;
+    final add = parseSgmoduleWithArguments(newRaw, newValues).rules;
+    return (remove: remove, add: add);
+  }
+
+  /// Re-sync the MITM proxy; safe to call when the core is not running.
+  static Future<void> _syncMitm(WidgetRef ref) async {
+    try {
+      await ref.read(coreActionProvider.notifier).syncMitm();
+    } catch (_) {}
   }
 
   /// Download a `.sgmodule` from a remote URL and import it.
@@ -161,25 +271,30 @@ class ShadowrocketImport {
     bool enabled,
   ) async {
     await moduleStore.toggle(info.id, enabled);
-    if (info.ruleSetRules.isNotEmpty) {
+    final modules = await moduleStore.list();
+    final current = modules.where((e) => e.id == info.id).firstOrNull ?? info;
+    if (current.ruleSetRules.isNotEmpty) {
       if (enabled) {
-        await _addGlobalRules(ref, info.ruleSetRules);
-        final inline = await moduleStore.readInlineRules(info.id);
+        await _addGlobalRules(ref, current.ruleSetRules);
+        final inline = await moduleStore.readInlineRules(current.id);
         if (inline.isNotEmpty) {
           await _addGlobalRules(ref, inline);
         }
       } else {
-        await _removeGlobalRules(ref, info.ruleSetRules);
-        final inline = await moduleStore.readInlineRules(info.id);
+        await _removeGlobalRules(ref, current.ruleSetRules);
+        final inline = await moduleStore.readInlineRules(current.id);
         if (inline.isNotEmpty) {
           await _removeGlobalRules(ref, inline);
         }
       }
       return;
     }
-    final raw = await moduleStore.readRaw(info.id);
+    final raw = await moduleStore.readRaw(current.id);
     if (raw == null) return;
-    final Sgmodule parsed = parseSgmodule(raw);
+    final Sgmodule parsed = parseSgmoduleWithArguments(
+      raw,
+      current.argumentValues,
+    );
     if (parsed.rules.isEmpty) return;
     if (enabled) {
       await _addGlobalRules(ref, parsed.rules);

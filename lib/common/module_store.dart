@@ -137,12 +137,13 @@ class ModuleStore {
   /// `rule-providers`; [ModuleInfo.ruleSetRules] holds the `RULE-SET` rules
   /// the caller should add to global rules instead of every rule.
   Future<ModuleInfo> import(String raw, {String? fileName}) async {
-    final Sgmodule parsed = parseSgmodule(raw);
+    final Sgmodule parsed = parseSgmoduleWithArguments(raw, const {});
     final id = DateTime.now().microsecondsSinceEpoch.toString();
     final name = parsed.name.isEmpty
         ? (fileName?.replaceAll('.sgmodule', '') ?? 'Module $id')
         : parsed.name;
-    await File(await moduleFilePath(id)).writeAsString(raw);
+    final filePath = await moduleFilePath(id);
+    await File(filePath).writeAsString(raw);
     List<String> ruleSetRules = const [];
     if (parsed.rules.length > ruleProviderThreshold) {
       ruleSetRules = await _writeRuleProviders(id, parsed.rules);
@@ -175,31 +176,100 @@ class ModuleStore {
     await _saveIndex(modules);
   }
 
-  Future<void> delete(String id) async {
-    final modules = (await list()).where((e) => e.id != id).toList();
+  Future<ModuleInfo?> findByName(String name) async {
+    final modules = await list();
+    final index = modules.indexWhere((e) => e.name == name);
+    return index < 0 ? null : modules[index];
+  }
+
+  Future<void> setArgumentValues(String id, Map<String, String> values) async {
+    final modules = await list();
+    final index = modules.indexWhere((e) => e.id == id);
+    if (index < 0) return;
+    modules[index] = modules[index].copyWith(
+      argumentValues: Map<String, String>.from(values),
+    );
     await _saveIndex(modules);
-    final dir = await _modulesDir();
-    for (final name in [
-      '$id.sgmodule',
-      '${id}_PROXY.yaml',
-      '${id}_DIRECT.yaml',
-      '${id}_REJECT.yaml',
-      '${id}_INLINE',
-    ]) {
-      final file = File(join(dir, name));
-      if (await file.exists()) {
-        await file.delete();
-      }
+  }
+
+  /// User values are kept for keys the new file still declares; values for
+  /// removed keys are dropped. Global rules are left to the caller.
+  Future<ModuleInfo?> updateContent(String id, String newRaw) async {
+    final modules = await list();
+    final index = modules.indexWhere((e) => e.id == id);
+    if (index < 0) return null;
+    final old = modules[index];
+    final declared = parseSgmodule(newRaw);
+    final merged = <String, String>{};
+    for (final arg in declared.arguments) {
+      final value = old.argumentValues[arg.key];
+      if (value != null) merged[arg.key] = value;
     }
-    // Clean up any other provider files for this module.
+    await File(await moduleFilePath(id)).writeAsString(newRaw);
+    await _clearRuleProviders(id);
+    final parsed = parseSgmoduleWithArguments(newRaw, merged);
+    List<String> ruleSetRules = const [];
+    if (parsed.rules.length > ruleProviderThreshold) {
+      ruleSetRules = await _writeRuleProviders(id, parsed.rules);
+    }
+    final info = old.copyWith(
+      name: declared.name.isEmpty ? old.name : declared.name,
+      desc: declared.desc,
+      author: declared.author,
+      ruleCount: parsed.rules.length,
+      hostCount: parsed.hosts.length,
+      rewriteCount: parsed.urlRewrites.length,
+      scriptCount: parsed.scripts.length,
+      needsMitm: parsed.needsMitm,
+      ruleSetRules: ruleSetRules,
+      rulesAppend: parsed.rulesAppend,
+      argumentValues: merged,
+    );
+    modules[index] = info;
+    await _saveIndex(modules);
+    return info;
+  }
+
+  Future<List<String>> rewriteRuleProviders(
+    String id,
+    List<String> substitutedRules,
+  ) async {
+    await _clearRuleProviders(id);
+    final ruleSetRules = substitutedRules.length > ruleProviderThreshold
+        ? await _writeRuleProviders(id, substitutedRules)
+        : const <String>[];
+    final modules = await list();
+    final index = modules.indexWhere((e) => e.id == id);
+    if (index >= 0) {
+      modules[index] = modules[index].copyWith(ruleSetRules: ruleSetRules);
+      await _saveIndex(modules);
+    }
+    return ruleSetRules;
+  }
+
+  Future<void> _clearRuleProviders(String id) async {
+    final dir = await _modulesDir();
+    final direct = ['${id}_INLINE'];
     await for (final entity in Directory(dir).list()) {
       if (entity is File) {
         final base = basename(entity.path);
-        if (base.startsWith('${id}_') && base.endsWith('.yaml')) {
+        if (base.startsWith('${id}_') &&
+            (base.endsWith('.yaml') || direct.contains(base))) {
           await entity.delete();
         }
       }
     }
+  }
+
+  Future<void> delete(String id) async {
+    final modules = (await list()).where((e) => e.id != id).toList();
+    await _saveIndex(modules);
+    final dir = await _modulesDir();
+    final moduleFile = File(join(dir, '$id.sgmodule'));
+    if (await moduleFile.exists()) {
+      await moduleFile.delete();
+    }
+    await _clearRuleProviders(id);
   }
 
   Future<List<ModuleInfo>> enabledModules() async {

@@ -776,6 +776,15 @@ String? _normalizeConfRule(String line) {
   return normalized;
 }
 
+/// A module parameter from `#!arguments=key:default,...`. The user-filled
+/// value survives module updates, falling back to [defaultValue].
+class ModuleArgument {
+  final String key;
+  final String defaultValue;
+
+  const ModuleArgument({required this.key, this.defaultValue = ''});
+}
+
 /// A parsed `.sgmodule` file.
 class Sgmodule {
   final String name;
@@ -792,6 +801,9 @@ class Sgmodule {
   /// `%APPEND%` in `[Rule]`: append rules instead of replacing config rules.
   final bool rulesAppend;
 
+  final List<ModuleArgument> arguments;
+  final Map<String, String> argumentDescriptions;
+
   const Sgmodule({
     this.name = '',
     this.desc = '',
@@ -804,6 +816,8 @@ class Sgmodule {
     this.mitmHostnames = const [],
     this.raw = '',
     this.rulesAppend = false,
+    this.arguments = const [],
+    this.argumentDescriptions = const {},
   });
 
   bool get isEmpty =>
@@ -829,6 +843,8 @@ Sgmodule parseSgmodule(String content) {
   final scripts = <String>[];
   final mitmHostnames = <String>[];
   var rulesAppend = false;
+  var moduleArguments = const <ModuleArgument>[];
+  var argumentsDescRaw = '';
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -846,6 +862,10 @@ Sgmodule parseSgmodule(String content) {
             desc = value;
           case 'author':
             author = value;
+          case 'arguments':
+            moduleArguments = parseModuleArguments(value);
+          case 'arguments-desc':
+            argumentsDescRaw = value;
         }
       }
       continue;
@@ -896,8 +916,98 @@ Sgmodule parseSgmodule(String content) {
     scripts: scripts,
     mitmHostnames: mitmHostnames,
     rulesAppend: rulesAppend,
+    arguments: moduleArguments,
+    argumentDescriptions: parseModuleArgumentDescriptions(
+      argumentsDescRaw,
+      moduleArguments,
+    ),
     raw: content,
   );
+}
+
+/// Splits each pair on the first colon only, so values like URLs survive.
+List<ModuleArgument> parseModuleArguments(String value) {
+  final args = <ModuleArgument>[];
+  for (final part in value.split(',')) {
+    final item = part.trim();
+    if (item.isEmpty) continue;
+    final colon = item.indexOf(':');
+    if (colon < 0) {
+      args.add(ModuleArgument(key: item));
+      continue;
+    }
+    final key = item.substring(0, colon).trim();
+    if (key.isEmpty) continue;
+    args.add(
+      ModuleArgument(key: key, defaultValue: item.substring(colon + 1).trim()),
+    );
+  }
+  return args;
+}
+
+Map<String, String> parseModuleArgumentDescriptions(
+  String value,
+  List<ModuleArgument> declared,
+) {
+  if (value.isEmpty || declared.isEmpty) return const {};
+  final keys = declared.map((e) => e.key).toSet();
+  final descs = <String, String>{};
+  String? current;
+  for (final rawLine in value.replaceAll(r'\n', '\n').split('\n')) {
+    final line = rawLine.trim();
+    if (line.isEmpty) {
+      current = null;
+      continue;
+    }
+    var matched = false;
+    for (final key in keys) {
+      for (final sep in [':', '：']) {
+        if (line.startsWith('$key$sep')) {
+          descs[key] = line.substring(key.length + sep.length).trim();
+          current = key;
+          matched = true;
+          break;
+        }
+      }
+      if (matched) break;
+    }
+    if (!matched && current != null) {
+      descs[current] = '${descs[current]}\n$line';
+    }
+  }
+  return descs;
+}
+
+final _argumentPlaceholder = RegExp(r'\{\{\{\s*([^{}]+?)\s*\}\}\}');
+
+/// Keys missing from [values] are left intact.
+String substituteModuleArguments(String text, Map<String, String> values) {
+  return text.replaceAllMapped(_argumentPlaceholder, (match) {
+    final key = match.group(1)!.trim();
+    return values.containsKey(key) ? values[key]! : match.group(0)!;
+  });
+}
+
+Map<String, String> effectiveModuleArguments(
+  Sgmodule module,
+  Map<String, String> userValues,
+) {
+  final effective = <String, String>{};
+  for (final arg in module.arguments) {
+    effective[arg.key] = userValues[arg.key] ?? arg.defaultValue;
+  }
+  return effective;
+}
+
+/// The returned [Sgmodule.raw] holds the substituted text.
+Sgmodule parseSgmoduleWithArguments(
+  String raw,
+  Map<String, String> userValues,
+) {
+  final declared = parseSgmodule(raw);
+  final effective = effectiveModuleArguments(declared, userValues);
+  if (effective.isEmpty) return declared;
+  return parseSgmodule(substituteModuleArguments(raw, effective));
 }
 
 /// Parse a `[Header Rewrite]` line into (pattern, action, args).

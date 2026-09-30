@@ -72,7 +72,10 @@ class MitmManager {
         final file = File(path);
         if (!await file.exists()) continue;
         final content = await file.readAsString();
-        final Sgmodule sg = parseSgmodule(content);
+        final Sgmodule sg = parseSgmoduleWithArguments(
+          content,
+          module.argumentValues,
+        );
 
         // MITM hostnames.
         addHosts(sg.mitmHostnames);

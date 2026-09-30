@@ -1,4 +1,5 @@
 import 'package:fl_clash/common/common.dart';
+import 'module_argument_editor.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/module.dart';
 import 'package:fl_clash/state.dart';
@@ -139,10 +140,32 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     await _refresh();
   }
 
-  void _showDetail(ModuleInfo info) {
+  Future<void> _showDetail(ModuleInfo info) async {
+    final raw = await moduleStore.readRaw(info.id);
+    final declared = raw == null ? null : parseSgmodule(raw);
+    final args = declared?.arguments ?? const <ModuleArgument>[];
+    if (!mounted) return;
     dialogs.showCommonDialog(
       child: CommonDialog(
         title: info.name,
+        actions: [
+          if (args.isNotEmpty)
+            TextButton(
+              onPressed: () async {
+                final saved = await dialogs.showCommonDialog<bool>(
+                  child: ModuleArgumentEditorDialog(
+                    info: info,
+                    arguments: args,
+                    descriptions: declared?.argumentDescriptions ?? const {},
+                  ),
+                );
+                if (saved == true) {
+                  await _refresh();
+                }
+              },
+              child: const Text('编辑参数'),
+            ),
+        ],
         child: SizedBox(
           width: 300,
           child: Column(
