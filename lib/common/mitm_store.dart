@@ -7,14 +7,9 @@ import 'package:fl_clash/common/common.dart';
 /// alongside the profile's YAML file. Avoids database migration.
 class MitmStore {
   static Future<File> _file(int profileId) async {
-    final dir = await appPath.getProfilePath('');
-    // getProfilePath('') gives the directory; construct file path.
-    final base = dir.endsWith('/') ? dir : '$dir/';
-    // Actually getProfilePath(id) returns the full path for id.yaml.
-    // Derive directory from it.
     final yamlPath = await appPath.getProfilePath(profileId.toString());
     final sep = yamlPath.lastIndexOf('/');
-    final directory = sep > 0 ? yamlPath.substring(0, sep) : base;
+    final directory = sep > 0 ? yamlPath.substring(0, sep) : '.';
     return File('$directory/$profileId.mitm.json');
   }
 
