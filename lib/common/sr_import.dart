@@ -42,6 +42,13 @@ class ShadowrocketImport {
   }) async {
     final ConfData conf = parseConf(content);
     if (conf.isEmpty) return null;
+    // Parse [MITM] section: enable flag and comma-separated hostnames.
+    final mitmEnabled = conf.mitm['enable']?.toLowerCase() == 'true';
+    final mitmHostnames = (conf.mitm['hostname'] ?? '')
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
     String? profileLabel;
     if (conf.proxies.isNotEmpty) {
       final yamlText = buildClashConfigFromProxies(
@@ -74,6 +81,28 @@ class ShadowrocketImport {
         hosts: conf.hosts,
         urlRewrites: conf.urlRewrites,
         headerRewrites: conf.headerRewrites,
+        mitmEnabled: mitmEnabled,
+        mitmHostnames: mitmHostnames,
+      );
+    }
+    // Pure rules/hosts/rewrites/MITM conf (no proxies): still create a
+    // Profile so hosts, rewrites and MITM have a home.
+    if (conf.proxies.isEmpty &&
+        (mitmEnabled ||
+            mitmHostnames.isNotEmpty ||
+            conf.hosts.isNotEmpty ||
+            conf.urlRewrites.isNotEmpty ||
+            conf.headerRewrites.isNotEmpty)) {
+      final yamlText = buildClashConfigFromProxies(proxies: []);
+      profileLabel = await _createProfileFromYaml(
+        ref,
+        yamlText,
+        fileName?.replaceAll('.conf', '') ?? '导入配置',
+        hosts: conf.hosts,
+        urlRewrites: conf.urlRewrites,
+        headerRewrites: conf.headerRewrites,
+        mitmEnabled: mitmEnabled,
+        mitmHostnames: mitmHostnames,
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -206,6 +235,8 @@ class ShadowrocketImport {
     Map<String, String> hosts = const {},
     List<String> urlRewrites = const [],
     List<String> headerRewrites = const [],
+    bool mitmEnabled = false,
+    List<String> mitmHostnames = const [],
   }) async {
     final core = ref.read(coreHandlerProvider);
     final profile = await Profile.normal(label: label)
@@ -213,6 +244,8 @@ class ShadowrocketImport {
           hosts: hosts,
           urlRewrites: urlRewrites,
           headerRewrites: headerRewrites,
+          mitmEnabled: mitmEnabled,
+          mitmHostnames: mitmHostnames,
         )
         .saveFile(
           Uint8List.fromList(utf8.encode(yamlText)),

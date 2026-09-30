@@ -78,6 +78,10 @@ class CoreAction extends _$CoreAction {
       await manager.syncAndStart(
         profileUrlRewrites: profile?.urlRewrites ?? [],
         profileHeaderRewrites: profile?.headerRewrites ?? [],
+        profileMitmHostnames:
+            (profile?.mitmEnabled ?? false)
+                ? (profile?.mitmHostnames ?? [])
+                : [],
       );
     } catch (_) {}
   }
