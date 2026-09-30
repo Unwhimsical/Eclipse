@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../models/clash_config.dart';
 import '../models/module.dart';
@@ -34,24 +32,6 @@ class ShadowrocketImport {
     );
   }
 
-  /// Save [MITM] config from a parsed .conf to documents/pigcat_mitm.json.
-  static Future<void> _saveMitmConfig(ConfData conf) async {
-    try {
-      final enabled = conf.mitm['enable']?.toLowerCase() == 'true';
-      final hostnames = (conf.mitm['hostname'] ?? '')
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
-      if (!enabled && hostnames.isEmpty) return;
-      final docDir = await getApplicationDocumentsDirectory();
-      final file = File('${docDir.path}/pigcat_mitm.json');
-      await file.writeAsString(
-        json.encode({'enabled': enabled, 'hostnames': hostnames}),
-      );
-    } catch (_) {}
-  }
-
   /// Import a `.conf` file. Nodes become a new profile; rules and proxy
   /// groups are merged into global rules / the new profile. `[General]`
   /// DNS servers are applied to the generated profile.
@@ -62,8 +42,6 @@ class ShadowrocketImport {
   }) async {
     final ConfData conf = parseConf(content);
     if (conf.isEmpty) return null;
-    // Persist [MITM] section to a JSON file for MitmManager.
-    await _saveMitmConfig(conf);
     String? profileLabel;
     if (conf.proxies.isNotEmpty) {
       final yamlText = buildClashConfigFromProxies(
