@@ -1,9 +1,35 @@
+import 'dart:convert';
+
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:test/test.dart';
 
 void main() {
+  group('Profile MITM fields', () {
+    test('round-trips through JSON', () {
+      final profile = Profile.normal(label: 'mitm').copyWith(
+        mitmEnabled: true,
+        mitmHostnames: const ['gs-loc.apple.com', 'example.com'],
+      );
+
+      final restored = Profile.fromJson(
+        jsonDecode(jsonEncode(profile)) as Map<String, Object?>,
+      );
+
+      expect(restored, profile);
+      expect(restored.mitmEnabled, isTrue);
+      expect(restored.mitmHostnames, ['gs-loc.apple.com', 'example.com']);
+    });
+
+    test('defaults to disabled with no hostnames', () {
+      final profile = Profile.normal();
+
+      expect(profile.mitmEnabled, isFalse);
+      expect(profile.mitmHostnames, isEmpty);
+    });
+  });
+
   group('SubscriptionInfo', () {
     test('parses subscription-userinfo header values', () {
       final info = SubscriptionInfo.formHString(

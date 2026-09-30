@@ -35,6 +35,8 @@ void main() {
         autoUpdate: false,
         selectedMap: const {'Selector': 'Proxy'},
         unfoldSet: const {'Selector'},
+        mitmEnabled: true,
+        mitmHostnames: const ['gs-loc.apple.com', 'example.com'],
         overwriteType: OverwriteType.custom,
         scriptId: 7,
         order: 1,

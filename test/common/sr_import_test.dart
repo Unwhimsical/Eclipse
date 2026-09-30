@@ -63,4 +63,30 @@ void main() {
       expect(ShadowrocketImport.fileNameFromUrl(''), '');
     });
   });
+
+  group('ShadowrocketImport MITM helpers', () {
+    test('parseMitmEnabled reads the enable flag', () {
+      expect(ShadowrocketImport.parseMitmEnabled({'enable': 'true'}), isTrue);
+      expect(ShadowrocketImport.parseMitmEnabled({'enable': 'TRUE'}), isTrue);
+      expect(ShadowrocketImport.parseMitmEnabled({'enable': ' true '}), isTrue);
+      expect(ShadowrocketImport.parseMitmEnabled({'enable': 'false'}), isFalse);
+      expect(ShadowrocketImport.parseMitmEnabled({'enable': '1'}), isFalse);
+      expect(ShadowrocketImport.parseMitmEnabled({}), isFalse);
+    });
+
+    test('parseMitmHostnames splits and trims the hostname list', () {
+      expect(
+        ShadowrocketImport.parseMitmHostnames({
+          'hostname': 'gs-loc.apple.com, gs-loc-cn.apple.com',
+        }),
+        ['gs-loc.apple.com', 'gs-loc-cn.apple.com'],
+      );
+      expect(
+        ShadowrocketImport.parseMitmHostnames({'hostname': 'a.com,, ,b.com,'}),
+        ['a.com', 'b.com'],
+      );
+      expect(ShadowrocketImport.parseMitmHostnames({}), isEmpty);
+      expect(ShadowrocketImport.parseMitmHostnames({'hostname': ''}), isEmpty);
+    });
+  });
 }

@@ -172,6 +172,31 @@ class $ProfilesTable extends Profiles
     requiredDuringInsert: false,
     defaultValue: const Constant('[]'),
   ).withConverter<List<String>>($ProfilesTable.$converterheaderRewrites);
+  static const VerificationMeta _mitmEnabledMeta = const VerificationMeta(
+    'mitmEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> mitmEnabled = GeneratedColumn<bool>(
+    'mitm_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("mitm_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<List<String>, String>
+  mitmHostnames = GeneratedColumn<String>(
+    'mitm_hostnames',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  ).withConverter<List<String>>($ProfilesTable.$convertermitmHostnames);
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
@@ -199,6 +224,8 @@ class $ProfilesTable extends Profiles
     hosts,
     urlRewrites,
     headerRewrites,
+    mitmEnabled,
+    mitmHostnames,
     order,
   ];
   @override
@@ -283,6 +310,15 @@ class $ProfilesTable extends Profiles
       );
     } else if (isInserting) {
       context.missing(_autoUpdateMeta);
+    }
+    if (data.containsKey('mitm_enabled')) {
+      context.handle(
+        _mitmEnabledMeta,
+        mitmEnabled.isAcceptableOrUnknown(
+          data['mitm_enabled']!,
+          _mitmEnabledMeta,
+        ),
+      );
     }
     if (data.containsKey('order')) {
       context.handle(
@@ -377,6 +413,16 @@ class $ProfilesTable extends Profiles
           data['${effectivePrefix}header_rewrites'],
         )!,
       ),
+      mitmEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}mitm_enabled'],
+      )!,
+      mitmHostnames: $ProfilesTable.$convertermitmHostnames.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}mitm_hostnames'],
+        )!,
+      ),
       order: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}order'],
@@ -405,6 +451,8 @@ class $ProfilesTable extends Profiles
       const StringListConverter();
   static TypeConverter<List<String>, String> $converterheaderRewrites =
       const StringListConverter();
+  static TypeConverter<List<String>, String> $convertermitmHostnames =
+      const StringListConverter();
 }
 
 class RawProfile extends DataClass implements Insertable<RawProfile> {
@@ -424,6 +472,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   final Map<String, String> hosts;
   final List<String> urlRewrites;
   final List<String> headerRewrites;
+  final bool mitmEnabled;
+  final List<String> mitmHostnames;
   final int? order;
   const RawProfile({
     required this.id,
@@ -442,6 +492,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     required this.hosts,
     required this.urlRewrites,
     required this.headerRewrites,
+    required this.mitmEnabled,
+    required this.mitmHostnames,
     this.order,
   });
   @override
@@ -501,6 +553,12 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites),
       );
     }
+    map['mitm_enabled'] = Variable<bool>(mitmEnabled);
+    {
+      map['mitm_hostnames'] = Variable<String>(
+        $ProfilesTable.$convertermitmHostnames.toSql(mitmHostnames),
+      );
+    }
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
@@ -535,6 +593,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       hosts: Value(hosts),
       urlRewrites: Value(urlRewrites),
       headerRewrites: Value(headerRewrites),
+      mitmEnabled: Value(mitmEnabled),
+      mitmHostnames: Value(mitmHostnames),
       order: order == null && nullToAbsent
           ? const Value.absent()
           : Value(order),
@@ -571,6 +631,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       hosts: serializer.fromJson<Map<String, String>>(json['hosts']),
       urlRewrites: serializer.fromJson<List<String>>(json['urlRewrites']),
       headerRewrites: serializer.fromJson<List<String>>(json['headerRewrites']),
+      mitmEnabled: serializer.fromJson<bool>(json['mitmEnabled']),
+      mitmHostnames: serializer.fromJson<List<String>>(json['mitmHostnames']),
       order: serializer.fromJson<int?>(json['order']),
     );
   }
@@ -600,6 +662,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       'hosts': serializer.toJson<Map<String, String>>(hosts),
       'urlRewrites': serializer.toJson<List<String>>(urlRewrites),
       'headerRewrites': serializer.toJson<List<String>>(headerRewrites),
+      'mitmEnabled': serializer.toJson<bool>(mitmEnabled),
+      'mitmHostnames': serializer.toJson<List<String>>(mitmHostnames),
       'order': serializer.toJson<int?>(order),
     };
   }
@@ -621,6 +685,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     Map<String, String>? hosts,
     List<String>? urlRewrites,
     List<String>? headerRewrites,
+    bool? mitmEnabled,
+    List<String>? mitmHostnames,
     Value<int?> order = const Value.absent(),
   }) => RawProfile(
     id: id ?? this.id,
@@ -646,6 +712,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     hosts: hosts ?? this.hosts,
     urlRewrites: urlRewrites ?? this.urlRewrites,
     headerRewrites: headerRewrites ?? this.headerRewrites,
+    mitmEnabled: mitmEnabled ?? this.mitmEnabled,
+    mitmHostnames: mitmHostnames ?? this.mitmHostnames,
     order: order.present ? order.value : this.order,
   );
   RawProfile copyWithCompanion(ProfilesCompanion data) {
@@ -686,6 +754,12 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       headerRewrites: data.headerRewrites.present
           ? data.headerRewrites.value
           : this.headerRewrites,
+      mitmEnabled: data.mitmEnabled.present
+          ? data.mitmEnabled.value
+          : this.mitmEnabled,
+      mitmHostnames: data.mitmHostnames.present
+          ? data.mitmHostnames.value
+          : this.mitmHostnames,
       order: data.order.present ? data.order.value : this.order,
     );
   }
@@ -709,6 +783,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ..write('hosts: $hosts, ')
           ..write('urlRewrites: $urlRewrites, ')
           ..write('headerRewrites: $headerRewrites, ')
+          ..write('mitmEnabled: $mitmEnabled, ')
+          ..write('mitmHostnames: $mitmHostnames, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -732,6 +808,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     hosts,
     urlRewrites,
     headerRewrites,
+    mitmEnabled,
+    mitmHostnames,
     order,
   );
   @override
@@ -754,6 +832,8 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           other.hosts == this.hosts &&
           other.urlRewrites == this.urlRewrites &&
           other.headerRewrites == this.headerRewrites &&
+          other.mitmEnabled == this.mitmEnabled &&
+          other.mitmHostnames == this.mitmHostnames &&
           other.order == this.order);
 }
 
@@ -774,6 +854,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
   final Value<Map<String, String>> hosts;
   final Value<List<String>> urlRewrites;
   final Value<List<String>> headerRewrites;
+  final Value<bool> mitmEnabled;
+  final Value<List<String>> mitmHostnames;
   final Value<int?> order;
   const ProfilesCompanion({
     this.id = const Value.absent(),
@@ -792,6 +874,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.hosts = const Value.absent(),
     this.urlRewrites = const Value.absent(),
     this.headerRewrites = const Value.absent(),
+    this.mitmEnabled = const Value.absent(),
+    this.mitmHostnames = const Value.absent(),
     this.order = const Value.absent(),
   });
   ProfilesCompanion.insert({
@@ -811,6 +895,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.hosts = const Value.absent(),
     this.urlRewrites = const Value.absent(),
     this.headerRewrites = const Value.absent(),
+    this.mitmEnabled = const Value.absent(),
+    this.mitmHostnames = const Value.absent(),
     this.order = const Value.absent(),
   }) : label = Value(label),
        url = Value(url),
@@ -836,6 +922,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Expression<String>? hosts,
     Expression<String>? urlRewrites,
     Expression<String>? headerRewrites,
+    Expression<bool>? mitmEnabled,
+    Expression<String>? mitmHostnames,
     Expression<int>? order,
   }) {
     return RawValuesInsertable({
@@ -856,6 +944,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       if (hosts != null) 'hosts': hosts,
       if (urlRewrites != null) 'url_rewrites': urlRewrites,
       if (headerRewrites != null) 'header_rewrites': headerRewrites,
+      if (mitmEnabled != null) 'mitm_enabled': mitmEnabled,
+      if (mitmHostnames != null) 'mitm_hostnames': mitmHostnames,
       if (order != null) 'order': order,
     });
   }
@@ -877,6 +967,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Value<Map<String, String>>? hosts,
     Value<List<String>>? urlRewrites,
     Value<List<String>>? headerRewrites,
+    Value<bool>? mitmEnabled,
+    Value<List<String>>? mitmHostnames,
     Value<int?>? order,
   }) {
     return ProfilesCompanion(
@@ -897,6 +989,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       hosts: hosts ?? this.hosts,
       urlRewrites: urlRewrites ?? this.urlRewrites,
       headerRewrites: headerRewrites ?? this.headerRewrites,
+      mitmEnabled: mitmEnabled ?? this.mitmEnabled,
+      mitmHostnames: mitmHostnames ?? this.mitmHostnames,
       order: order ?? this.order,
     );
   }
@@ -968,6 +1062,14 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
         $ProfilesTable.$converterheaderRewrites.toSql(headerRewrites.value),
       );
     }
+    if (mitmEnabled.present) {
+      map['mitm_enabled'] = Variable<bool>(mitmEnabled.value);
+    }
+    if (mitmHostnames.present) {
+      map['mitm_hostnames'] = Variable<String>(
+        $ProfilesTable.$convertermitmHostnames.toSql(mitmHostnames.value),
+      );
+    }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
@@ -993,6 +1095,8 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
           ..write('hosts: $hosts, ')
           ..write('urlRewrites: $urlRewrites, ')
           ..write('headerRewrites: $headerRewrites, ')
+          ..write('mitmEnabled: $mitmEnabled, ')
+          ..write('mitmHostnames: $mitmHostnames, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -3685,6 +3789,8 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<Map<String, String>> hosts,
       Value<List<String>> urlRewrites,
       Value<List<String>> headerRewrites,
+      Value<bool> mitmEnabled,
+      Value<List<String>> mitmHostnames,
       Value<int?> order,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
@@ -3705,6 +3811,8 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<Map<String, String>> hosts,
       Value<List<String>> urlRewrites,
       Value<List<String>> headerRewrites,
+      Value<bool> mitmEnabled,
+      Value<List<String>> mitmHostnames,
       Value<int?> order,
     });
 
@@ -3855,6 +3963,17 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnFilters<bool> get mitmEnabled => $composableBuilder(
+    column: $table.mitmEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get mitmHostnames => $composableBuilder(
+    column: $table.mitmHostnames,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   ColumnFilters<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnFilters(column),
@@ -4000,6 +4119,16 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get mitmEnabled => $composableBuilder(
+    column: $table.mitmEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mitmHostnames => $composableBuilder(
+    column: $table.mitmHostnames,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnOrderings(column),
@@ -4085,6 +4214,17 @@ class $$ProfilesTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get headerRewrites =>
       $composableBuilder(
         column: $table.headerRewrites,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<bool> get mitmEnabled => $composableBuilder(
+    column: $table.mitmEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<List<String>, String> get mitmHostnames =>
+      $composableBuilder(
+        column: $table.mitmHostnames,
         builder: (column) => column,
       );
 
@@ -4190,6 +4330,8 @@ class $$ProfilesTableTableManager
                 Value<Map<String, String>> hosts = const Value.absent(),
                 Value<List<String>> urlRewrites = const Value.absent(),
                 Value<List<String>> headerRewrites = const Value.absent(),
+                Value<bool> mitmEnabled = const Value.absent(),
+                Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
@@ -4208,6 +4350,8 @@ class $$ProfilesTableTableManager
                 hosts: hosts,
                 urlRewrites: urlRewrites,
                 headerRewrites: headerRewrites,
+                mitmEnabled: mitmEnabled,
+                mitmHostnames: mitmHostnames,
                 order: order,
               ),
           createCompanionCallback:
@@ -4229,6 +4373,8 @@ class $$ProfilesTableTableManager
                 Value<Map<String, String>> hosts = const Value.absent(),
                 Value<List<String>> urlRewrites = const Value.absent(),
                 Value<List<String>> headerRewrites = const Value.absent(),
+                Value<bool> mitmEnabled = const Value.absent(),
+                Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
@@ -4247,6 +4393,8 @@ class $$ProfilesTableTableManager
                 hosts: hosts,
                 urlRewrites: urlRewrites,
                 headerRewrites: headerRewrites,
+                mitmEnabled: mitmEnabled,
+                mitmHostnames: mitmHostnames,
                 order: order,
               ),
           withReferenceMapper: (p0) => p0

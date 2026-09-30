@@ -24,13 +24,15 @@ class MitmManager {
   Future<bool> syncAndStart({
     List<String> profileUrlRewrites = const [],
     List<String> profileHeaderRewrites = const [],
+    List<String> profileMitmHostnames = const [],
   }) async {
     final modules = await _moduleStore.list();
     final enabled = modules.where((m) => m.enabled).toList();
-    // Start MITM if modules OR profile have rewrites/scripts.
+    // Start MITM if modules OR profile have rewrites/scripts/hostnames.
     if (enabled.isEmpty &&
         profileUrlRewrites.isEmpty &&
-        profileHeaderRewrites.isEmpty) {
+        profileHeaderRewrites.isEmpty &&
+        profileMitmHostnames.isEmpty) {
       await stop();
       return false;
     }
@@ -49,6 +51,9 @@ class MitmManager {
         'status': parts.length >= 3 ? parts[2] : '302',
       });
     }
+
+    // Profile MITM hostnames join the same host set as module hostnames.
+    hosts.addAll(profileMitmHostnames);
 
     for (final module in enabled) {
       try {

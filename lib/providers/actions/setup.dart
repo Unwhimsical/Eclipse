@@ -526,6 +526,10 @@ class SetupAction extends _$SetupAction {
     if (setupFailed || profileFailed) {
       return _SetupTaskResult.failed;
     }
+    // The running core keeps its old MITM hosts until re-synced, so a
+    // profile switch without a core restart still picks up the new
+    // profile's hostnames here.
+    unawaited(ref.read(coreActionProvider.notifier).syncMitm());
     return _SetupTaskResult.completed;
   }
 }

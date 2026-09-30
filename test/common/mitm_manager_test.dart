@@ -1,8 +1,35 @@
+import 'dart:io';
+
 import 'package:fl_clash/common/ca_store.dart';
 import 'package:fl_clash/common/mitm_manager.dart';
+import 'package:fl_clash/core/core.dart';
+import 'package:fl_clash/core/interface.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class _MockCoreHandlerInterface extends Mock implements CoreHandlerInterface {}
+
+class _FakePathProvider extends PathProviderPlatform {
+  _FakePathProvider(this.root);
+
+  final String root;
+
+  @override
+  Future<String?> getTemporaryPath() async => root;
+
+  @override
+  Future<String?> getApplicationSupportPath() async => root;
+
+  @override
+  Future<String?> getApplicationCachePath() async => root;
+}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('MitmManager.parseScriptLine', () {
     test('parses full script line', () {
       final parsed = MitmManager.parseScriptLine(
@@ -114,6 +141,65 @@ void main() {
         'sha256': 'x',
       });
       expect(meta.sha256, 'x');
+    });
+  });
+
+  group('MitmManager.syncAndStart profile hostnames', () {
+    late Directory root;
+
+    setUpAll(() async {
+      root = await Directory.systemTemp.createTemp('mitm_manager_test');
+      PathProviderPlatform.instance = _FakePathProvider(root.path);
+      SharedPreferences.setMockInitialValues({});
+      registerFallbackValue(<String, dynamic>{});
+      final caDir = await Directory(p.join(root.path, 'ca')).create();
+      await File(p.join(caDir.path, 'ca.crt')).writeAsString('cert');
+      await File(p.join(caDir.path, 'ca.key')).writeAsString('key');
+    });
+
+    tearDownAll(() {
+      if (root.existsSync()) {
+        root.deleteSync(recursive: true);
+      }
+    });
+
+    _MockCoreHandlerInterface mockHandler() {
+      final handler = _MockCoreHandlerInterface();
+      when(() => handler.mitmStop()).thenAnswer((_) async => {});
+      return handler;
+    }
+
+    test('starts with profile MITM hostnames and no modules', () async {
+      final handler = mockHandler();
+      Map<String, dynamic>? startedConfig;
+      when(() => handler.mitmStart(any())).thenAnswer((invocation) async {
+        startedConfig = Map<String, dynamic>.from(
+          invocation.positionalArguments.first as Map,
+        );
+        return <String, dynamic>{};
+      });
+      final manager = MitmManager(CoreController.scoped(handler));
+
+      final started = await manager.syncAndStart(
+        profileMitmHostnames: const ['gs-loc.apple.com', 'example.com'],
+      );
+
+      expect(started, isTrue);
+      expect(startedConfig, isNotNull);
+      expect((startedConfig!['hosts'] as List).toSet(), {
+        'gs-loc.apple.com',
+        'example.com',
+      });
+    });
+
+    test('stops when nothing needs MITM', () async {
+      final handler = mockHandler();
+      final manager = MitmManager(CoreController.scoped(handler));
+
+      final started = await manager.syncAndStart();
+
+      expect(started, isFalse);
+      verify(() => handler.mitmStop()).called(1);
     });
   });
 }

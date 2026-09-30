@@ -44,6 +44,12 @@ class Profiles extends Table {
       .map(const StringListConverter())
       .withDefault(const Constant('[]'))();
 
+  BoolColumn get mitmEnabled => boolean().withDefault(const Constant(false))();
+
+  TextColumn get mitmHostnames => text()
+      .map(const StringListConverter())
+      .withDefault(const Constant('[]'))();
+
   IntColumn get order => integer().nullable()();
 
   @override
@@ -134,6 +140,8 @@ extension RawProfilExt on RawProfile {
       hosts: hosts,
       urlRewrites: urlRewrites,
       headerRewrites: headerRewrites,
+      mitmEnabled: mitmEnabled,
+      mitmHostnames: mitmHostnames,
       overwriteType: overwriteType,
       scriptId: scriptId,
       matchTarget: matchTarget,
@@ -158,6 +166,8 @@ extension ProfilesCompanionExt on Profile {
       hosts: Value(hosts),
       urlRewrites: Value(urlRewrites),
       headerRewrites: Value(headerRewrites),
+      mitmEnabled: Value(mitmEnabled),
+      mitmHostnames: Value(mitmHostnames),
       overwriteType: overwriteType,
       scriptId: Value(scriptId),
       matchTarget: Value(matchTarget),

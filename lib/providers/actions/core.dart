@@ -65,19 +65,23 @@ class CoreAction extends _$CoreAction {
     // Flutter binding (unit tests) the read throws here instead of
     // escaping from the async gap.
     try {
-      unawaited(_syncMitm(_core));
+      unawaited(syncMitm());
     } catch (_) {}
     return true;
   }
 
-  /// Sync MITM proxy with enabled modules and current profile rewrites.
-  Future<void> _syncMitm(CoreController controller) async {
+  /// Sync the MITM proxy with enabled modules and the current profile's
+  /// rewrites and MITM hostnames.
+  Future<void> syncMitm() async {
     try {
-      final manager = MitmManager(controller);
+      final manager = MitmManager(_core);
       final profile = ref.read(currentProfileProvider);
       await manager.syncAndStart(
         profileUrlRewrites: profile?.urlRewrites ?? [],
         profileHeaderRewrites: profile?.headerRewrites ?? [],
+        profileMitmHostnames: (profile?.mitmEnabled ?? false)
+            ? (profile?.mitmHostnames ?? [])
+            : [],
       );
     } catch (_) {}
   }

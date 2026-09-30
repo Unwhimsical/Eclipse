@@ -40,6 +40,13 @@ void _downgradeToV3(Database raw) {
   raw.execute('PRAGMA user_version = 3');
 }
 
+/// Schema version 4 had no per-profile `mitm_enabled`/`mitm_hostnames`.
+void _downgradeToV4(Database raw) {
+  raw.execute('ALTER TABLE profiles DROP COLUMN mitm_enabled');
+  raw.execute('ALTER TABLE profiles DROP COLUMN mitm_hostnames');
+  raw.execute('PRAGMA user_version = 4');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -84,7 +91,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 4);
+    expect(_userVersion(raw), 5);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -94,7 +101,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 4);
+    expect(_userVersion(raw), 5);
   });
 
   test(
@@ -106,7 +113,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 4);
+      expect(_userVersion(raw), 5);
     },
   );
 
@@ -181,7 +188,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 4);
+    expect(_userVersion(raw), 5);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -191,7 +198,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 4);
+    expect(_userVersion(raw), 5);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
   });
 
@@ -207,7 +214,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
     );
-    expect(_userVersion(raw), 4);
+    expect(_userVersion(raw), 5);
   });
 
   test('the v4 upgrade preserves existing profile rows', () async {
@@ -228,4 +235,48 @@ void main() {
     expect(rows, hasLength(1));
     expect(rows.single['label'], 'keep me');
   });
+
+  test('the v5 upgrade adds per-profile mitm columns', () async {
+    _downgradeToV4(raw);
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('mitm_enabled')));
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('mitm_hostnames')));
+
+    await openAndMigrate();
+
+    expect(
+      _columnsOf(raw, 'profiles'),
+      containsAll(<String>['mitm_enabled', 'mitm_hostnames']),
+    );
+    expect(_userVersion(raw), 5);
+  });
+
+  test('the v5 upgrade preserves existing profile rows', () async {
+    _downgradeToV4(raw);
+    raw.execute(
+      'INSERT INTO profiles (id, label, url, overwrite_type, '
+      'auto_update_duration_millis, auto_update, selected_map, unfold_set) '
+      "VALUES (1, 'keep me', '', 'standard', 0, 0, '{}', '[]')",
+    );
+
+    final database = await openAndMigrate();
+
+    final profiles = await database.profilesDao.query().get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.label, 'keep me');
+    expect(profiles.single.mitmEnabled, isFalse);
+    expect(profiles.single.mitmHostnames, isEmpty);
+  });
+
+  test(
+    'a v4 user_version with mitm columns already present still opens',
+    () async {
+      raw.execute('PRAGMA user_version = 4');
+      expect(_columnsOf(raw, 'profiles'), contains('mitm_enabled'));
+
+      await openAndMigrate();
+
+      expect(_columnsOf(raw, 'profiles'), contains('mitm_hostnames'));
+      expect(_userVersion(raw), 5);
+    },
+  );
 }

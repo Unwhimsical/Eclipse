@@ -32,6 +32,20 @@ class ShadowrocketImport {
     );
   }
 
+  /// Read the `[MITM]` enable flag from a parsed conf's mitm map.
+  static bool parseMitmEnabled(Map<String, String> mitm) {
+    return (mitm['enable'] ?? '').trim().toLowerCase() == 'true';
+  }
+
+  /// Split the `[MITM]` hostname list from a parsed conf's mitm map.
+  static List<String> parseMitmHostnames(Map<String, String> mitm) {
+    return (mitm['hostname'] ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+  }
+
   /// Import a `.conf` file. Nodes become a new profile; rules and proxy
   /// groups are merged into global rules / the new profile. `[General]`
   /// DNS servers are applied to the generated profile.
@@ -74,6 +88,8 @@ class ShadowrocketImport {
         hosts: conf.hosts,
         urlRewrites: conf.urlRewrites,
         headerRewrites: conf.headerRewrites,
+        mitmEnabled: parseMitmEnabled(conf.mitm),
+        mitmHostnames: parseMitmHostnames(conf.mitm),
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -206,6 +222,8 @@ class ShadowrocketImport {
     Map<String, String> hosts = const {},
     List<String> urlRewrites = const [],
     List<String> headerRewrites = const [],
+    bool mitmEnabled = false,
+    List<String> mitmHostnames = const [],
   }) async {
     final core = ref.read(coreHandlerProvider);
     final profile = await Profile.normal(label: label)
@@ -213,6 +231,8 @@ class ShadowrocketImport {
           hosts: hosts,
           urlRewrites: urlRewrites,
           headerRewrites: headerRewrites,
+          mitmEnabled: mitmEnabled,
+          mitmHostnames: mitmHostnames,
         )
         .saveFile(
           Uint8List.fromList(utf8.encode(yamlText)),
