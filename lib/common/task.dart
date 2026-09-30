@@ -525,9 +525,17 @@ Set<String> collectMitmHostnames({
   return hosts;
 }
 
+/// Hoisted: hostname extraction runs once per rewrite line, so building
+/// these per call wastes a RegExp compilation for every one of thousands
+/// of lines.
+final _whitespaceSplitter = RegExp(r'\s+');
+final _rewriteHostnamePattern = RegExp(r'https\??://([A-Za-z0-9_.\-\\]+)');
+final _ruleSetRefPattern = RegExp(r'^RULE-SET,([^,]+),', caseSensitive: false);
+final _moduleProviderNamePattern = RegExp(r'^\d+_[A-Z]+$');
+
 /// A `[Body Rewrite]` line starts with the type; the URL pattern is the second token.
 String? extractBodyRewriteHostname(String line) {
-  final parts = line.trim().split(RegExp(r'\s+'));
+  final parts = line.trim().split(_whitespaceSplitter);
   if (parts.length < 2) return null;
   return extractRewriteHostname(parts[1]);
 }
@@ -558,9 +566,9 @@ List<String> mitmRulesForHosts(Set<String> hosts) {
 /// `Uri.parse` cannot handle these, so a regex is used.
 @visibleForTesting
 String? extractRewriteHostname(String line) {
-  final pattern = line.trim().split(RegExp(r'\s+')).firstOrNull;
+  final pattern = line.trim().split(_whitespaceSplitter).firstOrNull;
   if (pattern == null || pattern.isEmpty) return null;
-  final match = RegExp(r'https\??://([A-Za-z0-9_.\-\\]+)').firstMatch(pattern);
+  final match = _rewriteHostnamePattern.firstMatch(pattern);
   if (match == null) return null;
   final host = match.group(1)!.replaceAll('\\', '');
   if (host.isEmpty || host.startsWith('.') || host.startsWith('-')) {
@@ -578,10 +586,7 @@ void _injectModuleRuleProviders(
 ) {
   final providerNames = <String>{};
   for (final rule in rules) {
-    final match = RegExp(
-      r'^RULE-SET,([^,]+),',
-      caseSensitive: false,
-    ).firstMatch(rule);
+    final match = _ruleSetRefPattern.firstMatch(rule);
     if (match != null) {
       providerNames.add(match.group(1)!.trim());
     }
@@ -596,7 +601,7 @@ void _injectModuleRuleProviders(
   for (final name in providerNames) {
     if (providers.containsKey(name)) continue;
     // Module provider files are named `<moduleId>_<policy>.yaml`.
-    if (!RegExp(r'^\d+_[A-Z]+$').hasMatch(name)) continue;
+    if (!_moduleProviderNamePattern.hasMatch(name)) continue;
     final path = join(modulesDir, '$name.yaml');
     if (!File(path).existsSync()) continue;
     providers[name] = {'type': 'file', 'behavior': 'domain', 'path': path};

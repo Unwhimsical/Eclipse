@@ -2,6 +2,37 @@ import 'dart:convert';
 
 import 'yaml.dart';
 
+/// Hoisted: the section/rule parsers below run once per line, so building
+/// these per call costs over a million RegExp compilations on a 10MB module.
+final _sectionHeaderPattern = RegExp(r'^\[(.+)\]$');
+final _mitmHostSeparator = RegExp(r'[,\s]+');
+final _updateIntervalParam = RegExp(
+  r',update-interval=\d+',
+  caseSensitive: false,
+);
+final _protocolWord = RegExp(
+  r'(?<![A-Z-])PROTOCOL(?![A-Z-])',
+  caseSensitive: false,
+);
+final _destPortWord = RegExp(
+  r'(?<![A-Z-])DEST-PORT(?![A-Z-])',
+  caseSensitive: false,
+);
+final _rejectNoDropWord = RegExp(
+  r'(?<![A-Z-])REJECT-NO-DROP(?![A-Z-])',
+  caseSensitive: false,
+);
+final _granularRejectWord = RegExp(
+  r'(?<![A-Z-])REJECT-(DICT|ARRAY|200|IMG|TINYGIF|VIDEO)(?![A-Z-])',
+  caseSensitive: false,
+);
+final _headerRewriteLinePattern = RegExp(
+  r'^(\S+)\s+(header-del|header-add|header-replace|header-replace-regex)\s+(.+)$',
+);
+final _quotedArgPattern = RegExp(r'"([^"]*)"');
+final _bodyRewriteLinePattern = RegExp(r'^(\S+)\s+(\S+)\s+(.+)$');
+final _bodyRewriteExprPattern = RegExp(r'^(\S+)\s+(.+)$');
+
 /// Parsers for Shadowrocket formats: share links, `.conf` sections and
 /// `.sgmodule` files. Everything converts to Clash-compatible maps so the
 /// existing profile pipeline can consume them without core changes.
@@ -479,7 +510,7 @@ ConfData parseConf(String content) {
     if (line.isEmpty || line.startsWith('#') || line.startsWith(';')) {
       continue;
     }
-    final sectionMatch = RegExp(r'^\[(.+)\]$').firstMatch(line);
+    final sectionMatch = _sectionHeaderPattern.firstMatch(line);
     if (sectionMatch != null) {
       section = sectionMatch.group(1)!.trim().toLowerCase();
       continue;
@@ -756,37 +787,19 @@ String? _normalizeConfRule(String line) {
   // RULE-SET has no such parameter — strip it.
   // e.g. `RULE-SET,https://x.com/a.txt,PROXY,update-interval=86400`
   //   -> `RULE-SET,https://x.com/a.txt,PROXY`
-  normalized = normalized.replaceAll(
-    RegExp(r',update-interval=\d+', caseSensitive: false),
-    '',
-  );
+  normalized = normalized.replaceAll(_updateIntervalParam, '');
   // Shadowrocket `PROTOCOL,UDP` -> Clash Meta `NETWORK,UDP`.
-  normalized = normalized.replaceAll(
-    RegExp(r'(?<![A-Z-])PROTOCOL(?![A-Z-])', caseSensitive: false),
-    'NETWORK',
-  );
+  normalized = normalized.replaceAll(_protocolWord, 'NETWORK');
   // Shadowrocket `DEST-PORT` -> Clash `DST-PORT`.
-  normalized = normalized.replaceAll(
-    RegExp(r'(?<![A-Z-])DEST-PORT(?![A-Z-])', caseSensitive: false),
-    'DST-PORT',
-  );
+  normalized = normalized.replaceAll(_destPortWord, 'DST-PORT');
   // Shadowrocket `REJECT-NO-DROP` behaves like Clash `REJECT` (TCP RST,
   // not silent drop).
-  normalized = normalized.replaceAll(
-    RegExp(r'(?<![A-Z-])REJECT-NO-DROP(?![A-Z-])', caseSensitive: false),
-    'REJECT',
-  );
+  normalized = normalized.replaceAll(_rejectNoDropWord, 'REJECT');
   // Shadowrocket granular reject actions have no Clash equivalent and would
   // fail config parsing as unknown proxies — fall back to plain `REJECT`
   // (still blocks the traffic). `REJECT-DROP` is intentionally kept:
   // Clash Meta implements it natively as silent drop.
-  normalized = normalized.replaceAll(
-    RegExp(
-      r'(?<![A-Z-])REJECT-(DICT|ARRAY|200|IMG|TINYGIF|VIDEO)(?![A-Z-])',
-      caseSensitive: false,
-    ),
-    'REJECT',
-  );
+  normalized = normalized.replaceAll(_granularRejectWord, 'REJECT');
   return normalized;
 }
 
@@ -958,7 +971,7 @@ Sgmodule parseSgmodule(String content) {
       continue;
     }
     if (line.startsWith('#') || line.startsWith(';')) continue;
-    final sectionMatch = RegExp(r'^\[(.+)\]$').firstMatch(line);
+    final sectionMatch = _sectionHeaderPattern.firstMatch(line);
     if (sectionMatch != null) {
       section = sectionMatch.group(1)!.trim().toLowerCase();
       continue;
@@ -991,7 +1004,7 @@ Sgmodule parseSgmodule(String content) {
       case 'mitm':
         final eq = line.indexOf('=');
         final value = eq > 0 ? line.substring(eq + 1) : line;
-        for (final host in value.split(RegExp(r'[,\s]+'))) {
+        for (final host in value.split(_mitmHostSeparator)) {
           final h = host.trim();
           if (h.isEmpty || h.startsWith('%')) continue;
           mitmHostnames.add(h);
@@ -1114,16 +1127,14 @@ Sgmodule parseSgmoduleWithArguments(
 ) {
   // Match: pattern followed by action and quoted args
   // e.g.: ^https?://example.com/ header-del "X-Header"
-  final match = RegExp(
-    r'^(\S+)\s+(header-del|header-add|header-replace|header-replace-regex)\s+(.+)$',
-  ).firstMatch(line.trim());
+  final match = _headerRewriteLinePattern.firstMatch(line.trim());
   if (match == null) return null;
   final pattern = match.group(1)!;
   final action = match.group(2)!;
   final argsStr = match.group(3)!;
   // Extract quoted strings
   final args = <String>[];
-  final quoted = RegExp(r'"([^"]*)"').allMatches(argsStr);
+  final quoted = _quotedArgPattern.allMatches(argsStr);
   for (final m in quoted) {
     args.add(m.group(1)!);
   }
@@ -1220,7 +1231,7 @@ parseMapLocalLine(String line) {
 /// `<http-request|http-response> <url-pattern> <regex> <replacement>` or `<http-request-jq|http-response-jq> <url-pattern> <jq>`
 ({String type, String pattern, String regex, String replacement, String jq})?
 parseBodyRewriteLine(String line) {
-  final match = RegExp(r'^(\S+)\s+(\S+)\s+(.+)$').firstMatch(line.trim());
+  final match = _bodyRewriteLinePattern.firstMatch(line.trim());
   if (match == null) return null;
   final type = match.group(1)!.toLowerCase();
   final pattern = match.group(2)!;
@@ -1242,7 +1253,7 @@ parseBodyRewriteLine(String line) {
     default:
       return null;
   }
-  final expr = RegExp(r'^(\S+)\s+(.+)$').firstMatch(rest);
+  final expr = _bodyRewriteExprPattern.firstMatch(rest);
   if (expr == null) return null;
   return (
     type: type,

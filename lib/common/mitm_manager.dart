@@ -7,6 +7,8 @@ import 'package:fl_clash/common/shadowrocket.dart';
 import 'package:fl_clash/core/controller.dart';
 import 'package:flutter/foundation.dart';
 
+final _whitespacePattern = RegExp(r'\s+');
+
 /// Manages the MITM proxy lifecycle: collects hosts/rewrites/scripts from
 /// enabled modules, downloads remote scripts, and starts/stops the Go MITM
 /// proxy.
@@ -64,7 +66,7 @@ class MitmManager {
 
     // Profile rewrites come first (they're part of the config).
     for (final line in profileUrlRewrites) {
-      final parts = line.trim().split(RegExp(r'\s+'));
+      final parts = line.trim().split(_whitespacePattern);
       if (parts.length < 2) continue;
       rewrites.add({
         'pattern': parts[0],
@@ -92,7 +94,7 @@ class MitmManager {
 
         // URL rewrites: parse "pattern target status".
         for (final line in sg.urlRewrites) {
-          final parts = line.trim().split(RegExp(r'\s+'));
+          final parts = line.trim().split(_whitespacePattern);
           if (parts.length < 2) continue;
           rewrites.add({
             'pattern': parts[0],
@@ -114,16 +116,26 @@ class MitmManager {
           }
         }
 
-        // Scripts: parse and download content.
+        // Fetch each unique script URL once: a module can list the same URL hundreds of times.
+        final parsedScripts = <Map<String, dynamic>>[];
+        final scriptPaths = <String>{};
         for (final line in sg.scripts) {
           final parsed = parseScriptLine(line);
           if (parsed == null) continue;
-          // Download remote script content.
           final scriptPath = parsed['scriptPath'] as String?;
-          String content = '';
           if (scriptPath != null && scriptPath.isNotEmpty) {
-            content = await _downloadScript(scriptPath);
+            scriptPaths.add(scriptPath);
           }
+          parsedScripts.add(parsed);
+        }
+        final scriptContents = <String, String>{};
+        await Future.wait(
+          scriptPaths.map(
+            (path) async => scriptContents[path] = await _downloadScript(path),
+          ),
+        );
+        for (final parsed in parsedScripts) {
+          final scriptPath = parsed['scriptPath'] as String?;
           scripts.add({
             'name': parsed['name'],
             'type': parsed['type'],
@@ -134,7 +146,9 @@ class MitmManager {
             'maxSize': parsed['maxSize'],
             'argument': parsed['argument'],
             'scriptPath': scriptPath,
-            'content': content,
+            'content': scriptPath == null
+                ? ''
+                : (scriptContents[scriptPath] ?? ''),
           });
         }
       } catch (_) {
