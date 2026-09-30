@@ -1,0 +1,21 @@
+name: Debug Format 4
+on: [push]
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+      - run: dart format lib/models/generated/profile.freezed.dart lib/models/generated/profile.g.dart lib/models/profile.dart lib/common/mitm_manager.dart lib/providers/actions/core.dart lib/common/sr_import.dart test/common/mitm_profile_test.dart
+      - run: |
+          git config user.name "debug"
+          git config user.email "debug@localhost"
+          git checkout -b format-fix
+          git add -A
+          git diff --cached --stat
+          git commit -m "format fix" || echo "no changes"
+          git push origin format-fix --force
