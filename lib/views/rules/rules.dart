@@ -1,7 +1,10 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/config/rules.dart';
+import 'package:fl_clash/views/rewrite/body_rewrite_editor.dart';
+import 'package:fl_clash/views/rewrite/map_local_editor.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -105,12 +108,62 @@ class _RulesViewState extends ConsumerState<RulesView> {
       title: appLocalizations.rules,
       actions: [
         IconButton(
+          icon: const Icon(Icons.tune),
+          tooltip: '改写',
+          onPressed: _showRewriteMenu,
+        ),
+        IconButton(
           icon: const Icon(Icons.file_open),
           tooltip: '导入 .conf 规则',
           onPressed: _showImportMenu,
         ),
       ],
       body: const AddedRulesView(),
+    );
+  }
+
+  void _openRewritePage(bool isMapLocal) {
+    final profileId = ref.read(currentProfileIdProvider);
+    if (profileId == null) {
+      dialogs.showNotifier('当前没有配置', level: MessageLevel.warning);
+      return;
+    }
+    BaseNavigator.push(
+      context,
+      isMapLocal
+          ? MapLocalEditorPage(profileId: profileId)
+          : BodyRewriteEditorPage(profileId: profileId),
+    );
+  }
+
+  void _showRewriteMenu() {
+    dialogs.showCommonDialog(
+      child: CommonDialog(
+        title: '改写',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListItem(
+              leading: const Icon(Icons.map),
+              title: const Text('Map Local'),
+              subtitle: const Text('将匹配请求的响应替换为本地内容'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _openRewritePage(true);
+              },
+            ),
+            ListItem(
+              leading: const Icon(Icons.data_object),
+              title: const Text('Body Rewrite'),
+              subtitle: const Text('用正则或 jq 改写请求/响应正文'),
+              onTap: () {
+                Navigator.of(context).pop();
+                _openRewritePage(false);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
