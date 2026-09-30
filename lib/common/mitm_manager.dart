@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:dio/dio.dart';
 import 'package:fl_clash/common/ca_store.dart';
@@ -29,34 +27,15 @@ class MitmManager {
   }) async {
     final modules = await _moduleStore.list();
     final enabled = modules.where((m) => m.enabled).toList();
-    // Load per-conf [MITM] hostnames from documents/pigcat_mitm.json.
-    final confMitmHostnames = <String>[];
-    try {
-      final docDir = await getApplicationDocumentsDirectory();
-      final mitmFile = File('${docDir.path}/pigcat_mitm.json');
-      if (await mitmFile.exists()) {
-        final data = json.decode(await mitmFile.readAsString());
-        if (data['enabled'] == true) {
-          confMitmHostnames.addAll(
-            (data['hostnames'] as List?)
-                    ?.map((e) => e.toString())
-                    .toList() ??
-                const <String>[],
-          );
-        }
-      }
-    } catch (_) {}
-    // Start MITM if modules, profile, or conf have rewrites/scripts/hostnames.
+    // Start MITM if modules OR profile have rewrites/scripts.
     if (enabled.isEmpty &&
         profileUrlRewrites.isEmpty &&
-        profileHeaderRewrites.isEmpty &&
-        confMitmHostnames.isEmpty) {
+        profileHeaderRewrites.isEmpty) {
       await stop();
       return false;
     }
 
     final hosts = <String>{};
-    hosts.addAll(confMitmHostnames);
     final rewrites = <Map<String, String>>[];
     final scripts = <Map<String, dynamic>>[];
 
