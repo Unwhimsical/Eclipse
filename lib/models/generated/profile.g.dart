@@ -62,12 +62,6 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
           ?.map((e) => e as String)
           .toList() ??
       const [],
-  mitmEnabled: json['mitmEnabled'] as bool? ?? false,
-  mitmHostnames:
-      (json['mitmHostnames'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList() ??
-      const [],
   overwriteType:
       $enumDecodeNullable(_$OverwriteTypeEnumMap, json['overwriteType']) ??
       OverwriteType.standard,
@@ -90,8 +84,6 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'hosts': instance.hosts,
   'urlRewrites': instance.urlRewrites,
   'headerRewrites': instance.headerRewrites,
-  'mitmEnabled': instance.mitmEnabled,
-  'mitmHostnames': instance.mitmHostnames,
   'overwriteType': _$OverwriteTypeEnumMap[instance.overwriteType]!,
   'scriptId': instance.scriptId,
   'matchTarget': instance.matchTarget,

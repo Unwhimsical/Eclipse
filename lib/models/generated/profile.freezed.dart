@@ -295,7 +295,7 @@ as int,
 /// @nodoc
 mixin _$Profile {
 
- int get id; String get label; String? get currentGroupName; String get url; DateTime? get lastUpdateDate; Duration get autoUpdateDuration; SubscriptionInfo? get subscriptionInfo; bool get autoUpdate; Map<String, String> get selectedMap; Set<String> get unfoldSet; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; bool get mitmEnabled; List<String> get mitmHostnames; OverwriteType get overwriteType; int? get scriptId; String? get matchTarget; int? get order;
+ int get id; String get label; String? get currentGroupName; String get url; DateTime? get lastUpdateDate; Duration get autoUpdateDuration; SubscriptionInfo? get subscriptionInfo; bool get autoUpdate; Map<String, String> get selectedMap; Set<String> get unfoldSet; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; OverwriteType get overwriteType; int? get scriptId; String? get matchTarget; int? get order;
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -333,7 +333,7 @@ abstract mixin class $ProfileCopyWith<$Res>  {
   factory $ProfileCopyWith(Profile value, $Res Function(Profile) _then) = _$ProfileCopyWithImpl;
 @useResult
 $Res call({
- int id, String label, String? currentGroupName, String url, DateTime? lastUpdateDate, Duration autoUpdateDuration, SubscriptionInfo? subscriptionInfo, bool autoUpdate, Map<String, String> selectedMap, Set<String> unfoldSet, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, bool mitmEnabled, List<String> mitmHostnames, OverwriteType overwriteType, int? scriptId, String? matchTarget, int? order
+ int id, String label, String? currentGroupName, String url, DateTime? lastUpdateDate, Duration autoUpdateDuration, SubscriptionInfo? subscriptionInfo, bool autoUpdate, Map<String, String> selectedMap, Set<String> unfoldSet, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, OverwriteType overwriteType, int? scriptId, String? matchTarget, int? order
 });
 
 
@@ -350,7 +350,7 @@ class _$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mitmEnabled = null,Object? mitmHostnames = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
   return _then(Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
@@ -365,9 +365,6 @@ as Map<String, String>,unfoldSet: null == unfoldSet ? _self.unfoldSet : unfoldSe
 as Set<String>,hosts: null == hosts ? _self.hosts : hosts // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,urlRewrites: null == urlRewrites ? _self.urlRewrites : urlRewrites // ignore: cast_nullable_to_non_nullable
 as List<String>,headerRewrites: null == headerRewrites ? _self.headerRewrites : headerRewrites // ignore: cast_nullable_to_non_nullable
-as List<String>,mitmEnabled: null == mitmEnabled ? _self.mitmEnabled : mitmEnabled // ignore: cast_nullable_to_non_nullable
-as bool,
-mitmHostnames: null == mitmHostnames ? _self.mitmHostnames : mitmHostnames // ignore: cast_nullable_to_non_nullable
 as List<String>,overwriteType: null == overwriteType ? _self.overwriteType : overwriteType // ignore: cast_nullable_to_non_nullable
 as OverwriteType,scriptId: freezed == scriptId ? _self.scriptId : scriptId // ignore: cast_nullable_to_non_nullable
 as int?,matchTarget: freezed == matchTarget ? _self.matchTarget : matchTarget // ignore: cast_nullable_to_non_nullable
@@ -525,7 +522,7 @@ return $default(_that.id,_that.label,_that.currentGroupName,_that.url,_that.last
 @JsonSerializable()
 
 class _Profile implements Profile {
-  const _Profile({required this.id, this.label = '', this.currentGroupName, this.url = '', this.lastUpdateDate, required this.autoUpdateDuration, this.subscriptionInfo, this.autoUpdate = true,  Map<String, String> selectedMap = const {},  Set<String> unfoldSet = const {},  Map<String, String> hosts = const {},  List<String> urlRewrites = const [],  List<String> headerRewrites = const [], this.mitmEnabled = false, List<String> mitmHostnames = const [], this.overwriteType = OverwriteType.standard, this.scriptId, this.matchTarget, this.order}): _selectedMap = selectedMap,_unfoldSet = unfoldSet,_hosts = hosts,_urlRewrites = urlRewrites,_headerRewrites = headerRewrites,_mitmHostnames = mitmHostnames;
+  const _Profile({required this.id, this.label = '', this.currentGroupName, this.url = '', this.lastUpdateDate, required this.autoUpdateDuration, this.subscriptionInfo, this.autoUpdate = true,  Map<String, String> selectedMap = const {},  Set<String> unfoldSet = const {},  Map<String, String> hosts = const {},  List<String> urlRewrites = const [],  List<String> headerRewrites = const [], this.overwriteType = OverwriteType.standard, this.scriptId, this.matchTarget, this.order}): _selectedMap = selectedMap,_unfoldSet = unfoldSet,_hosts = hosts,_urlRewrites = urlRewrites,_headerRewrites = headerRewrites;
   factory _Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
 
 @override final  int id;
@@ -570,13 +567,6 @@ class _Profile implements Profile {
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_headerRewrites);
 }
-@override@JsonKey() final  bool mitmEnabled;
- final  List<String> _mitmHostnames;
-@override@JsonKey() List<String> get mitmHostnames {
-  if (_mitmHostnames is EqualUnmodifiableListView) return _mitmHostnames;
-  // ignore: implicit_dynamic_type
-  return EqualUnmodifiableListView(_mitmHostnames);
-}
 
 @override@JsonKey() final  OverwriteType overwriteType;
 @override final  int? scriptId;
@@ -596,18 +586,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.currentGroupName, currentGroupName) || other.currentGroupName == currentGroupName)&&(identical(other.url, url) || other.url == url)&&(identical(other.lastUpdateDate, lastUpdateDate) || other.lastUpdateDate == lastUpdateDate)&&(identical(other.autoUpdateDuration, autoUpdateDuration) || other.autoUpdateDuration == autoUpdateDuration)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate)&&const DeepCollectionEquality().equals(other.selectedMap, _selectedMap)&&const DeepCollectionEquality().equals(other.unfoldSet, _unfoldSet)&&const DeepCollectionEquality().equals(other.hosts, _hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _headerRewrites)&&(identical(other.mitmEnabled, mitmEnabled) || other.mitmEnabled == mitmEnabled)&&const DeepCollectionEquality().equals(other.mitmHostnames, _mitmHostnames)&&(identical(other.overwriteType, overwriteType) || other.overwriteType == overwriteType)&&(identical(other.scriptId, scriptId) || other.scriptId == scriptId)&&(identical(other.matchTarget, matchTarget) || other.matchTarget == matchTarget)&&(identical(other.order, order) || other.order == order));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Profile&&(identical(other.id, id) || other.id == id)&&(identical(other.label, label) || other.label == label)&&(identical(other.currentGroupName, currentGroupName) || other.currentGroupName == currentGroupName)&&(identical(other.url, url) || other.url == url)&&(identical(other.lastUpdateDate, lastUpdateDate) || other.lastUpdateDate == lastUpdateDate)&&(identical(other.autoUpdateDuration, autoUpdateDuration) || other.autoUpdateDuration == autoUpdateDuration)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.autoUpdate, autoUpdate) || other.autoUpdate == autoUpdate)&&const DeepCollectionEquality().equals(other.selectedMap, _selectedMap)&&const DeepCollectionEquality().equals(other.unfoldSet, _unfoldSet)&&const DeepCollectionEquality().equals(other.hosts, _hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _headerRewrites)&&(identical(other.overwriteType, overwriteType) || other.overwriteType == overwriteType)&&(identical(other.scriptId, scriptId) || other.scriptId == scriptId)&&(identical(other.matchTarget, matchTarget) || other.matchTarget == matchTarget)&&(identical(other.order, order) || other.order == order));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,label,currentGroupName,url,lastUpdateDate,autoUpdateDuration,subscriptionInfo,autoUpdate,const DeepCollectionEquality().hash(_selectedMap),const DeepCollectionEquality().hash(_unfoldSet),const DeepCollectionEquality().hash(_hosts),const DeepCollectionEquality().hash(_urlRewrites),const DeepCollectionEquality().hash(_headerRewrites),mitmEnabled,const DeepCollectionEquality().hash(_mitmHostnames),overwriteType,scriptId,matchTarget,order);
+    return Object.hash(runtimeType,id,label,currentGroupName,url,lastUpdateDate,autoUpdateDuration,subscriptionInfo,autoUpdate,const DeepCollectionEquality().hash(_selectedMap),const DeepCollectionEquality().hash(_unfoldSet),const DeepCollectionEquality().hash(_hosts),const DeepCollectionEquality().hash(_urlRewrites),const DeepCollectionEquality().hash(_headerRewrites),overwriteType,scriptId,matchTarget,order);
 }
 
 @override
 String toString() {
-    return 'Profile(id: $id, label: $label, currentGroupName: $currentGroupName, url: $url, lastUpdateDate: $lastUpdateDate, autoUpdateDuration: $autoUpdateDuration, subscriptionInfo: $subscriptionInfo, autoUpdate: $autoUpdate, selectedMap: $selectedMap, unfoldSet: $unfoldSet, hosts: $hosts, urlRewrites: $urlRewrites, headerRewrites: $headerRewrites, mitmEnabled: $mitmEnabled, mitmHostnames: $mitmHostnames, overwriteType: $overwriteType, scriptId: $scriptId, matchTarget: $matchTarget, order: $order)';
+    return 'Profile(id: $id, label: $label, currentGroupName: $currentGroupName, url: $url, lastUpdateDate: $lastUpdateDate, autoUpdateDuration: $autoUpdateDuration, subscriptionInfo: $subscriptionInfo, autoUpdate: $autoUpdate, selectedMap: $selectedMap, unfoldSet: $unfoldSet, hosts: $hosts, urlRewrites: $urlRewrites, headerRewrites: $headerRewrites, overwriteType: $overwriteType, scriptId: $scriptId, matchTarget: $matchTarget, order: $order)';
 }
 
 
@@ -618,7 +608,7 @@ abstract mixin class _$ProfileCopyWith<$Res> implements $ProfileCopyWith<$Res> {
   factory _$ProfileCopyWith(_Profile value, $Res Function(_Profile) _then) = __$ProfileCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String label, String? currentGroupName, String url, DateTime? lastUpdateDate, Duration autoUpdateDuration, SubscriptionInfo? subscriptionInfo, bool autoUpdate, Map<String, String> selectedMap, Set<String> unfoldSet, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, bool mitmEnabled, List<String> mitmHostnames, OverwriteType overwriteType, int? scriptId, String? matchTarget, int? order
+ int id, String label, String? currentGroupName, String url, DateTime? lastUpdateDate, Duration autoUpdateDuration, SubscriptionInfo? subscriptionInfo, bool autoUpdate, Map<String, String> selectedMap, Set<String> unfoldSet, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, OverwriteType overwriteType, int? scriptId, String? matchTarget, int? order
 });
 
 
@@ -635,7 +625,7 @@ class __$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mitmEnabled = null,Object? mitmHostnames = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
   return _then(_Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
