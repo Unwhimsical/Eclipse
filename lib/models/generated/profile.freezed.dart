@@ -366,7 +366,8 @@ as Set<String>,hosts: null == hosts ? _self.hosts : hosts // ignore: cast_nullab
 as Map<String, String>,urlRewrites: null == urlRewrites ? _self.urlRewrites : urlRewrites // ignore: cast_nullable_to_non_nullable
 as List<String>,headerRewrites: null == headerRewrites ? _self.headerRewrites : headerRewrites // ignore: cast_nullable_to_non_nullable
 as List<String>,mitmEnabled: null == mitmEnabled ? _self.mitmEnabled : mitmEnabled // ignore: cast_nullable_to_non_nullable
-as bool,mitmHostnames: null == mitmHostnames ? _self.mitmHostnames : mitmHostnames // ignore: cast_nullable_to_non_nullable
+as bool,
+mitmHostnames: null == mitmHostnames ? _self.mitmHostnames : mitmHostnames // ignore: cast_nullable_to_non_nullable
 as List<String>,overwriteType: null == overwriteType ? _self.overwriteType : overwriteType // ignore: cast_nullable_to_non_nullable
 as OverwriteType,scriptId: freezed == scriptId ? _self.scriptId : scriptId // ignore: cast_nullable_to_non_nullable
 as int?,matchTarget: freezed == matchTarget ? _self.matchTarget : matchTarget // ignore: cast_nullable_to_non_nullable
