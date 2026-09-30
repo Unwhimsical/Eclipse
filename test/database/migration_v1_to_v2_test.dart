@@ -54,6 +54,12 @@ void _downgradeToV5(Database raw) {
   raw.execute('PRAGMA user_version = 5');
 }
 
+/// Schema version 6 had no per-profile `general_settings`.
+void _downgradeToV6(Database raw) {
+  raw.execute('ALTER TABLE profiles DROP COLUMN general_settings');
+  raw.execute('PRAGMA user_version = 6');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -98,7 +104,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -108,7 +114,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
   });
 
   test(
@@ -120,7 +126,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 6);
+      expect(_userVersion(raw), 7);
     },
   );
 
@@ -195,7 +201,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -205,7 +211,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
   });
 
@@ -221,7 +227,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
     );
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
   });
 
   test('the v4 upgrade preserves existing profile rows', () async {
@@ -234,7 +240,7 @@ void main() {
 
     await openAndMigrate();
 
-    final rows = await raw.select(
+    final rows = raw.select(
       'SELECT id, label, hosts, url_rewrites, header_rewrites '
       'FROM profiles WHERE id = ?',
       [1],
@@ -254,7 +260,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['mitm_enabled', 'mitm_hostnames']),
     );
-    expect(_userVersion(raw), 6);
+    expect(_userVersion(raw), 7);
   });
 
   test('the v5 upgrade preserves existing profile rows', () async {
@@ -283,7 +289,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('mitm_hostnames'));
-      expect(_userVersion(raw), 6);
+      expect(_userVersion(raw), 7);
     },
   );
 
@@ -300,7 +306,7 @@ void main() {
         _columnsOf(raw, 'profiles'),
         containsAll(<String>['map_local', 'body_rewrites']),
       );
-      expect(_userVersion(raw), 6);
+      expect(_userVersion(raw), 7);
     },
   );
 
@@ -330,7 +336,34 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('body_rewrites'));
-      expect(_userVersion(raw), 6);
+      expect(_userVersion(raw), 7);
     },
   );
+
+  test('the v7 upgrade adds the per-profile general settings column', () async {
+    _downgradeToV6(raw);
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('general_settings')));
+
+    await openAndMigrate();
+
+    expect(_columnsOf(raw, 'profiles'), contains('general_settings'));
+    expect(_userVersion(raw), 7);
+  });
+
+  test('the v7 upgrade preserves existing profile rows', () async {
+    _downgradeToV6(raw);
+    raw.execute(
+      'INSERT INTO profiles (id, label, url, overwrite_type, '
+      'auto_update_duration_millis, auto_update, selected_map, unfold_set) '
+      "VALUES (1, 'keep me', '', 'standard', 0, 0, '{}', '[]')",
+    );
+
+    final database = await openAndMigrate();
+
+    final profiles = await database.profilesDao.query().get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.label, 'keep me');
+    expect(profiles.single.generalSettings.dnsServers, isEmpty);
+    expect(profiles.single.generalSettings.ipv6, isNull);
+  });
 }

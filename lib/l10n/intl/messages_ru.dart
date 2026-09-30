@@ -164,6 +164,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "allowLanDesc": MessageLookupByLibrary.simpleMessage(
       "Разрешить доступ к прокси из локальной сети",
     ),
+    "alwaysRealIp": MessageLookupByLibrary.simpleMessage("Всегда реальный IP"),
     "app": MessageLookupByLibrary.simpleMessage("Приложение"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "Контроль доступа приложений",
@@ -339,6 +340,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Smart App Control в Windows заблокировал неподписанный EclipseCore.exe. Откройте Безопасность Windows → Управление приложениями и браузером → Параметры Smart App Control, выберите «Выкл.» и снова запустите Eclipse. Повторно включить Smart App Control без переустановки Windows нельзя.",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("Статус ядра"),
+    "coreUnsupported": MessageLookupByLibrary.simpleMessage(
+      "Не поддерживается ядром",
+    ),
     "country": MessageLookupByLibrary.simpleMessage("Регион"),
     "crashDetected": MessageLookupByLibrary.simpleMessage("Обнаружен сбой"),
     "crashDetectedTip": m1,
@@ -399,6 +403,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Режим разработчика включён.",
     ),
     "direct": MessageLookupByLibrary.simpleMessage("Прямой"),
+    "directDnsServers": MessageLookupByLibrary.simpleMessage(
+      "Прямые DNS-серверы",
+    ),
     "disableUDP": MessageLookupByLibrary.simpleMessage("Отключить UDP"),
     "disclaimer": MessageLookupByLibrary.simpleMessage(
       "Отказ от ответственности",
@@ -415,6 +422,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dnsHijacking": MessageLookupByLibrary.simpleMessage("Перехват DNS"),
     "dnsMode": MessageLookupByLibrary.simpleMessage("Режим DNS"),
+    "dnsServers": MessageLookupByLibrary.simpleMessage("DNS-серверы"),
     "domain": MessageLookupByLibrary.simpleMessage("Домен"),
     "download": MessageLookupByLibrary.simpleMessage("Загрузка"),
     "edit": MessageLookupByLibrary.simpleMessage("Редактировать"),
@@ -469,6 +477,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "fallbackDesc": MessageLookupByLibrary.simpleMessage(
       "Обычно зарубежный DNS",
     ),
+    "fallbackDnsServers": MessageLookupByLibrary.simpleMessage(
+      "Резервные DNS-серверы",
+    ),
     "fallbackFilter": MessageLookupByLibrary.simpleMessage("Фильтр fallback"),
     "fidelityScheme": MessageLookupByLibrary.simpleMessage("Точная передача"),
     "file": MessageLookupByLibrary.simpleMessage("Файл"),
@@ -489,6 +500,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Фруктовый микс"),
     "general": MessageLookupByLibrary.simpleMessage("Общие"),
+    "generalSettings": MessageLookupByLibrary.simpleMessage("Общие настройки"),
     "geoAutoUpdate": MessageLookupByLibrary.simpleMessage("Автообновление"),
     "geoAutoUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "Интервал автообновления",
@@ -561,6 +573,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "includeAllProxyProvidersTip": MessageLookupByLibrary.simpleMessage(
       "При включении переопределяет подключённых провайдеров прокси",
     ),
+    "includeUrl": MessageLookupByLibrary.simpleMessage(
+      "URL включаемой конфигурации",
+    ),
+    "includeUrlDesc": MessageLookupByLibrary.simpleMessage(
+      "Удалённая конфигурация, объединённая при импорте; хранится для справки.",
+    ),
     "infiniteTime": MessageLookupByLibrary.simpleMessage("Бессрочно"),
     "init": MessageLookupByLibrary.simpleMessage("Инициализация"),
     "inputCorrectHotkey": MessageLookupByLibrary.simpleMessage(
@@ -608,9 +626,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "При включении можно принимать трафик IPv6",
     ),
+    "ipv6FollowConfig": MessageLookupByLibrary.simpleMessage(
+      "Как в глобальных настройках",
+    ),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage(
       "Разрешить входящий IPv6",
     ),
+    "ipv6Off": MessageLookupByLibrary.simpleMessage("IPv6 выключен"),
+    "ipv6On": MessageLookupByLibrary.simpleMessage("IPv6 включён"),
     "ja": MessageLookupByLibrary.simpleMessage("Японский"),
     "justNow": MessageLookupByLibrary.simpleMessage("Только что"),
     "keepAliveIntervalDesc": MessageLookupByLibrary.simpleMessage(
@@ -782,6 +805,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Пользовательский режим: полная настройка групп прокси и правил",
     ),
     "palette": MessageLookupByLibrary.simpleMessage("Палитра"),
+    "paramOff": MessageLookupByLibrary.simpleMessage("Выкл."),
+    "paramOn": MessageLookupByLibrary.simpleMessage("Вкл."),
     "password": MessageLookupByLibrary.simpleMessage("Пароль"),
     "paste": MessageLookupByLibrary.simpleMessage("Вставить"),
     "pickFromAlbum": MessageLookupByLibrary.simpleMessage("Выбрать из галереи"),
@@ -805,6 +830,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "Предпочитать HTTP/3 для DoH",
     ),
+    "preferIpv6": MessageLookupByLibrary.simpleMessage("Предпочитать IPv6"),
     "prerequisites": MessageLookupByLibrary.simpleMessage(
       "Предварительные условия",
     ),
@@ -812,6 +838,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "preview": MessageLookupByLibrary.simpleMessage("Предпросмотр"),
     "previousMatch": MessageLookupByLibrary.simpleMessage(
       "Предыдущее совпадение",
+    ),
+    "privateIpAnswer": MessageLookupByLibrary.simpleMessage(
+      "Ответ приватным IP",
     ),
     "process": MessageLookupByLibrary.simpleMessage("Процесс"),
     "profile": MessageLookupByLibrary.simpleMessage("Профиль"),
@@ -1121,6 +1150,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Запускаться в фоновом режиме",
     ),
     "size": MessageLookupByLibrary.simpleMessage("Размер"),
+    "skipProxy": MessageLookupByLibrary.simpleMessage("Обход прокси"),
+    "skipProxyDesc": MessageLookupByLibrary.simpleMessage(
+      "Остаются в TUN-туннеле; политика определяется цепочкой правил.",
+    ),
     "socksPort": MessageLookupByLibrary.simpleMessage("Порт SOCKS"),
     "sort": MessageLookupByLibrary.simpleMessage("Сортировка"),
     "source": MessageLookupByLibrary.simpleMessage("Источник"),
@@ -1210,6 +1243,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunDesc": MessageLookupByLibrary.simpleMessage(
       "Работает только в режиме администратора",
+    ),
+    "tunExcludedRoutes": MessageLookupByLibrary.simpleMessage(
+      "Исключённые маршруты TUN",
+    ),
+    "tunExcludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "CIDR-маршруты, исключённые из TUN",
+    ),
+    "tunIncludedRoutes": MessageLookupByLibrary.simpleMessage(
+      "Включённые маршруты TUN",
+    ),
+    "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "CIDR-маршруты, включённые в TUN",
     ),
     "turnOff": MessageLookupByLibrary.simpleMessage("Выключить"),
     "turnOn": MessageLookupByLibrary.simpleMessage("Включить"),

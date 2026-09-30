@@ -217,6 +217,16 @@ class $ProfilesTable extends Profiles
     requiredDuringInsert: false,
     defaultValue: const Constant('[]'),
   ).withConverter<List<String>>($ProfilesTable.$convertermitmHostnames);
+  @override
+  late final GeneratedColumnWithTypeConverter<GeneralSettings, String>
+  generalSettings = GeneratedColumn<String>(
+    'general_settings',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('{}'),
+  ).withConverter<GeneralSettings>($ProfilesTable.$convertergeneralSettings);
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
@@ -248,6 +258,7 @@ class $ProfilesTable extends Profiles
     bodyRewrites,
     mitmEnabled,
     mitmHostnames,
+    generalSettings,
     order,
   ];
   @override
@@ -457,6 +468,12 @@ class $ProfilesTable extends Profiles
           data['${effectivePrefix}mitm_hostnames'],
         )!,
       ),
+      generalSettings: $ProfilesTable.$convertergeneralSettings.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}general_settings'],
+        )!,
+      ),
       order: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}order'],
@@ -491,6 +508,8 @@ class $ProfilesTable extends Profiles
       const StringListConverter();
   static TypeConverter<List<String>, String> $convertermitmHostnames =
       const StringListConverter();
+  static TypeConverter<GeneralSettings, String> $convertergeneralSettings =
+      const GeneralSettingsConverter();
 }
 
 class RawProfile extends DataClass implements Insertable<RawProfile> {
@@ -514,6 +533,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   final List<String> bodyRewrites;
   final bool mitmEnabled;
   final List<String> mitmHostnames;
+  final GeneralSettings generalSettings;
   final int? order;
   const RawProfile({
     required this.id,
@@ -536,6 +556,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     required this.bodyRewrites,
     required this.mitmEnabled,
     required this.mitmHostnames,
+    required this.generalSettings,
     this.order,
   });
   @override
@@ -611,6 +632,11 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         $ProfilesTable.$convertermitmHostnames.toSql(mitmHostnames),
       );
     }
+    {
+      map['general_settings'] = Variable<String>(
+        $ProfilesTable.$convertergeneralSettings.toSql(generalSettings),
+      );
+    }
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
@@ -649,6 +675,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       bodyRewrites: Value(bodyRewrites),
       mitmEnabled: Value(mitmEnabled),
       mitmHostnames: Value(mitmHostnames),
+      generalSettings: Value(generalSettings),
       order: order == null && nullToAbsent
           ? const Value.absent()
           : Value(order),
@@ -689,6 +716,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       bodyRewrites: serializer.fromJson<List<String>>(json['bodyRewrites']),
       mitmEnabled: serializer.fromJson<bool>(json['mitmEnabled']),
       mitmHostnames: serializer.fromJson<List<String>>(json['mitmHostnames']),
+      generalSettings: serializer.fromJson<GeneralSettings>(
+        json['generalSettings'],
+      ),
       order: serializer.fromJson<int?>(json['order']),
     );
   }
@@ -722,6 +752,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       'bodyRewrites': serializer.toJson<List<String>>(bodyRewrites),
       'mitmEnabled': serializer.toJson<bool>(mitmEnabled),
       'mitmHostnames': serializer.toJson<List<String>>(mitmHostnames),
+      'generalSettings': serializer.toJson<GeneralSettings>(generalSettings),
       'order': serializer.toJson<int?>(order),
     };
   }
@@ -747,6 +778,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     List<String>? bodyRewrites,
     bool? mitmEnabled,
     List<String>? mitmHostnames,
+    GeneralSettings? generalSettings,
     Value<int?> order = const Value.absent(),
   }) => RawProfile(
     id: id ?? this.id,
@@ -776,6 +808,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     bodyRewrites: bodyRewrites ?? this.bodyRewrites,
     mitmEnabled: mitmEnabled ?? this.mitmEnabled,
     mitmHostnames: mitmHostnames ?? this.mitmHostnames,
+    generalSettings: generalSettings ?? this.generalSettings,
     order: order.present ? order.value : this.order,
   );
   RawProfile copyWithCompanion(ProfilesCompanion data) {
@@ -826,6 +859,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       mitmHostnames: data.mitmHostnames.present
           ? data.mitmHostnames.value
           : this.mitmHostnames,
+      generalSettings: data.generalSettings.present
+          ? data.generalSettings.value
+          : this.generalSettings,
       order: data.order.present ? data.order.value : this.order,
     );
   }
@@ -853,6 +889,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ..write('bodyRewrites: $bodyRewrites, ')
           ..write('mitmEnabled: $mitmEnabled, ')
           ..write('mitmHostnames: $mitmHostnames, ')
+          ..write('generalSettings: $generalSettings, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -880,6 +917,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     bodyRewrites,
     mitmEnabled,
     mitmHostnames,
+    generalSettings,
     order,
   ]);
   @override
@@ -906,6 +944,7 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           other.bodyRewrites == this.bodyRewrites &&
           other.mitmEnabled == this.mitmEnabled &&
           other.mitmHostnames == this.mitmHostnames &&
+          other.generalSettings == this.generalSettings &&
           other.order == this.order);
 }
 
@@ -930,6 +969,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
   final Value<List<String>> bodyRewrites;
   final Value<bool> mitmEnabled;
   final Value<List<String>> mitmHostnames;
+  final Value<GeneralSettings> generalSettings;
   final Value<int?> order;
   const ProfilesCompanion({
     this.id = const Value.absent(),
@@ -952,6 +992,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.bodyRewrites = const Value.absent(),
     this.mitmEnabled = const Value.absent(),
     this.mitmHostnames = const Value.absent(),
+    this.generalSettings = const Value.absent(),
     this.order = const Value.absent(),
   });
   ProfilesCompanion.insert({
@@ -975,6 +1016,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.bodyRewrites = const Value.absent(),
     this.mitmEnabled = const Value.absent(),
     this.mitmHostnames = const Value.absent(),
+    this.generalSettings = const Value.absent(),
     this.order = const Value.absent(),
   }) : label = Value(label),
        url = Value(url),
@@ -1004,6 +1046,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Expression<String>? bodyRewrites,
     Expression<bool>? mitmEnabled,
     Expression<String>? mitmHostnames,
+    Expression<String>? generalSettings,
     Expression<int>? order,
   }) {
     return RawValuesInsertable({
@@ -1028,6 +1071,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       if (bodyRewrites != null) 'body_rewrites': bodyRewrites,
       if (mitmEnabled != null) 'mitm_enabled': mitmEnabled,
       if (mitmHostnames != null) 'mitm_hostnames': mitmHostnames,
+      if (generalSettings != null) 'general_settings': generalSettings,
       if (order != null) 'order': order,
     });
   }
@@ -1053,6 +1097,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Value<List<String>>? bodyRewrites,
     Value<bool>? mitmEnabled,
     Value<List<String>>? mitmHostnames,
+    Value<GeneralSettings>? generalSettings,
     Value<int?>? order,
   }) {
     return ProfilesCompanion(
@@ -1077,6 +1122,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       bodyRewrites: bodyRewrites ?? this.bodyRewrites,
       mitmEnabled: mitmEnabled ?? this.mitmEnabled,
       mitmHostnames: mitmHostnames ?? this.mitmHostnames,
+      generalSettings: generalSettings ?? this.generalSettings,
       order: order ?? this.order,
     );
   }
@@ -1166,6 +1212,11 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
         $ProfilesTable.$convertermitmHostnames.toSql(mitmHostnames.value),
       );
     }
+    if (generalSettings.present) {
+      map['general_settings'] = Variable<String>(
+        $ProfilesTable.$convertergeneralSettings.toSql(generalSettings.value),
+      );
+    }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
@@ -1195,6 +1246,7 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
           ..write('bodyRewrites: $bodyRewrites, ')
           ..write('mitmEnabled: $mitmEnabled, ')
           ..write('mitmHostnames: $mitmHostnames, ')
+          ..write('generalSettings: $generalSettings, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -3891,6 +3943,7 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<List<String>> bodyRewrites,
       Value<bool> mitmEnabled,
       Value<List<String>> mitmHostnames,
+      Value<GeneralSettings> generalSettings,
       Value<int?> order,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
@@ -3915,6 +3968,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<List<String>> bodyRewrites,
       Value<bool> mitmEnabled,
       Value<List<String>> mitmHostnames,
+      Value<GeneralSettings> generalSettings,
       Value<int?> order,
     });
 
@@ -4088,6 +4142,12 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnWithTypeConverterFilters<GeneralSettings, GeneralSettings, String>
+  get generalSettings => $composableBuilder(
+    column: $table.generalSettings,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
   ColumnFilters<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnFilters(column),
@@ -4253,6 +4313,11 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get generalSettings => $composableBuilder(
+    column: $table.generalSettings,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnOrderings(column),
@@ -4361,6 +4426,12 @@ class $$ProfilesTableAnnotationComposer
         builder: (column) => column,
       );
 
+  GeneratedColumnWithTypeConverter<GeneralSettings, String>
+  get generalSettings => $composableBuilder(
+    column: $table.generalSettings,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get order =>
       $composableBuilder(column: $table.order, builder: (column) => column);
 
@@ -4467,6 +4538,7 @@ class $$ProfilesTableTableManager
                 Value<List<String>> bodyRewrites = const Value.absent(),
                 Value<bool> mitmEnabled = const Value.absent(),
                 Value<List<String>> mitmHostnames = const Value.absent(),
+                Value<GeneralSettings> generalSettings = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
@@ -4489,6 +4561,7 @@ class $$ProfilesTableTableManager
                 bodyRewrites: bodyRewrites,
                 mitmEnabled: mitmEnabled,
                 mitmHostnames: mitmHostnames,
+                generalSettings: generalSettings,
                 order: order,
               ),
           createCompanionCallback:
@@ -4514,6 +4587,7 @@ class $$ProfilesTableTableManager
                 Value<List<String>> bodyRewrites = const Value.absent(),
                 Value<bool> mitmEnabled = const Value.absent(),
                 Value<List<String>> mitmHostnames = const Value.absent(),
+                Value<GeneralSettings> generalSettings = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
@@ -4536,6 +4610,7 @@ class $$ProfilesTableTableManager
                 bodyRewrites: bodyRewrites,
                 mitmEnabled: mitmEnabled,
                 mitmHostnames: mitmHostnames,
+                generalSettings: generalSettings,
                 order: order,
               ),
           withReferenceMapper: (p0) => p0

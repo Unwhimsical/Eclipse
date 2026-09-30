@@ -58,6 +58,10 @@ class Profiles extends Table {
       .map(const StringListConverter())
       .withDefault(const Constant('[]'))();
 
+  TextColumn get generalSettings => text()
+      .map(const GeneralSettingsConverter())
+      .withDefault(const Constant('{}'))();
+
   IntColumn get order => integer().nullable()();
 
   @override
@@ -152,6 +156,7 @@ extension RawProfilExt on RawProfile {
       bodyRewrites: bodyRewrites,
       mitmEnabled: mitmEnabled,
       mitmHostnames: mitmHostnames,
+      generalSettings: generalSettings,
       overwriteType: overwriteType,
       scriptId: scriptId,
       matchTarget: matchTarget,
@@ -180,6 +185,7 @@ extension ProfilesCompanionExt on Profile {
       bodyRewrites: Value(bodyRewrites),
       mitmEnabled: Value(mitmEnabled),
       mitmHostnames: Value(mitmHostnames),
+      generalSettings: Value(generalSettings),
       overwriteType: overwriteType,
       scriptId: Value(scriptId),
       matchTarget: Value(matchTarget),

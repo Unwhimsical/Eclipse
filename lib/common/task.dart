@@ -251,6 +251,27 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
       rawConfig['dns']['nameserver'] = [...nameserver, systemDns];
     }
   }
+  final generalSettings = data.generalSettings;
+  if (generalSettings.dnsServers.isNotEmpty) {
+    rawConfig['dns']['nameserver'] = generalSettings.dnsServers;
+  }
+  if (generalSettings.fallbackDnsServers.isNotEmpty) {
+    rawConfig['dns']['fallback'] = generalSettings.fallbackDnsServers;
+  }
+  if (generalSettings.directDnsServers.isNotEmpty) {
+    rawConfig['dns']['direct-nameserver'] = generalSettings.directDnsServers;
+  }
+  if (generalSettings.ipv6 != null) {
+    rawConfig['ipv6'] = generalSettings.ipv6;
+  }
+  if (generalSettings.tunExcludedRoutes.isNotEmpty) {
+    rawConfig['tun']['route-exclude-address'] =
+        generalSettings.tunExcludedRoutes;
+  }
+  if (generalSettings.tunIncludedRoutes.isNotEmpty) {
+    rawConfig['tun']['route-include-address'] =
+        generalSettings.tunIncludedRoutes;
+  }
   List<String> rules = [];
   if (data.rules.isEmpty) {
     if (rawConfig['rules'] != null) {

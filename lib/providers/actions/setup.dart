@@ -371,6 +371,7 @@ class SetupAction extends _$SetupAction {
         mapLocal: setupState.mapLocal,
         bodyRewrites: setupState.bodyRewrites,
         mitmHostnames: setupState.mitmHostnames,
+        generalSettings: setupState.generalSettings,
         matchTarget: setupState.matchTarget,
       ),
     );

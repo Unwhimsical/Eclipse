@@ -361,6 +361,7 @@ abstract class MakeRealProfileState with _$MakeRealProfileState {
     @Default([]) List<String> mapLocal,
     @Default([]) List<String> bodyRewrites,
     @Default([]) List<String> mitmHostnames,
+    @Default(GeneralSettings()) GeneralSettings generalSettings,
     String? matchTarget,
   }) = _MakeRealProfileState;
 }
@@ -395,6 +396,7 @@ abstract class SetupState with _$SetupState {
     @Default([]) List<String> mapLocal,
     @Default([]) List<String> bodyRewrites,
     @Default([]) List<String> mitmHostnames,
+    @Default(GeneralSettings()) GeneralSettings generalSettings,
     String? matchTarget,
   }) = _SetupState;
 }

@@ -7,9 +7,9 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/pages/editor.dart';
-import 'package:fl_clash/providers/action.dart';
-import 'package:fl_clash/providers/core.dart';
+import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/profiles/general.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,7 +63,11 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
 
   Future<void> _handleConfirm() async {
     if (!_formKey.currentState!.validate()) return;
-    var profile = widget.profile.copyWith(
+    // Read the latest profile: sub-pages (e.g. General settings) may have
+    // saved newer fields through the provider already.
+    final latestProfile =
+        ref.read(profileProvider(widget.profile.id)) ?? widget.profile;
+    var profile = latestProfile.copyWith(
       url: _urlController.text,
       label: _labelController.text,
       autoUpdate: _autoUpdate,
@@ -72,7 +76,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
       ),
     );
     final profilesAction = ref.read(profilesActionProvider.notifier);
-    final hasUpdate = widget.profile.url != profile.url;
+    final hasUpdate = latestProfile.url != profile.url;
     if (_fileData != null) {
       if (profile.type == ProfileType.url && _autoUpdate) {
         final appLocalizations = context.appLocalizations;
@@ -245,6 +249,16 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
         fileInfoNotifier: _fileInfoNotifier,
         onEdit: _editProfileFile,
         onUpload: _uploadProfileFile,
+      ),
+      ListItem(
+        leading: const Icon(Icons.settings_outlined),
+        title: Text(appLocalizations.generalSettings),
+        onTap: () {
+          BaseNavigator.push(
+            context,
+            GeneralSettingsView(profileId: widget.profile.id),
+          );
+        },
       ),
     ];
     return FocusTraversalGroup(

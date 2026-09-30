@@ -34,7 +34,7 @@ class Database extends _$Database {
   Database([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
@@ -68,6 +68,9 @@ class Database extends _$Database {
         if (from < 6) {
           await _addColumnIfMissing(m, profiles, profiles.mapLocal);
           await _addColumnIfMissing(m, profiles, profiles.bodyRewrites);
+        }
+        if (from < 7) {
+          await _addColumnIfMissing(m, profiles, profiles.generalSettings);
         }
       },
     );

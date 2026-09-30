@@ -22,6 +22,60 @@ Map<String, dynamic> _$SubscriptionInfoToJson(_SubscriptionInfo instance) =>
       'expire': instance.expire,
     };
 
+_GeneralSettings _$GeneralSettingsFromJson(Map<String, dynamic> json) =>
+    _GeneralSettings(
+      dnsServers:
+          (json['dnsServers'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      fallbackDnsServers:
+          (json['fallbackDnsServers'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      directDnsServers:
+          (json['directDnsServers'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      skipProxy:
+          (json['skipProxy'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      tunExcludedRoutes:
+          (json['tunExcludedRoutes'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      tunIncludedRoutes:
+          (json['tunIncludedRoutes'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      ipv6: json['ipv6'] as bool?,
+      preferIpv6: json['preferIpv6'] as bool?,
+      privateIpAnswer: json['privateIpAnswer'] as bool?,
+      alwaysRealIp: json['alwaysRealIp'] as bool?,
+      include: json['include'] as String?,
+    );
+
+Map<String, dynamic> _$GeneralSettingsToJson(_GeneralSettings instance) =>
+    <String, dynamic>{
+      'dnsServers': instance.dnsServers,
+      'fallbackDnsServers': instance.fallbackDnsServers,
+      'directDnsServers': instance.directDnsServers,
+      'skipProxy': instance.skipProxy,
+      'tunExcludedRoutes': instance.tunExcludedRoutes,
+      'tunIncludedRoutes': instance.tunIncludedRoutes,
+      'ipv6': instance.ipv6,
+      'preferIpv6': instance.preferIpv6,
+      'privateIpAnswer': instance.privateIpAnswer,
+      'alwaysRealIp': instance.alwaysRealIp,
+      'include': instance.include,
+    };
+
 _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
   id: (json['id'] as num).toInt(),
   label: json['label'] as String? ?? '',
@@ -76,6 +130,11 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  generalSettings: json['generalSettings'] == null
+      ? const GeneralSettings()
+      : GeneralSettings.fromJson(
+          json['generalSettings'] as Map<String, dynamic>,
+        ),
   overwriteType:
       $enumDecodeNullable(_$OverwriteTypeEnumMap, json['overwriteType']) ??
       OverwriteType.standard,
@@ -102,6 +161,7 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'bodyRewrites': instance.bodyRewrites,
   'mitmEnabled': instance.mitmEnabled,
   'mitmHostnames': instance.mitmHostnames,
+  'generalSettings': instance.generalSettings,
   'overwriteType': _$OverwriteTypeEnumMap[instance.overwriteType]!,
   'scriptId': instance.scriptId,
   'matchTarget': instance.matchTarget,

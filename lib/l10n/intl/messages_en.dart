@@ -162,6 +162,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "allowLanDesc": MessageLookupByLibrary.simpleMessage(
       "Allow proxy access over the LAN",
     ),
+    "alwaysRealIp": MessageLookupByLibrary.simpleMessage("Always Real IP"),
     "app": MessageLookupByLibrary.simpleMessage("App"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage(
       "App access control",
@@ -329,6 +330,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Windows Smart App Control blocked EclipseCore.exe because it is not signed. Open Windows Security → App & browser control → Smart App Control settings, choose Off, then start Eclipse again. Smart App Control cannot be turned back on without reinstalling Windows.",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("Core status"),
+    "coreUnsupported": MessageLookupByLibrary.simpleMessage(
+      "Not supported by the core",
+    ),
     "country": MessageLookupByLibrary.simpleMessage("Region"),
     "crashDetected": MessageLookupByLibrary.simpleMessage("Crash detected"),
     "crashDetectedTip": m1,
@@ -389,6 +393,9 @@ class MessageLookup extends MessageLookupByLibrary {
       "Developer mode is enabled.",
     ),
     "direct": MessageLookupByLibrary.simpleMessage("Direct"),
+    "directDnsServers": MessageLookupByLibrary.simpleMessage(
+      "Direct DNS Servers",
+    ),
     "disableUDP": MessageLookupByLibrary.simpleMessage("Disable UDP"),
     "disclaimer": MessageLookupByLibrary.simpleMessage("Disclaimer"),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
@@ -403,6 +410,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "dnsHijacking": MessageLookupByLibrary.simpleMessage("DNS hijacking"),
     "dnsMode": MessageLookupByLibrary.simpleMessage("DNS mode"),
+    "dnsServers": MessageLookupByLibrary.simpleMessage("DNS Servers"),
     "domain": MessageLookupByLibrary.simpleMessage("Domain"),
     "download": MessageLookupByLibrary.simpleMessage("Download"),
     "edit": MessageLookupByLibrary.simpleMessage("Edit"),
@@ -453,6 +461,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "fallbackDesc": MessageLookupByLibrary.simpleMessage(
       "Usually an overseas DNS",
     ),
+    "fallbackDnsServers": MessageLookupByLibrary.simpleMessage(
+      "Fallback DNS Servers",
+    ),
     "fallbackFilter": MessageLookupByLibrary.simpleMessage("Fallback filter"),
     "fidelityScheme": MessageLookupByLibrary.simpleMessage("Fidelity"),
     "file": MessageLookupByLibrary.simpleMessage("File"),
@@ -473,6 +484,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Fruit salad"),
     "general": MessageLookupByLibrary.simpleMessage("General"),
+    "generalSettings": MessageLookupByLibrary.simpleMessage("General Settings"),
     "geoAutoUpdate": MessageLookupByLibrary.simpleMessage("Auto update"),
     "geoAutoUpdateInterval": MessageLookupByLibrary.simpleMessage(
       "Auto-update interval",
@@ -545,6 +557,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "includeAllProxyProvidersTip": MessageLookupByLibrary.simpleMessage(
       "When enabled, the imported proxy providers are overridden",
     ),
+    "includeUrl": MessageLookupByLibrary.simpleMessage("Include URL"),
+    "includeUrlDesc": MessageLookupByLibrary.simpleMessage(
+      "Remote config merged at import; kept for reference.",
+    ),
     "infiniteTime": MessageLookupByLibrary.simpleMessage("Never expires"),
     "init": MessageLookupByLibrary.simpleMessage("Init"),
     "inputCorrectHotkey": MessageLookupByLibrary.simpleMessage(
@@ -556,9 +572,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Enter the rule content",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -594,9 +611,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "When enabled, IPv6 traffic can be received",
     ),
+    "ipv6FollowConfig": MessageLookupByLibrary.simpleMessage(
+      "Follow global setting",
+    ),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage(
       "Allow IPv6 inbound",
     ),
+    "ipv6Off": MessageLookupByLibrary.simpleMessage("IPv6 off"),
+    "ipv6On": MessageLookupByLibrary.simpleMessage("IPv6 on"),
     "ja": MessageLookupByLibrary.simpleMessage("Japanese"),
     "justNow": MessageLookupByLibrary.simpleMessage("Just now"),
     "keepAliveIntervalDesc": MessageLookupByLibrary.simpleMessage(
@@ -754,6 +776,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "Custom mode: fully customize proxy groups and rules",
     ),
     "palette": MessageLookupByLibrary.simpleMessage("Palette"),
+    "paramOff": MessageLookupByLibrary.simpleMessage("Off"),
+    "paramOn": MessageLookupByLibrary.simpleMessage("On"),
     "password": MessageLookupByLibrary.simpleMessage("Password"),
     "paste": MessageLookupByLibrary.simpleMessage("Paste"),
     "pickFromAlbum": MessageLookupByLibrary.simpleMessage("Choose from album"),
@@ -775,10 +799,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "preferH3Desc": MessageLookupByLibrary.simpleMessage(
       "Prefer HTTP/3 for DoH",
     ),
+    "preferIpv6": MessageLookupByLibrary.simpleMessage("Prefer IPv6"),
     "prerequisites": MessageLookupByLibrary.simpleMessage("Prerequisites"),
     "pressKeyboard": MessageLookupByLibrary.simpleMessage("Please press a key"),
     "preview": MessageLookupByLibrary.simpleMessage("Preview"),
     "previousMatch": MessageLookupByLibrary.simpleMessage("Previous match"),
+    "privateIpAnswer": MessageLookupByLibrary.simpleMessage(
+      "Private IP Answer",
+    ),
     "process": MessageLookupByLibrary.simpleMessage("Process"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
@@ -1075,6 +1103,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Start in the background",
     ),
     "size": MessageLookupByLibrary.simpleMessage("Size"),
+    "skipProxy": MessageLookupByLibrary.simpleMessage("Skip Proxy"),
+    "skipProxyDesc": MessageLookupByLibrary.simpleMessage(
+      "Kept on the TUN path; the rule chain still decides the policy.",
+    ),
     "socksPort": MessageLookupByLibrary.simpleMessage("SOCKS port"),
     "sort": MessageLookupByLibrary.simpleMessage("Sort"),
     "source": MessageLookupByLibrary.simpleMessage("Source"),
@@ -1154,6 +1186,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunDesc": MessageLookupByLibrary.simpleMessage(
       "Only effective in administrator mode",
+    ),
+    "tunExcludedRoutes": MessageLookupByLibrary.simpleMessage(
+      "TUN Excluded Routes",
+    ),
+    "tunExcludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "CIDR routes excluded from TUN",
+    ),
+    "tunIncludedRoutes": MessageLookupByLibrary.simpleMessage(
+      "TUN Included Routes",
+    ),
+    "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "CIDR routes included in TUN",
     ),
     "turnOff": MessageLookupByLibrary.simpleMessage("Turn off"),
     "turnOn": MessageLookupByLibrary.simpleMessage("Turn on"),

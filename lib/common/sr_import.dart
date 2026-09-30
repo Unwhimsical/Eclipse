@@ -7,6 +7,7 @@ import '../models/clash_config.dart';
 import '../models/module.dart';
 import '../models/profile.dart';
 import '../providers/providers.dart';
+import 'include.dart';
 import 'module_store.dart';
 import 'request.dart';
 import 'shadowrocket.dart';
@@ -54,8 +55,13 @@ class ShadowrocketImport {
     required String content,
     String? fileName,
   }) async {
-    final ConfData conf = parseConf(content);
+    var conf = parseConf(content);
     if (conf.isEmpty) return null;
+    final includeUrl = conf.includeUrl;
+    conf = await resolveConfIncludes(conf);
+    final generalSettings = generalSettingsFromConf(
+      conf,
+    ).copyWith(include: includeUrl);
     String? profileLabel;
     if (conf.proxies.isNotEmpty) {
       final yamlText = buildClashConfigFromProxies(
@@ -91,6 +97,7 @@ class ShadowrocketImport {
         bodyRewrites: conf.bodyRewrites,
         mitmEnabled: parseMitmEnabled(conf.mitm),
         mitmHostnames: parseMitmHostnames(conf.mitm),
+        generalSettings: generalSettings,
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -331,6 +338,40 @@ class ShadowrocketImport {
     return proxies;
   }
 
+  static GeneralSettings generalSettingsFromConf(ConfData conf) {
+    List<String> splitList(String key) {
+      final value = conf.general[key];
+      if (value == null || value.isEmpty) return const [];
+      return value
+          .split(',')
+          .map((item) => item.trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
+    }
+
+    bool? triBool(String key) {
+      if (!conf.general.containsKey(key)) return null;
+      final value = conf.general[key]!.toLowerCase();
+      if (value == 'true' || value == '1' || value == 'yes') return true;
+      if (value == 'false' || value == '0' || value == 'no') return false;
+      return null;
+    }
+
+    return GeneralSettings(
+      dnsServers: splitList('dns-server'),
+      fallbackDnsServers: splitList('fallback-dns-server'),
+      directDnsServers: splitList('direct-dns-server'),
+      skipProxy: splitList('skip-proxy'),
+      tunExcludedRoutes: splitList('tun-excluded-routes'),
+      tunIncludedRoutes: splitList('tun-included-routes'),
+      ipv6: conf.general.containsKey('ipv6') ? conf.ipv6Enabled : null,
+      // No core equivalent: stored for fidelity, shown as unsupported in UI.
+      preferIpv6: triBool('prefer-ipv6'),
+      privateIpAnswer: triBool('private-ip-answer'),
+      alwaysRealIp: triBool('always-real-ip'),
+    );
+  }
+
   static Future<String?> _createProfileFromYaml(
     WidgetRef ref,
     String yamlText,
@@ -342,6 +383,7 @@ class ShadowrocketImport {
     List<String> bodyRewrites = const [],
     bool mitmEnabled = false,
     List<String> mitmHostnames = const [],
+    GeneralSettings generalSettings = const GeneralSettings(),
   }) async {
     final core = ref.read(coreHandlerProvider);
     final profile = await Profile.normal(label: label)
@@ -353,6 +395,7 @@ class ShadowrocketImport {
           bodyRewrites: bodyRewrites,
           mitmEnabled: mitmEnabled,
           mitmHostnames: mitmHostnames,
+          generalSettings: generalSettings,
         )
         .saveFile(
           Uint8List.fromList(utf8.encode(yamlText)),

@@ -134,6 +134,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "allowLan": MessageLookupByLibrary.simpleMessage("LANプロキシ"),
     "allowLanDesc": MessageLookupByLibrary.simpleMessage("LAN経由でのプロキシ利用を許可します"),
+    "alwaysRealIp": MessageLookupByLibrary.simpleMessage("常に実IP"),
     "app": MessageLookupByLibrary.simpleMessage("アプリ"),
     "appAccessControl": MessageLookupByLibrary.simpleMessage("アプリアクセス制御"),
     "appendSystemDns": MessageLookupByLibrary.simpleMessage("システムDNSを追加"),
@@ -263,6 +264,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Windows のスマート アプリ コントロールが、署名されていない EclipseCore.exe をブロックしました。Windows セキュリティ → アプリとブラウザーの制御 → スマート アプリ コントロールの設定で「オフ」を選び、Eclipse を再起動してください。一度オフにすると、Windows を再インストールしない限り再度オンにはできません。",
     ),
     "coreStatus": MessageLookupByLibrary.simpleMessage("コアの状態"),
+    "coreUnsupported": MessageLookupByLibrary.simpleMessage("コアがサポートしていません"),
     "country": MessageLookupByLibrary.simpleMessage("地域"),
     "crashDetected": MessageLookupByLibrary.simpleMessage("クラッシュを検出しました"),
     "crashDetectedTip": m1,
@@ -315,6 +317,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "開発者モードが有効になりました。",
     ),
     "direct": MessageLookupByLibrary.simpleMessage("ダイレクト"),
+    "directDnsServers": MessageLookupByLibrary.simpleMessage("ダイレクトDNSサーバー"),
     "disableUDP": MessageLookupByLibrary.simpleMessage("UDPを無効化"),
     "disclaimer": MessageLookupByLibrary.simpleMessage("免責事項"),
     "disclaimerDesc": MessageLookupByLibrary.simpleMessage(
@@ -327,6 +330,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "dnsDesc": MessageLookupByLibrary.simpleMessage("DNS関連の設定を更新します"),
     "dnsHijacking": MessageLookupByLibrary.simpleMessage("DNSハイジャック"),
     "dnsMode": MessageLookupByLibrary.simpleMessage("DNSモード"),
+    "dnsServers": MessageLookupByLibrary.simpleMessage("DNSサーバー"),
     "domain": MessageLookupByLibrary.simpleMessage("ドメイン"),
     "download": MessageLookupByLibrary.simpleMessage("ダウンロード"),
     "edit": MessageLookupByLibrary.simpleMessage("編集"),
@@ -369,6 +373,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "fakeipRange": MessageLookupByLibrary.simpleMessage("Fake-IP範囲"),
     "fallback": MessageLookupByLibrary.simpleMessage("フォールバック"),
     "fallbackDesc": MessageLookupByLibrary.simpleMessage("通常は国外のDNSを使用します"),
+    "fallbackDnsServers": MessageLookupByLibrary.simpleMessage(
+      "フォールバックDNSサーバー",
+    ),
     "fallbackFilter": MessageLookupByLibrary.simpleMessage("フォールバックフィルター"),
     "fidelityScheme": MessageLookupByLibrary.simpleMessage("フィデリティ"),
     "file": MessageLookupByLibrary.simpleMessage("ファイル"),
@@ -387,6 +394,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("フルーツサラダ"),
     "general": MessageLookupByLibrary.simpleMessage("一般"),
+    "generalSettings": MessageLookupByLibrary.simpleMessage("一般設定"),
     "geoAutoUpdate": MessageLookupByLibrary.simpleMessage("自動更新"),
     "geoAutoUpdateInterval": MessageLookupByLibrary.simpleMessage("自動更新間隔"),
     "geoAutoUpdateIntervalTip": MessageLookupByLibrary.simpleMessage(
@@ -447,6 +455,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "includeAllProxyProvidersTip": MessageLookupByLibrary.simpleMessage(
       "有効にすると、取り込んだプロキシプロバイダーを上書きします",
     ),
+    "includeUrl": MessageLookupByLibrary.simpleMessage("インクルードURL"),
+    "includeUrlDesc": MessageLookupByLibrary.simpleMessage(
+      "インポート時にマージされたリモート設定。参照用に保持されます。",
+    ),
     "infiniteTime": MessageLookupByLibrary.simpleMessage("無期限"),
     "init": MessageLookupByLibrary.simpleMessage("初期化"),
     "inputCorrectHotkey": MessageLookupByLibrary.simpleMessage(
@@ -489,7 +501,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "ipv6Desc": MessageLookupByLibrary.simpleMessage(
       "有効にすると、IPv6トラフィックを受信できます",
     ),
+    "ipv6FollowConfig": MessageLookupByLibrary.simpleMessage("グローバル設定に従う"),
     "ipv6InboundDesc": MessageLookupByLibrary.simpleMessage("IPv6インバウンドを許可します"),
+    "ipv6Off": MessageLookupByLibrary.simpleMessage("IPv6を無効化"),
+    "ipv6On": MessageLookupByLibrary.simpleMessage("IPv6を有効化"),
     "ja": MessageLookupByLibrary.simpleMessage("日本語"),
     "justNow": MessageLookupByLibrary.simpleMessage("たった今"),
     "keepAliveIntervalDesc": MessageLookupByLibrary.simpleMessage(
@@ -621,6 +636,8 @@ class MessageLookup extends MessageLookupByLibrary {
       "カスタムモード：プロキシグループとルールを完全にカスタマイズできます",
     ),
     "palette": MessageLookupByLibrary.simpleMessage("パレット"),
+    "paramOff": MessageLookupByLibrary.simpleMessage("オフ"),
+    "paramOn": MessageLookupByLibrary.simpleMessage("オン"),
     "password": MessageLookupByLibrary.simpleMessage("パスワード"),
     "paste": MessageLookupByLibrary.simpleMessage("貼り付け"),
     "pickFromAlbum": MessageLookupByLibrary.simpleMessage("アルバムから選択"),
@@ -636,10 +653,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "portConflictTip": MessageLookupByLibrary.simpleMessage("別のポートを入力してください"),
     "portTip": m24,
     "preferH3Desc": MessageLookupByLibrary.simpleMessage("DoHでHTTP/3を優先します"),
+    "preferIpv6": MessageLookupByLibrary.simpleMessage("IPv6を優先"),
     "prerequisites": MessageLookupByLibrary.simpleMessage("前提条件"),
     "pressKeyboard": MessageLookupByLibrary.simpleMessage("キーを押してください"),
     "preview": MessageLookupByLibrary.simpleMessage("プレビュー"),
     "previousMatch": MessageLookupByLibrary.simpleMessage("前の一致"),
+    "privateIpAnswer": MessageLookupByLibrary.simpleMessage("プライベートIP応答"),
     "process": MessageLookupByLibrary.simpleMessage("プロセス"),
     "profile": MessageLookupByLibrary.simpleMessage("プロファイル"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
@@ -898,6 +917,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "silentLaunch": MessageLookupByLibrary.simpleMessage("サイレント起動"),
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage("バックグラウンドで起動します"),
     "size": MessageLookupByLibrary.simpleMessage("サイズ"),
+    "skipProxy": MessageLookupByLibrary.simpleMessage("プロキシ除外"),
+    "skipProxyDesc": MessageLookupByLibrary.simpleMessage(
+      "TUN経由のままにし、ポリシーはルールチェーンが決定します。",
+    ),
     "socksPort": MessageLookupByLibrary.simpleMessage("SOCKSポート"),
     "sort": MessageLookupByLibrary.simpleMessage("並べ替え"),
     "source": MessageLookupByLibrary.simpleMessage("ソース"),
@@ -964,6 +987,14 @@ class MessageLookup extends MessageLookupByLibrary {
     "trafficUsage": MessageLookupByLibrary.simpleMessage("トラフィック統計"),
     "tun": MessageLookupByLibrary.simpleMessage("TUN"),
     "tunDesc": MessageLookupByLibrary.simpleMessage("管理者モードでのみ有効"),
+    "tunExcludedRoutes": MessageLookupByLibrary.simpleMessage("TUN除外ルート"),
+    "tunExcludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "TUNから除外するCIDRルート",
+    ),
+    "tunIncludedRoutes": MessageLookupByLibrary.simpleMessage("TUN包含ルート"),
+    "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "TUNに含めるCIDRルート",
+    ),
     "turnOff": MessageLookupByLibrary.simpleMessage("オフにする"),
     "turnOn": MessageLookupByLibrary.simpleMessage("オンにする"),
     "undo": MessageLookupByLibrary.simpleMessage("元に戻す"),

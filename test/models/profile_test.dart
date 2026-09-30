@@ -30,6 +30,55 @@ void main() {
     });
   });
 
+  group('Profile GeneralSettings', () {
+    test('round-trips through JSON', () {
+      final profile = Profile.normal(label: 'general').copyWith(
+        generalSettings: const GeneralSettings(
+          dnsServers: ['1.1.1.1'],
+          fallbackDnsServers: ['8.8.8.8'],
+          directDnsServers: ['223.5.5.5'],
+          skipProxy: ['example.com'],
+          tunExcludedRoutes: ['192.168.0.0/16'],
+          tunIncludedRoutes: ['10.0.0.0/8'],
+          ipv6: true,
+          preferIpv6: true,
+          privateIpAnswer: false,
+          alwaysRealIp: true,
+          include: 'https://example.com/remote.conf',
+        ),
+      );
+
+      final restored = Profile.fromJson(
+        jsonDecode(jsonEncode(profile)) as Map<String, Object?>,
+      );
+
+      expect(restored, profile);
+      expect(restored.generalSettings.dnsServers, ['1.1.1.1']);
+      expect(restored.generalSettings.fallbackDnsServers, ['8.8.8.8']);
+      expect(restored.generalSettings.ipv6, isTrue);
+      expect(restored.generalSettings.preferIpv6, isTrue);
+      expect(restored.generalSettings.privateIpAnswer, isFalse);
+      expect(restored.generalSettings.alwaysRealIp, isTrue);
+      expect(
+        restored.generalSettings.include,
+        'https://example.com/remote.conf',
+      );
+    });
+
+    test('defaults to empty lists with unset ipv6', () {
+      final profile = Profile.normal();
+
+      expect(profile.generalSettings.dnsServers, isEmpty);
+      expect(profile.generalSettings.skipProxy, isEmpty);
+      expect(profile.generalSettings.tunExcludedRoutes, isEmpty);
+      expect(profile.generalSettings.ipv6, isNull);
+      expect(profile.generalSettings.preferIpv6, isNull);
+      expect(profile.generalSettings.privateIpAnswer, isNull);
+      expect(profile.generalSettings.alwaysRealIp, isNull);
+      expect(profile.generalSettings.include, isNull);
+    });
+  });
+
   group('SubscriptionInfo', () {
     test('parses subscription-userinfo header values', () {
       final info = SubscriptionInfo.formHString(

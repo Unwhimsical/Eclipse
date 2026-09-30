@@ -42,6 +42,26 @@ abstract class SubscriptionInfo with _$SubscriptionInfo {
 }
 
 @freezed
+abstract class GeneralSettings with _$GeneralSettings {
+  const factory GeneralSettings({
+    @Default([]) List<String> dnsServers,
+    @Default([]) List<String> fallbackDnsServers,
+    @Default([]) List<String> directDnsServers,
+    @Default([]) List<String> skipProxy,
+    @Default([]) List<String> tunExcludedRoutes,
+    @Default([]) List<String> tunIncludedRoutes,
+    bool? ipv6,
+    bool? preferIpv6,
+    bool? privateIpAnswer,
+    bool? alwaysRealIp,
+    String? include,
+  }) = _GeneralSettings;
+
+  factory GeneralSettings.fromJson(Map<String, Object?> json) =>
+      _$GeneralSettingsFromJson(json);
+}
+
+@freezed
 abstract class Profile with _$Profile {
   const factory Profile({
     required int id,
@@ -61,6 +81,7 @@ abstract class Profile with _$Profile {
     @Default([]) List<String> bodyRewrites,
     @Default(false) bool mitmEnabled,
     @Default([]) List<String> mitmHostnames,
+    @Default(GeneralSettings()) GeneralSettings generalSettings,
     @Default(OverwriteType.standard) OverwriteType overwriteType,
     int? scriptId,
     String? matchTarget,

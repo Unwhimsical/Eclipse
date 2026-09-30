@@ -316,6 +316,88 @@ void main() {
     },
   );
 
+  test(
+    'makeRealProfileTask applies per-profile general settings last',
+    () async {
+      final rawConfig = await decodeJSONTask<Map<String, dynamic>>(
+        await encodeJSONTask({
+          'ipv6': false,
+          'dns': {
+            'enable': true,
+            'nameserver': ['1.1.1.1'],
+            'fallback': ['9.9.9.9'],
+          },
+          'tun': {
+            'route-exclude-address': ['192.168.0.0/16'],
+          },
+        }),
+      );
+      final result = await makeRealProfileTask(
+        MakeRealProfileState(
+          profilesPath: '/profiles',
+          profileId: 13,
+          rawConfig: rawConfig,
+          realPatchConfig: const PatchClashConfig(ipv6: false),
+          overrideDns: false,
+          appendSystemDns: false,
+          proxyGroups: const [],
+          rules: const [],
+          addedRules: const [],
+          defaultUA: 'FlClash-Test',
+          generalSettings: const GeneralSettings(
+            dnsServers: ['8.8.8.8'],
+            fallbackDnsServers: ['1.0.0.1'],
+            directDnsServers: ['223.5.5.5'],
+            tunExcludedRoutes: ['10.0.0.0/8'],
+            tunIncludedRoutes: ['172.16.0.0/12'],
+            ipv6: true,
+          ),
+        ),
+      );
+      final config = loadYaml(result.yaml) as YamlMap;
+
+      expect(config['dns']['nameserver'], ['8.8.8.8']);
+      expect(config['dns']['fallback'], ['1.0.0.1']);
+      expect(config['dns']['direct-nameserver'], ['223.5.5.5']);
+      expect(config['ipv6'], isTrue);
+      expect(config['tun']['route-exclude-address'], ['10.0.0.0/8']);
+      expect(config['tun']['route-include-address'], ['172.16.0.0/12']);
+    },
+  );
+
+  test(
+    'makeRealProfileTask leaves the config alone when general settings are unset',
+    () async {
+      final rawConfig = await decodeJSONTask<Map<String, dynamic>>(
+        await encodeJSONTask({
+          'ipv6': false,
+          'dns': {
+            'enable': true,
+            'nameserver': ['1.1.1.1'],
+          },
+        }),
+      );
+      final result = await makeRealProfileTask(
+        MakeRealProfileState(
+          profilesPath: '/profiles',
+          profileId: 14,
+          rawConfig: rawConfig,
+          realPatchConfig: const PatchClashConfig(ipv6: false),
+          overrideDns: false,
+          appendSystemDns: false,
+          proxyGroups: const [],
+          rules: const [],
+          addedRules: const [],
+          defaultUA: 'FlClash-Test',
+        ),
+      );
+      final config = loadYaml(result.yaml) as YamlMap;
+
+      expect(config['dns']['nameserver'], ['1.1.1.1']);
+      expect(config['ipv6'], isFalse);
+    },
+  );
+
   // A profile-shipped loopback skip-auth-prefixes would bypass the credentials.
   test('makeRealProfileTask lets the app own local authentication', () async {
     final rawConfig = await decodeJSONTask<Map<String, dynamic>>(

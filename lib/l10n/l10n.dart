@@ -5164,6 +5164,176 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `General Settings`
+  String get generalSettings {
+    return Intl.message(
+      'General Settings',
+      name: 'generalSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DNS Servers`
+  String get dnsServers {
+    return Intl.message('DNS Servers', name: 'dnsServers', desc: '', args: []);
+  }
+
+  /// `Fallback DNS Servers`
+  String get fallbackDnsServers {
+    return Intl.message(
+      'Fallback DNS Servers',
+      name: 'fallbackDnsServers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Direct DNS Servers`
+  String get directDnsServers {
+    return Intl.message(
+      'Direct DNS Servers',
+      name: 'directDnsServers',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Skip Proxy`
+  String get skipProxy {
+    return Intl.message('Skip Proxy', name: 'skipProxy', desc: '', args: []);
+  }
+
+  /// `Kept on the TUN path; the rule chain still decides the policy.`
+  String get skipProxyDesc {
+    return Intl.message(
+      'Kept on the TUN path; the rule chain still decides the policy.',
+      name: 'skipProxyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TUN Excluded Routes`
+  String get tunExcludedRoutes {
+    return Intl.message(
+      'TUN Excluded Routes',
+      name: 'tunExcludedRoutes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CIDR routes excluded from TUN`
+  String get tunExcludedRoutesDesc {
+    return Intl.message(
+      'CIDR routes excluded from TUN',
+      name: 'tunExcludedRoutesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TUN Included Routes`
+  String get tunIncludedRoutes {
+    return Intl.message(
+      'TUN Included Routes',
+      name: 'tunIncludedRoutes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CIDR routes included in TUN`
+  String get tunIncludedRoutesDesc {
+    return Intl.message(
+      'CIDR routes included in TUN',
+      name: 'tunIncludedRoutesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Follow global setting`
+  String get ipv6FollowConfig {
+    return Intl.message(
+      'Follow global setting',
+      name: 'ipv6FollowConfig',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `IPv6 on`
+  String get ipv6On {
+    return Intl.message('IPv6 on', name: 'ipv6On', desc: '', args: []);
+  }
+
+  /// `IPv6 off`
+  String get ipv6Off {
+    return Intl.message('IPv6 off', name: 'ipv6Off', desc: '', args: []);
+  }
+
+  /// `Include URL`
+  String get includeUrl {
+    return Intl.message('Include URL', name: 'includeUrl', desc: '', args: []);
+  }
+
+  /// `Remote config merged at import; kept for reference.`
+  String get includeUrlDesc {
+    return Intl.message(
+      'Remote config merged at import; kept for reference.',
+      name: 'includeUrlDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Not supported by the core`
+  String get coreUnsupported {
+    return Intl.message(
+      'Not supported by the core',
+      name: 'coreUnsupported',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Prefer IPv6`
+  String get preferIpv6 {
+    return Intl.message('Prefer IPv6', name: 'preferIpv6', desc: '', args: []);
+  }
+
+  /// `Private IP Answer`
+  String get privateIpAnswer {
+    return Intl.message(
+      'Private IP Answer',
+      name: 'privateIpAnswer',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Always Real IP`
+  String get alwaysRealIp {
+    return Intl.message(
+      'Always Real IP',
+      name: 'alwaysRealIp',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `On`
+  String get paramOn {
+    return Intl.message('On', name: 'paramOn', desc: '', args: []);
+  }
+
+  /// `Off`
+  String get paramOff {
+    return Intl.message('Off', name: 'paramOff', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

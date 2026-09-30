@@ -79,6 +79,7 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
     mitmHostnames: (profile?.mitmEnabled ?? false)
         ? (profile?.mitmHostnames ?? const [])
         : const [],
+    generalSettings: profile?.generalSettings ?? const GeneralSettings(),
     matchTarget: overwriteType == OverwriteType.standard
         ? profile?.matchTarget
         : null,

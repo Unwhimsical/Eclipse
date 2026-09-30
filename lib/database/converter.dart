@@ -41,3 +41,19 @@ class StringSetConverter extends TypeConverter<Set<String>, String> {
     return json.encode(value.toList());
   }
 }
+
+class GeneralSettingsConverter extends TypeConverter<GeneralSettings, String> {
+  const GeneralSettingsConverter();
+
+  @override
+  GeneralSettings fromSql(String fromDb) {
+    return GeneralSettings.fromJson(
+      Map<String, Object?>.from(json.decode(fromDb)),
+    );
+  }
+
+  @override
+  String toSql(GeneralSettings value) {
+    return json.encode(value.toJson());
+  }
+}
