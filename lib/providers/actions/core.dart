@@ -78,11 +78,7 @@ class CoreAction extends _$CoreAction {
       final profile = ref.read(currentProfileProvider);
       List<String> mitmHostnames = const [];
       if (profile != null) {
-        final yamlPath = await appPath.getProfilePath(profile.id.toString());
-        final mitm = await MitmStore.load(
-          MitmStore.dirFromProfilePath(yamlPath),
-          profile.id,
-        );
+        final mitm = await MitmStore.load(profile.id);
         if (mitm.enabled) {
           mitmHostnames = mitm.hostnames;
         }

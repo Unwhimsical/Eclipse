@@ -1,33 +1,44 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
 /// Per-profile MITM configuration stored as `<profileId>.mitm.json`
-/// alongside the profile's YAML file. Avoids database migration.
-/// Pure Dart (no Flutter deps) to avoid import cycles.
+/// in the app's documents directory. Avoids database migration.
+/// Uses path_provider directly to avoid import cycles with common.dart.
 class MitmStore {
-  static File _file(String directory, int profileId) {
-    return File('$directory/$profileId.mitm.json');
+  static Future<Directory> _dir() async {
+    final docDir = await getApplicationDocumentsDirectory();
+    final dir = Directory(p.join(docDir.path, 'mitm'));
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    return dir;
+  }
+
+  static Future<File> _file(int profileId) async {
+    final dir = await _dir();
+    return File(p.join(dir.path, '$profileId.mitm.json'));
   }
 
   /// Save MITM config for a profile.
   static Future<void> save(
-    String directory,
     int profileId, {
     required bool enabled,
     required List<String> hostnames,
   }) async {
-    final file = _file(directory, profileId);
+    final file = await _file(profileId);
     final data = {'enabled': enabled, 'hostnames': hostnames};
     await file.writeAsString(json.encode(data));
   }
 
   /// Load MITM config for a profile. Returns (enabled, hostnames).
   static Future<({bool enabled, List<String> hostnames})> load(
-    String directory,
     int profileId,
   ) async {
     try {
-      final file = _file(directory, profileId);
+      final file = await _file(profileId);
       if (!await file.exists()) {
         return (enabled: false, hostnames: const []);
       }
@@ -43,18 +54,12 @@ class MitmStore {
   }
 
   /// Delete MITM config for a profile.
-  static Future<void> delete(String directory, int profileId) async {
+  static Future<void> delete(int profileId) async {
     try {
-      final file = _file(directory, profileId);
+      final file = await _file(profileId);
       if (await file.exists()) {
         await file.delete();
       }
     } catch (_) {}
-  }
-
-  /// Get the directory containing profile files from a profile YAML path.
-  static String dirFromProfilePath(String yamlPath) {
-    final sep = yamlPath.lastIndexOf('/');
-    return sep > 0 ? yamlPath.substring(0, sep) : '.';
   }
 }

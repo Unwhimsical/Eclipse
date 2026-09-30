@@ -251,9 +251,7 @@ class ShadowrocketImport {
     ref.read(profilesActionProvider.notifier).putProfile(profile);
     // Persist MITM config per-profile (avoids Profile model/DB changes).
     if (mitmEnabled || mitmHostnames.isNotEmpty) {
-      final yamlPath = await appPath.getProfilePath(profile.id.toString());
       await MitmStore.save(
-        MitmStore.dirFromProfilePath(yamlPath),
         profile.id,
         enabled: mitmEnabled,
         hostnames: mitmHostnames,
