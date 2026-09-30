@@ -1,0 +1,17 @@
+name: Debug Format
+on:
+  workflow_dispatch:
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.1"
+      - name: Show format diff
+        run: |
+          echo "=== ios test ==="
+          dart format --output=show test/core/ios_platform_selection_test.dart
+          echo "=== netpilot test ==="
+          dart format --output=show test/common/netpilot_real_conf_test.dart
