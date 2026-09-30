@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"io"
 	"net"
 	"net/http"
@@ -129,6 +130,34 @@ func (p *Proxy) upstreamTLSConfig(host string) *tls.Config {
 	}
 }
 
+// upstreamTransport dials upstream via the mihomo chain; tests override it.
+func (p *Proxy) upstreamTransport() http.RoundTripper {
+	if p.testTransport != nil {
+		return p.testTransport
+	}
+	dialTCP := func(ctx context.Context, _, addr string) (net.Conn, error) {
+		h, port := splitHostPort(addr, 80)
+		return dialUpstream(ctx, h, port)
+	}
+	dialTLS := func(ctx context.Context, _, addr string) (net.Conn, error) {
+		h, port := splitHostPort(addr, 443)
+		raw, err := dialUpstream(ctx, h, port)
+		if err != nil {
+			return nil, err
+		}
+		tlsConn := tls.Client(raw, p.upstreamTLSConfig(h))
+		if err := tlsConn.HandshakeContext(ctx); err != nil {
+			raw.Close()
+			return nil, err
+		}
+		return tlsConn, nil
+	}
+	return &http.Transport{
+		DialContext:    dialTCP,
+		DialTLSContext: dialTLS,
+	}
+}
+
 func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 	scheme := "http"
 	if isTLS {
@@ -148,36 +177,23 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 	out.Header = req.Header.Clone()
 	out.Header.Del("Proxy-Connection")
 	out.Header.Del("Proxy-Authorization")
+	// NewRequest can't infer a server-parsed body's length; copy it to avoid re-chunking.
+	out.ContentLength = req.ContentLength
+	out.Close = req.Close
 	// Upstream goes through the mihomo proxy chain with real TLS verification.
-	dialTCP := func(ctx context.Context, _, addr string) (net.Conn, error) {
-		h, port := splitHostPort(addr, 80)
-		return dialUpstream(ctx, h, port)
-	}
-	dialTLS := func(ctx context.Context, _, addr string) (net.Conn, error) {
-		h, port := splitHostPort(addr, 443)
-		raw, err := dialUpstream(ctx, h, port)
-		if err != nil {
-			return nil, err
-		}
-		tlsConn := tls.Client(raw, p.upstreamTLSConfig(h))
-		if err := tlsConn.HandshakeContext(ctx); err != nil {
-			raw.Close()
-			return nil, err
-		}
-		return tlsConn, nil
-	}
 	client := &http.Client{
-		Timeout: 30 * time.Second,
-		Transport: &http.Transport{
-			DialContext:    dialTCP,
-			DialTLSContext: dialTLS,
-		},
+		Timeout:   30 * time.Second,
+		Transport: p.upstreamTransport(),
 		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 			return http.ErrUseLastResponse
 		},
 	}
 	resp, err := client.Do(out)
 	if err != nil {
+		w := newConnWriter(conn, req)
+		w.Header().Set("Content-Length", "0")
+		w.WriteHeader(http.StatusBadGateway)
+		_ = w.finish()
 		return
 	}
 	defer resp.Body.Close()
@@ -196,17 +212,59 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 			w.Header().Add(k, v)
 		}
 	}
+	w.Header().Del("Transfer-Encoding")
 	w.WriteHeader(resp.StatusCode)
 	if scriptBody != nil {
 		// Script provided a (possibly modified) body; fix framing.
 		w.Header().Set("Content-Length", strconv.Itoa(len(scriptBody)))
-		// Remove chunked encoding since we now know the length.
-		w.Header().Del("Transfer-Encoding")
-		_, _ = w.Write(scriptBody)
+		if responseHasBody(resp.StatusCode, req.Method) {
+			_, _ = w.Write(scriptBody)
+		}
+	} else if !responseHasBody(resp.StatusCode, req.Method) {
+	} else if resp.ContentLength >= 0 {
+		w.Header().Set("Content-Length", strconv.FormatInt(resp.ContentLength, 10))
+		n, _ := io.Copy(w, resp.Body)
+		if n < resp.ContentLength {
+			// Truncated upstream: close so the client sees EOF instead of hanging.
+			_ = conn.Close()
+		}
 	} else {
-		_, _ = io.Copy(w, resp.Body)
+		w.Header().Set("Transfer-Encoding", "chunked")
+		writeChunked(w, resp.Body)
 	}
 	_ = w.finish()
+}
+
+func responseHasBody(status int, method string) bool {
+	if method == http.MethodHead {
+		return false
+	}
+	switch {
+	case status >= 100 && status <= 199,
+		status == http.StatusNoContent,
+		status == http.StatusNotModified:
+		return false
+	}
+	return true
+}
+
+// writeChunked streams r chunked; on mid-body read error the terminator is omitted.
+func writeChunked(w io.Writer, r io.Reader) {
+	buf := make([]byte, 32*1024)
+	for {
+		n, rerr := r.Read(buf)
+		if n > 0 {
+			_, _ = fmt.Fprintf(w, "%x\r\n", n)
+			_, _ = w.Write(buf[:n])
+			_, _ = io.WriteString(w, "\r\n")
+		}
+		if rerr != nil {
+			if rerr == io.EOF {
+				_, _ = io.WriteString(w, "0\r\n\r\n")
+			}
+			return
+		}
+	}
 }
 
 type connWriter struct {

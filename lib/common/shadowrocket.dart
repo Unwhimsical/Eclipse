@@ -762,6 +762,17 @@ String? _normalizeConfRule(String line) {
     RegExp(r'(?<![A-Z-])REJECT-NO-DROP(?![A-Z-])', caseSensitive: false),
     'REJECT',
   );
+  // Shadowrocket granular reject actions have no Clash equivalent and would
+  // fail config parsing as unknown proxies — fall back to plain `REJECT`
+  // (still blocks the traffic). `REJECT-DROP` is intentionally kept:
+  // Clash Meta implements it natively as silent drop.
+  normalized = normalized.replaceAll(
+    RegExp(
+      r'(?<![A-Z-])REJECT-(DICT|ARRAY|200|IMG|TINYGIF|VIDEO)(?![A-Z-])',
+      caseSensitive: false,
+    ),
+    'REJECT',
+  );
   return normalized;
 }
 
@@ -955,9 +966,10 @@ String buildClashConfigFromProxies({
     if (ipv6Enabled != null) {
       dns['ipv6'] = ipv6Enabled;
     }
-    if (alwaysRealIp == true) {
-      dns['respect-rules'] = true;
-    }
+    // `always-real-ip` has no Clash equivalent and is intentionally not
+    // mapped: emitting `respect-rules` here would fail config parsing
+    // (it requires `proxy-server-nameserver`), and mihomo already returns
+    // real IPs in its default DNS mapping mode.
     config['dns'] = dns;
   }
   // TUN routes from [General]

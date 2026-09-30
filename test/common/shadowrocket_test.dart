@@ -246,6 +246,24 @@ AND,((PROTOCOL,UDP),(DEST-PORT,443)),REJECT-NO-DROP
       expect(data.rules[0], isNot(contains('REJECT-NO-DROP')));
     });
 
+    test('normalizes granular REJECT actions to safe equivalents', () {
+      final data = parseConf('''
+[Rule]
+DOMAIN-SUFFIX,a.example.com,REJECT-DICT
+DOMAIN-SUFFIX,b.example.com,REJECT-ARRAY
+DOMAIN-SUFFIX,c.example.com,REJECT-200
+DOMAIN-SUFFIX,d.example.com,REJECT-IMG
+DOMAIN-SUFFIX,e.example.com,REJECT-TINYGIF
+DOMAIN-SUFFIX,f.example.com,REJECT-VIDEO
+DOMAIN-SUFFIX,g.example.com,REJECT-DROP
+''');
+      expect(data.rules, hasLength(7));
+      for (final r in data.rules.take(6)) {
+        expect(r, endsWith(',REJECT'));
+      }
+      expect(data.rules[6], endsWith(',REJECT-DROP'));
+    });
+
     test('keeps USER-AGENT as comment instead of dropping', () {
       final data = parseConf('''
 [Rule]
@@ -515,7 +533,7 @@ hostname = %APPEND%,example.com,*.example.org
       expect((doc['proxy-groups'] as List).first['name'], 'AUTO');
       expect(doc['rules'], ['DOMAIN-SUFFIX,example.com,AUTO']);
       expect((doc['tun'] as Map)['route-include-address'], ['192.168.0.0/16']);
-      expect((doc['dns'] as Map)['respect-rules'], isTrue);
+      expect((doc['dns'] as Map).containsKey('respect-rules'), isFalse);
     });
 
     test('omits dns and tun sections when empty', () {

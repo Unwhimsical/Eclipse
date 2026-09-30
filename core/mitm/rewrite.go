@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -75,22 +76,29 @@ var (
 )
 
 func writeRewriteResult(w http.ResponseWriter, res *RewriteResult) {
+	// Every synthesized response carries an explicit framing so a keep-alive
+	// client never hangs waiting for a body that will not come.
 	switch res.Kind {
 	case "redirect":
 		w.Header().Set("Location", res.Target)
+		w.Header().Set("Content-Length", "0")
 		w.WriteHeader(res.Status)
 	case "reject-json":
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Content-Length", strconv.Itoa(len(rejectJSON)))
 		w.WriteHeader(res.Status)
 		_, _ = w.Write(rejectJSON)
 	case "reject-img":
 		w.Header().Set("Content-Type", "image/gif")
+		w.Header().Set("Content-Length", strconv.Itoa(len(rejectImg)))
 		w.WriteHeader(res.Status)
 		_, _ = w.Write(rejectImg)
 	case "reject-video":
 		w.Header().Set("Content-Type", "video/mp4")
+		w.Header().Set("Content-Length", "0")
 		w.WriteHeader(res.Status)
 	default:
+		w.Header().Set("Content-Length", "0")
 		w.WriteHeader(res.Status)
 	}
 }

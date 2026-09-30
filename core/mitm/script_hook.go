@@ -140,9 +140,12 @@ func writeScriptResult(w *connWriter, res *scriptResult) {
 	for k, v := range res.headers {
 		w.Header().Set(k, v)
 	}
-	// Ensure a Content-Length so the client knows the framing.
+	// Ensure a Content-Length so the client knows the framing, even when the
+	// script synthesized a status with no body.
 	if res.bodySet {
 		w.Header().Set("Content-Length", strconv.Itoa(len(res.body)))
+	} else {
+		w.Header().Set("Content-Length", "0")
 	}
 	w.WriteHeader(status)
 	if res.bodySet {

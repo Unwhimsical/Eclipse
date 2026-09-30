@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"sync"
 )
@@ -30,6 +31,9 @@ type Proxy struct {
 	mu        sync.RWMutex
 	running   bool
 	scripts   *ScriptRegistry
+	// testTransport overrides the upstream RoundTripper in tests.
+	// Nil in production, where forward() dials through the mihomo chain.
+	testTransport http.RoundTripper
 }
 
 func New(cfg Config) (*Proxy, error) {
