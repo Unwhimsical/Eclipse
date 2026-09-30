@@ -13,5 +13,6 @@ import UIKit
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     ServiceChannel.register(with: engineBridge.applicationRegistrar.messenger())
+    WifiSsidChannel.register(with: engineBridge.applicationRegistrar.messenger())
   }
 }

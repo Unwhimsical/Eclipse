@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/scene_mode.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -75,7 +76,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         if (system.isDesktop) const _HotkeyItem(),
         if (system.isWindows) const _LoopbackItem(),
         if (system.isAndroid) const _AccessItem(),
-        if (system.isAndroid) const _SceneModeItem(),
+        if (system.isAndroid || system.isIOS) const _SceneModeItem(),
         const _ConfigItem(),
         const _AdvancedConfigItem(),
         if (system.isMobile) const _CaItem(),
@@ -235,7 +236,12 @@ class _SceneModeItem extends StatelessWidget {
     return ListItem.open(
       leading: const Icon(Icons.auto_awesome),
       title: Text(context.appLocalizations.sceneMode),
-      subtitle: Text(context.appLocalizations.sceneModeDesc),
+      subtitle: Text(
+        sceneModeEntrySubtitle(
+          isIOS: system.isIOS,
+          base: context.appLocalizations.sceneModeDesc,
+        ),
+      ),
       widget: const SceneView(),
     );
   }

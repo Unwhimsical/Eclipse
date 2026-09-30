@@ -141,4 +141,17 @@ void main() {
       );
     });
   });
+
+  group('sceneModeEntrySubtitle', () {
+    test('returns the base text unchanged on non-iOS', () {
+      expect(sceneModeEntrySubtitle(isIOS: false, base: 'desc'), 'desc');
+    });
+
+    test('appends the foreground-only caveat on iOS', () {
+      expect(
+        sceneModeEntrySubtitle(isIOS: true, base: 'desc'),
+        'desc（iOS 仅在 App 处于前台时生效）',
+      );
+    });
+  });
 }
