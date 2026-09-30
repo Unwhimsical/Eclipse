@@ -22,6 +22,18 @@ type Config struct {
 	Scripts        []*Script
 	MapLocal       []MapLocalRule
 	BodyRewrites   []BodyRewriteRule
+	// RejectRules renders Shadowrocket granular reject actions
+	// (REJECT-DICT/ARRAY/200/IMG/TINYGIF/VIDEO from [Rule]) as graceful
+	// empty HTTP responses. Mihomo itself only ever sees plain REJECT.
+	RejectRules []RejectRule
+}
+
+// RejectRule maps a hostname pattern (same wildcard syntax as Hostnames)
+// to a writeRewriteResult kind + HTTP status.
+type RejectRule struct {
+	HostPattern string
+	Kind        string
+	Status      int
 }
 
 type Proxy struct {
@@ -149,6 +161,10 @@ func matchPattern(pat, host string) bool {
 	if len(pat) > 2 && pat[:2] == "*." {
 		suffix := pat[1:]
 		return len(host) > len(suffix) && host[len(host)-len(suffix):] == suffix
+	}
+	if len(pat) > 2 && pat[0] == '*' && pat[len(pat)-1] == '*' {
+		inner := pat[1 : len(pat)-1]
+		return inner != "" && strings.Contains(host, inner)
 	}
 	if len(pat) > 1 && pat[len(pat)-1] == '*' {
 		return len(host) >= len(pat)-1 && host[:len(pat)-1] == pat[:len(pat)-1]

@@ -48,6 +48,10 @@ class MitmManager {
     final headerRewriteLines = <String>[...profileHeaderRewrites];
     final mapLocalLines = <String>[...profileMapLocal];
     final bodyRewriteLines = <String>[...profileBodyRewrites];
+    // Granular reject entries (`REJECT-DICT` & co.) from enabled modules,
+    // in module list order; first occurrence of a host pattern wins.
+    final rejectRules = <Map<String, Object>>[];
+    final seenRejectHosts = <String>{};
 
     // DNS hostnames are case-insensitive; normalize so differently-cased
     // spellings of the same host do not become separate entries.
@@ -101,6 +105,15 @@ class MitmManager {
         mapLocalLines.addAll(sg.mapLocal);
         bodyRewriteLines.addAll(sg.bodyRewrites);
 
+        // Granular rejects: route the hosts through MITM and let the Go
+        // layer render the graceful empty response.
+        for (final granular in sg.granularRejects) {
+          if (seenRejectHosts.add(granular.hostPattern)) {
+            addHosts([granular.hostPattern]);
+            rejectRules.add(granular.toJson());
+          }
+        }
+
         // Scripts: parse and download content.
         for (final line in sg.scripts) {
           final parsed = parseScriptLine(line);
@@ -139,7 +152,8 @@ class MitmManager {
         scripts.isEmpty &&
         headerRewrites.isEmpty &&
         mapLocal.isEmpty &&
-        bodyRewrites.isEmpty) {
+        bodyRewrites.isEmpty &&
+        rejectRules.isEmpty) {
       await stop();
       return false;
     }
@@ -165,6 +179,7 @@ class MitmManager {
       'headerRewrites': headerRewrites,
       'mapLocal': mapLocal,
       'bodyRewrites': bodyRewrites,
+      'rejectRules': rejectRules,
       'scripts': scripts,
       // Upstream: forward through Mihomo's HTTP proxy if available.
       // Empty means direct.

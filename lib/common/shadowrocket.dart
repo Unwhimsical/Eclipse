@@ -799,6 +799,62 @@ class ModuleArgument {
   const ModuleArgument({required this.key, this.defaultValue = ''});
 }
 
+/// Granular reject action captured at parse time, before [_normalizeConfRule] flattens the rule to plain `REJECT` for Mihomo.
+class GranularRejectRule {
+  final String hostPattern;
+  final String kind;
+  final int status;
+
+  const GranularRejectRule({
+    required this.hostPattern,
+    required this.kind,
+    required this.status,
+  });
+
+  Map<String, Object> toJson() => {
+    'host': hostPattern,
+    'kind': kind,
+    'status': status,
+  };
+}
+
+GranularRejectRule? parseGranularRejectLine(String rawLine) {
+  final line = rawLine.trim();
+  if (line.isEmpty ||
+      line.startsWith('#') ||
+      line.startsWith(';') ||
+      line.startsWith('%')) {
+    return null;
+  }
+  final parts = line.split(',');
+  if (parts.length < 3) return null;
+  final type = parts[0].trim().toUpperCase();
+  final value = parts[1].trim();
+  final action = parts[2].trim().toUpperCase();
+  const kinds = {
+    'REJECT-DICT': ('reject-json', 200),
+    'REJECT-ARRAY': ('reject-array', 200),
+    'REJECT-200': ('reject', 200),
+    'REJECT-IMG': ('reject-img', 200),
+    'REJECT-TINYGIF': ('reject-img', 200),
+    'REJECT-VIDEO': ('reject-video', 200),
+  };
+  final kind = kinds[action];
+  if (kind == null || value.isEmpty) return null;
+  final hostPattern = switch (type) {
+    'DOMAIN' => value.toLowerCase(),
+    'DOMAIN-SUFFIX' => '*.${value.toLowerCase()}',
+    'DOMAIN-KEYWORD' => '*${value.toLowerCase()}*',
+    _ => null,
+  };
+  if (hostPattern == null) return null;
+  return GranularRejectRule(
+    hostPattern: hostPattern,
+    kind: kind.$1,
+    status: kind.$2,
+  );
+}
+
 /// A parsed `.sgmodule` file.
 class Sgmodule {
   final String name;
@@ -820,6 +876,8 @@ class Sgmodule {
   final List<ModuleArgument> arguments;
   final Map<String, String> argumentDescriptions;
 
+  final List<GranularRejectRule> granularRejects;
+
   const Sgmodule({
     this.name = '',
     this.desc = '',
@@ -836,6 +894,7 @@ class Sgmodule {
     this.rulesAppend = false,
     this.arguments = const [],
     this.argumentDescriptions = const {},
+    this.granularRejects = const [],
   });
 
   bool get isEmpty =>
@@ -852,7 +911,8 @@ class Sgmodule {
       headerRewrites.isNotEmpty ||
       mapLocal.isNotEmpty ||
       bodyRewrites.isNotEmpty ||
-      scripts.isNotEmpty;
+      scripts.isNotEmpty ||
+      granularRejects.isNotEmpty;
 }
 
 /// Parse a `.sgmodule` text.
@@ -868,6 +928,7 @@ Sgmodule parseSgmodule(String content) {
   final bodyRewrites = <String>[];
   final scripts = <String>[];
   final mitmHostnames = <String>[];
+  final granularRejects = <GranularRejectRule>[];
   var rulesAppend = false;
   var moduleArguments = const <ModuleArgument>[];
   var argumentsDescRaw = '';
@@ -907,6 +968,8 @@ Sgmodule parseSgmodule(String content) {
         if (line.startsWith('%')) {
           if (line.toUpperCase() == '%APPEND%') rulesAppend = true;
         } else {
+          final granular = parseGranularRejectLine(line);
+          if (granular != null) granularRejects.add(granular);
           final rule = _normalizeConfRule(line);
           if (rule != null) rules.add(rule);
         }
@@ -948,6 +1011,7 @@ Sgmodule parseSgmodule(String content) {
     scripts: scripts,
     mitmHostnames: mitmHostnames,
     rulesAppend: rulesAppend,
+    granularRejects: granularRejects,
     arguments: moduleArguments,
     argumentDescriptions: parseModuleArgumentDescriptions(
       argumentsDescRaw,

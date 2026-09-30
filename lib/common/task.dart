@@ -446,6 +446,17 @@ Future<void> _injectMitmProxy(
     profileMapLocal: profileMapLocal,
     profileBodyRewrites: profileBodyRewrites,
   );
+  // Granular reject rules (`REJECT-DICT` & co.) from enabled modules, in
+  // module list order: route their hosts through the MITM proxy so the Go
+  // layer can render the graceful empty response. First occurrence wins.
+  final seenRejectHosts = <String>{};
+  for (final sg in parsedModules) {
+    for (final granular in sg.granularRejects) {
+      if (seenRejectHosts.add(granular.hostPattern)) {
+        hosts.add(granular.hostPattern);
+      }
+    }
+  }
   if (hosts.isEmpty) return;
   try {
     final proxies = rawConfig['proxies'] is List
@@ -532,6 +543,10 @@ List<String> mitmRulesForHosts(Set<String> hosts) {
     }
     if (host.startsWith('*.')) {
       mitmRules.add('DOMAIN-SUFFIX,${host.substring(2)},$mitmProxyName');
+    } else if (host.startsWith('*') && host.endsWith('*') && host.length > 2) {
+      mitmRules.add(
+        'DOMAIN-KEYWORD,${host.substring(1, host.length - 1)},$mitmProxyName',
+      );
     } else {
       mitmRules.add('DOMAIN,$host,$mitmProxyName');
     }

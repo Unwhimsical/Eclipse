@@ -67,7 +67,7 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			if action == "" {
 				action = "redirect"
 				if target == "-" || strings.HasPrefix(strings.ToLower(target), "reject") {
-					action = "reject"
+					action = mitm.RejectActionForTarget(target)
 					target = ""
 				}
 			}
@@ -169,6 +169,32 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 				continue
 			}
 			cfg.BodyRewrites = append(cfg.BodyRewrites, *rule)
+		}
+	}
+	// Granular reject rules from [Rule]: list of {host,kind,status}.
+	if v, ok := args["rejectRules"].([]interface{}); ok {
+		for _, item := range v {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			host, _ := m["host"].(string)
+			kind, _ := m["kind"].(string)
+			if host == "" || kind == "" {
+				continue
+			}
+			status := 200
+			switch s := m["status"].(type) {
+			case float64:
+				status = int(s)
+			case int:
+				status = s
+			}
+			cfg.RejectRules = append(cfg.RejectRules, mitm.RejectRule{
+				HostPattern: host,
+				Kind:        kind,
+				Status:      status,
+			})
 		}
 	}
 	if cfg.CACertPEM == "" || cfg.CAKeyPEM == "" {

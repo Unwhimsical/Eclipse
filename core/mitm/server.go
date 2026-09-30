@@ -98,6 +98,14 @@ func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
 			return
 		}
 	}
+	// Granular reject rules from [Rule] (REJECT-DICT & co.): render the
+	// graceful empty response instead of forwarding upstream.
+	if res := p.applyRejectRules(req); res != nil {
+		w := newConnWriter(conn, req)
+		writeRewriteResult(w, res)
+		_ = w.finish()
+		return
+	}
 	// Header rewrites: modify request headers before forwarding upstream.
 	p.applyHeaderRewrites(req, fullURL)
 	p.forward(conn, req, isTLS)
