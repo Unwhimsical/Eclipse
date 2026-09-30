@@ -1,6 +1,9 @@
 name: Debug Format
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/debug-format.yaml
 jobs:
   debug:
     runs-on: ubuntu-latest
