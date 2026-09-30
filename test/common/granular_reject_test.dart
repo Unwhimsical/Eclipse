@@ -199,5 +199,105 @@ void main() {
       );
       expect((rejectRules.first as Map)['kind'], 'reject-json');
     });
+
+    test('collects UA rules in module order into the Go config', () async {
+      await ModuleStore().import(
+        '[Rule]\n'
+        'DOMAIN-SUFFIX,ads.example.com,REJECT-DICT\n'
+        'USER-AGENT,*ads*,REJECT-DICT\n'
+        'USER-AGENT,AVOS*,REJECT-VIDEO\n'
+        'USER-AGENT,*x*,PROXY\n',
+      );
+      final handler = _MockCoreHandlerInterface();
+      when(
+        () => handler.mitmUpdateConfig(any()),
+      ).thenAnswer((_) async => {'running': false});
+      Map<String, dynamic>? startedConfig;
+      when(() => handler.mitmStart(any())).thenAnswer((invocation) async {
+        startedConfig = Map<String, dynamic>.from(
+          invocation.positionalArguments.first as Map,
+        );
+        return <String, dynamic>{};
+      });
+      final manager = MitmManager(CoreController.scoped(handler));
+
+      expect(await manager.syncAndStart(), isTrue);
+      expect(startedConfig, isNotNull);
+      final uaRules = startedConfig!['uaRules'] as List;
+      expect(uaRules.length, 2);
+      expect((uaRules[0] as Map)['pattern'], '*ads*');
+      expect((uaRules[0] as Map)['policy'], 'REJECT-DICT');
+      expect((uaRules[1] as Map)['pattern'], 'AVOS*');
+      expect((uaRules[1] as Map)['policy'], 'REJECT-VIDEO');
+    });
+  });
+
+  group('parseUARejectLine', () {
+    test('passes through pattern and policy verbatim', () {
+      final rule = parseUARejectLine('USER-AGENT,*ads*,REJECT-DICT');
+      expect(rule, isNotNull);
+      expect(rule!.pattern, '*ads*');
+      expect(rule.policy, 'REJECT-DICT');
+    });
+
+    test('keeps the whole REJECT family, case-insensitively', () {
+      const policies = [
+        'REJECT',
+        '-',
+        'REJECT-NODROP',
+        'REJECT-NO-DROP',
+        'REJECT-200',
+        'REJECT-DICT',
+        'REJECT-JSON',
+        'REJECT-ARRAY',
+        'REJECT-IMG',
+        'REJECT-TINYGIF',
+        'REJECT-VIDEO',
+      ];
+      for (final policy in policies) {
+        expect(
+          parseUARejectLine('user-agent,Avos*,${policy.toLowerCase()}'),
+          isNotNull,
+          reason: policy,
+        );
+      }
+    });
+
+    test('drops PROXY/DIRECT/group names', () {
+      expect(parseUARejectLine('USER-AGENT,*ads*,PROXY'), isNull);
+      expect(parseUARejectLine('USER-AGENT,*ads*,DIRECT'), isNull);
+      expect(parseUARejectLine('USER-AGENT,*ads*,MyGroup'), isNull);
+      expect(parseUARejectLine('USER-AGENT,*ads*,REJECT-DROP'), isNull);
+    });
+
+    test('returns null for comments, short or non-UA lines', () {
+      expect(parseUARejectLine('DOMAIN-SUFFIX,x.com,REJECT-DICT'), isNull);
+      expect(parseUARejectLine('USER-AGENT,REJECT-DICT'), isNull);
+      expect(parseUARejectLine('USER-AGENT,,REJECT-DICT'), isNull);
+      expect(parseUARejectLine('USER-AGENT,*ads*,'), isNull);
+      expect(parseUARejectLine(''), isNull);
+      expect(parseUARejectLine('# USER-AGENT,*ads*,REJECT'), isNull);
+    });
+  });
+
+  group('parseSgmodule UA rejects', () {
+    test('collects entries in file order, keeps mihomo rules clean', () {
+      final sg = parseSgmodule(
+        '[Rule]\n'
+        'USER-AGENT,*ads*,REJECT-DICT\n'
+        'USER-AGENT,AVOS*,REJECT-200\n'
+        'USER-AGENT,*x*,PROXY\n',
+      );
+      expect(sg.uaRejects.length, 2);
+      expect(sg.uaRejects[0].pattern, '*ads*');
+      expect(sg.uaRejects[0].policy, 'REJECT-DICT');
+      expect(sg.uaRejects[1].pattern, 'AVOS*');
+      expect(sg.uaRejects[1].policy, 'REJECT-200');
+      // USER-AGENT never reaches the mihomo YAML — it is demoted to a comment.
+      for (final rule in sg.rules) {
+        expect(rule.startsWith('#'), isTrue, reason: rule);
+      }
+      expect(sg.needsMitm, isTrue);
+    });
   });
 }

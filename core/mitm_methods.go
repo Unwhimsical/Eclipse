@@ -197,6 +197,29 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			})
 		}
 	}
+	// USER-AGENT rejects from [Rule]: list of {pattern,policy}.
+	if v, ok := args["uaRules"].([]interface{}); ok {
+		for _, item := range v {
+			m, ok := item.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			pattern, _ := m["pattern"].(string)
+			policy, _ := m["policy"].(string)
+			if pattern == "" {
+				continue
+			}
+			kind, status, ok := mitm.UARejectKind(policy)
+			if !ok {
+				continue
+			}
+			rule, err := mitm.CompileUARejectRule(pattern, kind, status)
+			if err != nil || rule == nil {
+				continue
+			}
+			cfg.UARules = append(cfg.UARules, *rule)
+		}
+	}
 	if cfg.CACertPEM == "" || cfg.CAKeyPEM == "" {
 		return cfg, fmt.Errorf("mitm: CA certificate and key are required")
 	}

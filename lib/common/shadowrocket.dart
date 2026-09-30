@@ -868,6 +868,47 @@ GranularRejectRule? parseGranularRejectLine(String rawLine) {
   );
 }
 
+/// A `USER-AGENT,<pattern>,<policy>` rule; REJECT-family policies only.
+/// Go maps the policy and converts the glob to a regex.
+class UARejectRule {
+  final String pattern;
+  final String policy;
+
+  const UARejectRule({required this.pattern, required this.policy});
+
+  Map<String, Object> toJson() => {'pattern': pattern, 'policy': policy};
+}
+
+UARejectRule? parseUARejectLine(String rawLine) {
+  final line = rawLine.trim();
+  if (line.isEmpty ||
+      line.startsWith('#') ||
+      line.startsWith(';') ||
+      line.startsWith('%')) {
+    return null;
+  }
+  final parts = line.split(',');
+  if (parts.length < 3) return null;
+  if (parts[0].trim().toUpperCase() != 'USER-AGENT') return null;
+  final pattern = parts[1].trim();
+  final policy = parts[2].trim().toUpperCase();
+  const rejectPolicies = {
+    'REJECT',
+    '-',
+    'REJECT-NODROP',
+    'REJECT-NO-DROP',
+    'REJECT-200',
+    'REJECT-DICT',
+    'REJECT-JSON',
+    'REJECT-ARRAY',
+    'REJECT-IMG',
+    'REJECT-TINYGIF',
+    'REJECT-VIDEO',
+  };
+  if (!rejectPolicies.contains(policy) || pattern.isEmpty) return null;
+  return UARejectRule(pattern: pattern, policy: policy);
+}
+
 /// A parsed `.sgmodule` file.
 class Sgmodule {
   final String name;
@@ -891,6 +932,8 @@ class Sgmodule {
 
   final List<GranularRejectRule> granularRejects;
 
+  final List<UARejectRule> uaRejects;
+
   const Sgmodule({
     this.name = '',
     this.desc = '',
@@ -908,6 +951,7 @@ class Sgmodule {
     this.arguments = const [],
     this.argumentDescriptions = const {},
     this.granularRejects = const [],
+    this.uaRejects = const [],
   });
 
   bool get isEmpty =>
@@ -925,7 +969,8 @@ class Sgmodule {
       mapLocal.isNotEmpty ||
       bodyRewrites.isNotEmpty ||
       scripts.isNotEmpty ||
-      granularRejects.isNotEmpty;
+      granularRejects.isNotEmpty ||
+      uaRejects.isNotEmpty;
 }
 
 /// Parse a `.sgmodule` text.
@@ -942,6 +987,7 @@ Sgmodule parseSgmodule(String content) {
   final scripts = <String>[];
   final mitmHostnames = <String>[];
   final granularRejects = <GranularRejectRule>[];
+  final uaRejects = <UARejectRule>[];
   var rulesAppend = false;
   var moduleArguments = const <ModuleArgument>[];
   var argumentsDescRaw = '';
@@ -983,6 +1029,8 @@ Sgmodule parseSgmodule(String content) {
         } else {
           final granular = parseGranularRejectLine(line);
           if (granular != null) granularRejects.add(granular);
+          final uaReject = parseUARejectLine(line);
+          if (uaReject != null) uaRejects.add(uaReject);
           final rule = _normalizeConfRule(line);
           if (rule != null) rules.add(rule);
         }
@@ -1025,6 +1073,7 @@ Sgmodule parseSgmodule(String content) {
     mitmHostnames: mitmHostnames,
     rulesAppend: rulesAppend,
     granularRejects: granularRejects,
+    uaRejects: uaRejects,
     arguments: moduleArguments,
     argumentDescriptions: parseModuleArgumentDescriptions(
       argumentsDescRaw,

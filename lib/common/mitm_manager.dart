@@ -24,6 +24,9 @@ class MitmManager {
 
   /// Build MITM config from all enabled modules and start the proxy.
   /// Returns true if the proxy was started (at least one module needs MITM).
+  ///
+  /// `USER-AGENT` rules only fire on traffic MITM decrypts: a module with
+  /// UA rules but no intercepted hostnames never starts the proxy.
   Future<bool> syncAndStart({
     List<String> profileUrlRewrites = const [],
     List<String> profileHeaderRewrites = const [],
@@ -54,6 +57,10 @@ class MitmManager {
     // in module list order; first occurrence of a host pattern wins.
     final rejectRules = <Map<String, Object>>[];
     final seenRejectHosts = <String>{};
+
+    // USER-AGENT rejects from enabled modules, in module list order. They
+    // carry no host and are not routed through MITM (see [syncAndStart]).
+    final uaRules = <Map<String, Object>>[];
 
     // DNS hostnames are case-insensitive; normalize so differently-cased
     // spellings of the same host do not become separate entries.
@@ -114,6 +121,11 @@ class MitmManager {
             addHosts([granular.hostPattern]);
             rejectRules.add(granular.toJson());
           }
+        }
+
+        // USER-AGENT rejects: collected verbatim for the Go layer.
+        for (final ua in sg.uaRejects) {
+          uaRules.add(ua.toJson());
         }
 
         // Fetch each unique script URL once: a module can list the same URL hundreds of times.
@@ -194,6 +206,7 @@ class MitmManager {
       'mapLocal': mapLocal,
       'bodyRewrites': bodyRewrites,
       'rejectRules': rejectRules,
+      'uaRules': uaRules,
       'scripts': scripts,
       // Upstream: forward through Mihomo's HTTP proxy if available.
       // Empty means direct.
