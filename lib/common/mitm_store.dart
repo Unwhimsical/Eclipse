@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 /// Per-profile MITM configuration stored as `<profileId>.mitm.json`
@@ -10,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 class MitmStore {
   static Future<Directory> _dir() async {
     final docDir = await getApplicationDocumentsDirectory();
-    final dir = Directory(p.join(docDir.path, 'mitm'));
+    final dir = Directory('${docDir.path}/mitm');
     if (!await dir.exists()) {
       await dir.create(recursive: true);
     }
@@ -19,7 +18,7 @@ class MitmStore {
 
   static Future<File> _file(int profileId) async {
     final dir = await _dir();
-    return File(p.join(dir.path, '$profileId.mitm.json'));
+    return File('${dir.path}/$profileId.mitm.json');
   }
 
   /// Save MITM config for a profile.
