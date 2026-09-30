@@ -7,6 +7,7 @@ import '../models/clash_config.dart';
 import '../models/module.dart';
 import '../models/profile.dart';
 import '../providers/providers.dart';
+import 'mitm_store.dart';
 import 'module_store.dart';
 import 'request.dart';
 import 'shadowrocket.dart';
@@ -42,6 +43,14 @@ class ShadowrocketImport {
   }) async {
     final ConfData conf = parseConf(content);
     if (conf.isEmpty) return null;
+    // Parse [MITM] section.
+    final mitmEnabled = conf.mitm['enable']?.toLowerCase() == 'true';
+    final mitmHostnames = (conf.mitm['hostname'] ?? '')
+        .split(',')
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final hasMitm = mitmEnabled || mitmHostnames.isNotEmpty;
     String? profileLabel;
     if (conf.proxies.isNotEmpty) {
       final yamlText = buildClashConfigFromProxies(
@@ -74,6 +83,25 @@ class ShadowrocketImport {
         hosts: conf.hosts,
         urlRewrites: conf.urlRewrites,
         headerRewrites: conf.headerRewrites,
+        mitmEnabled: mitmEnabled,
+        mitmHostnames: mitmHostnames,
+      );
+    } else if (hasMitm ||
+        conf.hosts.isNotEmpty ||
+        conf.urlRewrites.isNotEmpty ||
+        conf.headerRewrites.isNotEmpty ||
+        conf.rules.isNotEmpty) {
+      // Pure rules/hosts/rewrites/MITM conf (no proxies): create a Profile
+      // so the config has a home and MITM hostnames are stored.
+      profileLabel = await _createProfileFromYaml(
+        ref,
+        'proxies: []\n',
+        fileName?.replaceAll('.conf', '') ?? '导入配置',
+        hosts: conf.hosts,
+        urlRewrites: conf.urlRewrites,
+        headerRewrites: conf.headerRewrites,
+        mitmEnabled: mitmEnabled,
+        mitmHostnames: mitmHostnames,
       );
     }
     if (conf.rules.isNotEmpty) {
@@ -206,6 +234,8 @@ class ShadowrocketImport {
     Map<String, String> hosts = const {},
     List<String> urlRewrites = const [],
     List<String> headerRewrites = const [],
+    bool mitmEnabled = false,
+    List<String> mitmHostnames = const [],
   }) async {
     final core = ref.read(coreHandlerProvider);
     final profile = await Profile.normal(label: label)
@@ -219,6 +249,14 @@ class ShadowrocketImport {
           validate: (path) => core.validateConfig(path),
         );
     ref.read(profilesActionProvider.notifier).putProfile(profile);
+    // Persist MITM config per-profile (avoids Profile model/DB changes).
+    if (mitmEnabled || mitmHostnames.isNotEmpty) {
+      await MitmStore.save(
+        profile.id,
+        enabled: mitmEnabled,
+        hostnames: mitmHostnames,
+      );
+    }
     return label;
   }
 
