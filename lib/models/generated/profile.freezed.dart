@@ -295,7 +295,7 @@ as int,
 /// @nodoc
 mixin _$Profile {
 
- int get id; String get label; String? get currentGroupName; String get url; DateTime? get lastUpdateDate; Duration get autoUpdateDuration; SubscriptionInfo? get subscriptionInfo; bool get autoUpdate; Map<String, String> get selectedMap; Set<String> get unfoldSet; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; OverwriteType get overwriteType; int? get scriptId; String? get matchTarget; int? get order;
+ int get id; String get label; String? get currentGroupName; String get url; DateTime? get lastUpdateDate; Duration get autoUpdateDuration; SubscriptionInfo? get subscriptionInfo; bool get autoUpdate; Map<String, String> get selectedMap; Set<String> get unfoldSet; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; bool get mitmEnabled; List<String> get mitmHostnames; OverwriteType get overwriteType; int? get scriptId; String? get matchTarget; int? get order;
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -350,7 +350,7 @@ class _$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mitmEnabled = null,Object? mitmHostnames = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
   return _then(Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
@@ -635,7 +635,7 @@ class __$ProfileCopyWithImpl<$Res>
 
 /// Create a copy of Profile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? label = null,Object? currentGroupName = freezed,Object? url = null,Object? lastUpdateDate = freezed,Object? autoUpdateDuration = null,Object? subscriptionInfo = freezed,Object? autoUpdate = null,Object? selectedMap = null,Object? unfoldSet = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mitmEnabled = null,Object? mitmHostnames = null,Object? overwriteType = null,Object? scriptId = freezed,Object? matchTarget = freezed,Object? order = freezed,}) {
   return _then(_Profile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,label: null == label ? _self.label : label // ignore: cast_nullable_to_non_nullable
