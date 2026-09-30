@@ -368,6 +368,7 @@ class SetupAction extends _$SetupAction {
         hosts: setupState.hosts,
         urlRewrites: setupState.urlRewrites,
         headerRewrites: setupState.headerRewrites,
+        mitmHostnames: setupState.mitmHostnames,
         matchTarget: setupState.matchTarget,
       ),
     );

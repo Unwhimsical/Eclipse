@@ -74,6 +74,9 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
     hosts: profile?.hosts ?? {},
     urlRewrites: profile?.urlRewrites ?? [],
     headerRewrites: profile?.headerRewrites ?? [],
+    mitmHostnames: (profile?.mitmEnabled ?? false)
+        ? (profile?.mitmHostnames ?? const [])
+        : const [],
     matchTarget: overwriteType == OverwriteType.standard
         ? profile?.matchTarget
         : null,

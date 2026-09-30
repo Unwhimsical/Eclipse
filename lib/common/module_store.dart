@@ -159,6 +159,7 @@ class ModuleStore {
       needsMitm: parsed.needsMitm,
       importDate: DateTime.now(),
       ruleSetRules: ruleSetRules,
+      rulesAppend: parsed.rulesAppend,
     );
     final modules = await list();
     modules.add(info);

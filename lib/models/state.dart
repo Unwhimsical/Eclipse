@@ -358,6 +358,7 @@ abstract class MakeRealProfileState with _$MakeRealProfileState {
     @Default({}) Map<String, String> hosts,
     @Default([]) List<String> urlRewrites,
     @Default([]) List<String> headerRewrites,
+    @Default([]) List<String> mitmHostnames,
     String? matchTarget,
   }) = _MakeRealProfileState;
 }
@@ -389,6 +390,7 @@ abstract class SetupState with _$SetupState {
     @Default({}) Map<String, String> hosts,
     @Default([]) List<String> urlRewrites,
     @Default([]) List<String> headerRewrites,
+    @Default([]) List<String> mitmHostnames,
     String? matchTarget,
   }) = _SetupState;
 }

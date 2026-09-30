@@ -475,15 +475,16 @@ hostname = %APPEND%,example.com,*.example.org
         ],
         dnsServers: ['8.8.8.8'],
         directDnsServers: ['114.114.114.114'],
-        skipProxy: ['example.com', '192.168.0.0/16'],
         tunExcludedRoutes: ['10.0.0.0/8'],
         ipv6Enabled: false,
       );
       final doc = yaml.loadYaml(text) as Map;
-      // skip-proxy becomes DIRECT rules prepended
+      // skip-proxy stays on the TUN path: no DIRECT rules are forced.
       final rules = doc['rules'] as List;
-      expect(rules[0], 'DOMAIN-SUFFIX,example.com,DIRECT');
-      expect(rules[1], 'IP-CIDR,192.168.0.0/16,DIRECT');
+      expect(
+        rules.where((r) => (r as String).endsWith(',DIRECT')),
+        isEmpty,
+      );
       // dns
       final dns = doc['dns'] as Map;
       expect(dns['direct-nameserver'], ['114.114.114.114']);

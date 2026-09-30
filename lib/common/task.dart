@@ -304,17 +304,20 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   }
   await _orderRulesByModules(rules);
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
-  await _injectMitmProxy(rawConfig, rules, data.urlRewrites);
+  await _injectMitmProxy(
+    rawConfig,
+    rules,
+    data.urlRewrites,
+    data.mitmHostnames,
+  );
   await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
 }
 
-/// Reorder [rules] for Shadowrocket semantics: enabled modules' rules come
-/// first, in the modules' UI list order (top to bottom), followed by the
-/// config's own rules. MITM interception rules are injected separately at
-/// position 0 and are unaffected.
+/// Shadowrocket rule order: enabled modules first (UI order), then config
+/// rules. A module without `%APPEND%` replaces config and earlier modules.
 Future<void> _orderRulesByModules(List<String> rules) async {
   try {
     final moduleStore = ModuleStore();
@@ -322,15 +325,12 @@ Future<void> _orderRulesByModules(List<String> rules) async {
     final enabled = modules.where((m) => m.enabled).toList();
     if (enabled.isEmpty || rules.isEmpty) return;
 
-    // Collect each module's rule strings, in list order.
-    final moduleRuleSets = <Set<String>>[];
+    final moduleRules = <({Set<String> ruleSet, bool rulesAppend})>[];
     for (final module in enabled) {
       final ruleSet = <String>{};
-      // Large modules: RULE-SET references + inline non-domain rules.
       ruleSet.addAll(module.ruleSetRules);
       final inline = await moduleStore.readInlineRules(module.id);
       ruleSet.addAll(inline);
-      // Small modules: rules were inlined directly; parse the raw file.
       if (ruleSet.isEmpty) {
         final raw = await moduleStore.readRaw(module.id);
         if (raw != null) {
@@ -339,32 +339,46 @@ Future<void> _orderRulesByModules(List<String> rules) async {
           } catch (_) {}
         }
       }
-      moduleRuleSets.add(ruleSet);
+      moduleRules.add((ruleSet: ruleSet, rulesAppend: module.rulesAppend));
     }
 
-    // Stable partition: module buckets in order, then everything else.
-    final buckets = List.generate(enabled.length, (_) => <String>[]);
-    final others = <String>[];
-    for (final rule in rules) {
-      var placed = false;
-      for (var i = 0; i < moduleRuleSets.length; i++) {
-        if (moduleRuleSets[i].contains(rule)) {
-          buckets[i].add(rule);
-          placed = true;
-          break;
-        }
-      }
-      if (!placed) {
-        others.add(rule);
-      }
-    }
-
-    rules.clear();
-    for (final bucket in buckets) {
-      rules.addAll(bucket);
-    }
-    rules.addAll(others);
+    final ordered = orderRulesByModules(rules, moduleRules);
+    rules
+      ..clear()
+      ..addAll(ordered);
   } catch (_) {}
+}
+
+@visibleForTesting
+List<String> orderRulesByModules(
+  List<String> rules,
+  List<({Set<String> ruleSet, bool rulesAppend})> modules,
+) {
+  final buckets = List.generate(modules.length, (_) => <String>[]);
+  final configRules = <String>[];
+  for (final rule in rules) {
+    var placed = false;
+    for (var i = 0; i < modules.length; i++) {
+      if (modules[i].ruleSet.contains(rule)) {
+        buckets[i].add(rule);
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) configRules.add(rule);
+  }
+
+  var moduleRules = <String>[];
+  var survivingConfigRules = configRules;
+  for (var i = 0; i < modules.length; i++) {
+    if (modules[i].rulesAppend) {
+      moduleRules.addAll(buckets[i]);
+    } else {
+      moduleRules = List<String>.from(buckets[i]);
+      survivingConfigRules = <String>[];
+    }
+  }
+  return [...moduleRules, ...survivingConfigRules];
 }
 
 /// Inject `[Host]` entries from enabled modules into the Clash `hosts` map.
@@ -392,47 +406,32 @@ Future<void> _injectModuleHosts(Map rawConfig) async {
   } catch (_) {}
 }
 
-/// Inject the local MITM proxy and routing rules for MITM hostnames.
-/// The Go MITM proxy listens on 127.0.0.1:9092; traffic to MITM hosts is
-/// routed through it so scripts/rewrites can run on decrypted traffic.
 Future<void> _injectMitmProxy(
   Map rawConfig,
   List<String> rules,
   List<String> profileUrlRewrites,
+  List<String> profileMitmHostnames,
 ) async {
+  final parsedModules = <Sgmodule>[];
   try {
     final moduleStore = ModuleStore();
     final modules = await moduleStore.list();
-    final hosts = <String>{};
     for (final module in modules.where((m) => m.enabled)) {
       try {
         final path = await moduleStore.moduleFilePath(module.id);
         final file = File(path);
         if (!await file.exists()) continue;
-        final Sgmodule sg = parseSgmodule(await file.readAsString());
-        hosts.addAll(sg.mitmHostnames);
-        // Modules with rewrites/scripts but no explicit MITM hostnames:
-        // their patterns may still need interception. Skip for now;
-        // hostname list drives interception.
+        parsedModules.add(parseSgmodule(await file.readAsString()));
       } catch (_) {}
     }
-    // Profile URL rewrites also need MITM interception. Extract hostnames
-    // from rewrite patterns (simple heuristic: try to parse as URL).
-    if (profileUrlRewrites.isNotEmpty && hosts.isEmpty) {
-      for (final line in profileUrlRewrites) {
-        final parts = line.trim().split(RegExp(r'\s+'));
-        if (parts.isEmpty) continue;
-        final pattern = parts[0];
-        try {
-          final uri = Uri.parse(pattern);
-          if (uri.host.isNotEmpty) hosts.add(uri.host);
-        } catch (_) {
-          // Pattern is not a URL, skip hostname extraction.
-        }
-      }
-    }
-    if (hosts.isEmpty) return;
-    // Add MITM proxy.
+  } catch (_) {}
+  final hosts = collectMitmHostnames(
+    modules: parsedModules,
+    profileMitmHostnames: profileMitmHostnames,
+    profileUrlRewrites: profileUrlRewrites,
+  );
+  if (hosts.isEmpty) return;
+  try {
     final proxies = rawConfig['proxies'] is List
         ? List<Map<String, dynamic>>.from(
             (rawConfig['proxies'] as List).map(
@@ -450,23 +449,72 @@ Future<void> _injectMitmProxy(
       });
     }
     rawConfig['proxies'] = proxies;
-    // Add rules: route MITM hosts to the proxy. Insert at the top so they
-    // take precedence.
-    final mitmRules = <String>[];
-    for (final host in hosts) {
-      final h = host.trim();
-      if (h.isEmpty) continue;
-      // Skip exclusions ('-...') and directives ('%...'): they must not
-      // become DOMAIN rules. Excluded hosts simply bypass MITM.
-      if (h.startsWith('-') || h.startsWith('%')) continue;
-      if (h.startsWith('*.')) {
-        mitmRules.add('DOMAIN-SUFFIX,${h.substring(2)},$mitmProxyName');
-      } else {
-        mitmRules.add('DOMAIN,$h,$mitmProxyName');
-      }
-    }
-    rules.insertAll(0, mitmRules);
+    rules.insertAll(0, mitmRulesForHosts(hosts));
   } catch (_) {}
+}
+
+@visibleForTesting
+Set<String> collectMitmHostnames({
+  required List<Sgmodule> modules,
+  required List<String> profileMitmHostnames,
+  required List<String> profileUrlRewrites,
+}) {
+  final hosts = <String>{};
+  void addHost(String? value) {
+    final host = value?.trim().toLowerCase() ?? '';
+    if (host.isNotEmpty) hosts.add(host);
+  }
+
+  for (final sg in modules) {
+    for (final h in sg.mitmHostnames) {
+      addHost(h);
+    }
+  }
+  for (final h in profileMitmHostnames) {
+    addHost(h);
+  }
+  for (final sg in modules) {
+    for (final line in sg.urlRewrites) {
+      addHost(extractRewriteHostname(line));
+    }
+  }
+  for (final line in profileUrlRewrites) {
+    addHost(extractRewriteHostname(line));
+  }
+  return hosts;
+}
+
+/// Exclusions (`-`, `!`) and directives (`%`) never become rules.
+@visibleForTesting
+List<String> mitmRulesForHosts(Set<String> hosts) {
+  const mitmProxyName = 'PigCat-MITM';
+  final mitmRules = <String>[];
+  for (final host in hosts) {
+    if (host.startsWith('-') || host.startsWith('!') || host.startsWith('%')) {
+      continue;
+    }
+    if (host.startsWith('*.')) {
+      mitmRules.add('DOMAIN-SUFFIX,${host.substring(2)},$mitmProxyName');
+    } else {
+      mitmRules.add('DOMAIN,$host,$mitmProxyName');
+    }
+  }
+  return mitmRules;
+}
+
+/// Hostname from a URL-rewrite regex like `^https?://example.com/path`;
+/// `Uri.parse` cannot handle these, so a regex is used.
+@visibleForTesting
+String? extractRewriteHostname(String line) {
+  final pattern = line.trim().split(RegExp(r'\s+')).firstOrNull;
+  if (pattern == null || pattern.isEmpty) return null;
+  final match = RegExp(r'https\??://([A-Za-z0-9_.\-\\]+)').firstMatch(pattern);
+  if (match == null) return null;
+  final host = match.group(1)!.replaceAll('\\', '');
+  if (host.isEmpty || host.startsWith('.') || host.startsWith('-')) {
+    return null;
+  }
+  return host;
 }
 
 /// Inject file-based `rule-providers` for `RULE-SET` rules that reference

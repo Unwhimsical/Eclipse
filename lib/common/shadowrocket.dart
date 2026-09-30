@@ -778,6 +778,9 @@ class Sgmodule {
   final List<String> mitmHostnames;
   final String raw;
 
+  /// `%APPEND%` in `[Rule]`: append rules instead of replacing config rules.
+  final bool rulesAppend;
+
   const Sgmodule({
     this.name = '',
     this.desc = '',
@@ -789,6 +792,7 @@ class Sgmodule {
     this.scripts = const [],
     this.mitmHostnames = const [],
     this.raw = '',
+    this.rulesAppend = false,
   });
 
   bool get isEmpty =>
@@ -813,6 +817,7 @@ Sgmodule parseSgmodule(String content) {
   final headerRewrites = <String>[];
   final scripts = <String>[];
   final mitmHostnames = <String>[];
+  var rulesAppend = false;
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -842,8 +847,12 @@ Sgmodule parseSgmodule(String content) {
     }
     switch (section) {
       case 'rule':
-        final rule = _normalizeConfRule(line);
-        if (rule != null) rules.add(rule);
+        if (line.startsWith('%')) {
+          if (line.toUpperCase() == '%APPEND%') rulesAppend = true;
+        } else {
+          final rule = _normalizeConfRule(line);
+          if (rule != null) rules.add(rule);
+        }
       case 'host':
         final eq = line.indexOf('=');
         if (eq > 0) {
@@ -875,6 +884,7 @@ Sgmodule parseSgmodule(String content) {
     headerRewrites: headerRewrites,
     scripts: scripts,
     mitmHostnames: mitmHostnames,
+    rulesAppend: rulesAppend,
     raw: content,
   );
 }
@@ -911,7 +921,6 @@ String buildClashConfigFromProxies({
   List<String>? rules,
   List<String>? dnsServers,
   List<String>? directDnsServers,
-  List<String>? skipProxy,
   List<String>? tunExcludedRoutes,
   List<String>? tunIncludedRoutes,
   bool? ipv6Enabled,
@@ -929,19 +938,8 @@ String buildClashConfigFromProxies({
       [
         {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
       ];
-  // Prepend DIRECT rules for skip-proxy domains.
+  // skip-proxy stays on the TUN path: no DIRECT rules are forced.
   final configRules = <String>[];
-  if (skipProxy != null) {
-    for (final domain in skipProxy) {
-      if (domain.contains('/')) {
-        // CIDR → IP-CIDR rule
-        configRules.add('IP-CIDR,$domain,DIRECT');
-      } else {
-        // Domain → DOMAIN-SUFFIX rule
-        configRules.add('DOMAIN-SUFFIX,$domain,DIRECT');
-      }
-    }
-  }
   configRules.addAll(rules ?? ['MATCH,$mainGroup']);
   final config = <String, dynamic>{
     'proxies': proxies,

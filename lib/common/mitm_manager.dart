@@ -41,6 +41,15 @@ class MitmManager {
     final rewrites = <Map<String, String>>[];
     final scripts = <Map<String, dynamic>>[];
 
+    // DNS hostnames are case-insensitive; normalize so differently-cased
+    // spellings of the same host do not become separate entries.
+    void addHosts(Iterable<String> values) {
+      for (final value in values) {
+        final host = value.trim().toLowerCase();
+        if (host.isNotEmpty) hosts.add(host);
+      }
+    }
+
     // Profile rewrites come first (they're part of the config).
     for (final line in profileUrlRewrites) {
       final parts = line.trim().split(RegExp(r'\s+'));
@@ -53,7 +62,7 @@ class MitmManager {
     }
 
     // Profile MITM hostnames join the same host set as module hostnames.
-    hosts.addAll(profileMitmHostnames);
+    addHosts(profileMitmHostnames);
 
     for (final module in enabled) {
       try {
@@ -64,7 +73,7 @@ class MitmManager {
         final Sgmodule sg = parseSgmodule(content);
 
         // MITM hostnames.
-        hosts.addAll(sg.mitmHostnames);
+        addHosts(sg.mitmHostnames);
 
         // URL rewrites: parse "pattern target status".
         for (final line in sg.urlRewrites) {

@@ -66,7 +66,6 @@ class ShadowrocketImport {
         directDnsServers: conf.directDnsServers.isEmpty
             ? null
             : conf.directDnsServers,
-        skipProxy: conf.skipProxy.isEmpty ? null : conf.skipProxy,
         tunExcludedRoutes: conf.tunExcludedRoutes.isEmpty
             ? null
             : conf.tunExcludedRoutes,

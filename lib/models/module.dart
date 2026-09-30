@@ -17,6 +17,10 @@ class ModuleInfo {
   /// e.g. `RULE-SET,<id>_PROXY,PROXY`. Empty when rules are inlined.
   final List<String> ruleSetRules;
 
+  /// The module's `[Rule]` section carries `%APPEND%`: its rules are added
+  /// to the config's rules instead of replacing them.
+  final bool rulesAppend;
+
   const ModuleInfo({
     required this.id,
     required this.name,
@@ -30,6 +34,7 @@ class ModuleInfo {
     this.needsMitm = false,
     required this.importDate,
     this.ruleSetRules = const [],
+    this.rulesAppend = true,
   });
 
   ModuleInfo copyWith({
@@ -43,6 +48,7 @@ class ModuleInfo {
     int? scriptCount,
     bool? needsMitm,
     List<String>? ruleSetRules,
+    bool? rulesAppend,
   }) {
     return ModuleInfo(
       id: id,
@@ -57,6 +63,7 @@ class ModuleInfo {
       needsMitm: needsMitm ?? this.needsMitm,
       importDate: importDate,
       ruleSetRules: ruleSetRules ?? this.ruleSetRules,
+      rulesAppend: rulesAppend ?? this.rulesAppend,
     );
   }
 
@@ -74,6 +81,7 @@ class ModuleInfo {
       'needsMitm': needsMitm,
       'importDate': importDate.toIso8601String(),
       'ruleSetRules': ruleSetRules,
+      'rulesAppend': rulesAppend,
     };
   }
 
@@ -94,6 +102,8 @@ class ModuleInfo {
       ruleSetRules:
           (json['ruleSetRules'] as List?)?.map((e) => '$e').toList() ??
           const [],
+      // Modules imported before the flag existed behave as before (append).
+      rulesAppend: json['rulesAppend'] as bool? ?? true,
     );
   }
 }

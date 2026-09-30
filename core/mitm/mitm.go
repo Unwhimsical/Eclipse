@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"net"
+	"strings"
 	"sync"
 )
 
@@ -139,10 +140,13 @@ func (p *Proxy) matchHostname(host string) bool {
 	if h, _, err := net.SplitHostPort(host); err == nil {
 		host = h
 	}
+	// DNS names are case-insensitive; match without regard to case.
+	host = strings.ToLower(host)
 	for _, pat := range patterns {
 		if pat == "" {
 			continue
 		}
+		pat = strings.ToLower(pat)
 		if pat == host {
 			return true
 		}
