@@ -67,6 +67,12 @@ void _downgradeToV7(Database raw) {
   raw.execute('PRAGMA user_version = 7');
 }
 
+/// Schema version 8 had no `scenes` table.
+void _downgradeToV8(Database raw) {
+  raw.execute('DROP TABLE IF EXISTS scenes');
+  raw.execute('PRAGMA user_version = 8');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -111,7 +117,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -121,7 +127,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test(
@@ -133,7 +139,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 8);
+      expect(_userVersion(raw), 9);
     },
   );
 
@@ -208,7 +214,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -218,7 +224,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
   });
 
@@ -234,7 +240,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
     );
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test('the v4 upgrade preserves existing profile rows', () async {
@@ -267,7 +273,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['mitm_enabled', 'mitm_hostnames']),
     );
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test('the v5 upgrade preserves existing profile rows', () async {
@@ -296,7 +302,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('mitm_hostnames'));
-      expect(_userVersion(raw), 8);
+      expect(_userVersion(raw), 9);
     },
   );
 
@@ -313,7 +319,7 @@ void main() {
         _columnsOf(raw, 'profiles'),
         containsAll(<String>['map_local', 'body_rewrites']),
       );
-      expect(_userVersion(raw), 8);
+      expect(_userVersion(raw), 9);
     },
   );
 
@@ -343,7 +349,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('body_rewrites'));
-      expect(_userVersion(raw), 8);
+      expect(_userVersion(raw), 9);
     },
   );
 
@@ -354,7 +360,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('general_settings'));
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test('the v7 upgrade preserves existing profile rows', () async {
@@ -381,7 +387,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('proxy_chains'));
-    expect(_userVersion(raw), 8);
+    expect(_userVersion(raw), 9);
   });
 
   test('the v8 upgrade preserves existing profile rows', () async {
@@ -411,5 +417,82 @@ void main() {
     final reloaded = await dao.query().get();
     expect(reloaded, hasLength(1));
     expect(reloaded.single.proxyChains, {'NodeA': 'NodeB', 'NodeB': 'NodeC'});
+  });
+
+  test('the v9 upgrade creates the scenes table', () async {
+    _downgradeToV8(raw);
+    expect(_hasTable(raw, 'scenes'), isFalse);
+
+    await openAndMigrate();
+
+    expect(_hasTable(raw, 'scenes'), isTrue);
+    expect(
+      _columnsOf(raw, 'scenes'),
+      containsAll(<String>[
+        'id',
+        'name',
+        'trigger_type',
+        'ssid',
+        'target_profile_id',
+        'mode',
+        'target_proxy',
+        'order',
+      ]),
+    );
+    expect(_userVersion(raw), 9);
+  });
+
+  test('scenes round-trip through the scenes table', () async {
+    final database = await openAndMigrate();
+    final dao = database.scenesDao;
+    await dao.put(
+      Scene(
+        id: 0,
+        name: 'home',
+        triggerType: SceneTriggerType.ssid,
+        ssid: 'MyWifi',
+        targetProfileId: 3,
+        mode: Mode.global,
+        targetProxy: 'NodeA',
+        order: 1,
+      ),
+    );
+
+    final reloaded = await dao.queryAll().get();
+    expect(reloaded, hasLength(1));
+    final scene = reloaded.single;
+    expect(scene.id, isNot(0));
+    expect(scene.name, 'home');
+    expect(scene.triggerType, SceneTriggerType.ssid);
+    expect(scene.ssid, 'MyWifi');
+    expect(scene.targetProfileId, 3);
+    expect(scene.mode, Mode.global);
+    expect(scene.targetProxy, 'NodeA');
+    expect(scene.order, 1);
+  });
+
+  test('a scene update replaces the row with the same id', () async {
+    final database = await openAndMigrate();
+    final dao = database.scenesDao;
+    final id = await dao.put(
+      Scene(
+        id: 0,
+        name: 'home',
+        triggerType: SceneTriggerType.cellular,
+        order: 0,
+      ),
+    );
+    await dao.put(
+      Scene(
+        id: id,
+        name: 'home renamed',
+        triggerType: SceneTriggerType.cellular,
+        order: 0,
+      ),
+    );
+
+    final reloaded = await dao.queryAll().get();
+    expect(reloaded, hasLength(1));
+    expect(reloaded.single.name, 'home renamed');
   });
 }

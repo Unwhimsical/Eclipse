@@ -644,5 +644,21 @@
   "privateIpAnswer": "プライベートIP応答",
   "alwaysRealIp": "常に実IP",
   "paramOn": "オン",
-  "paramOff": "オフ"
+  "paramOff": "オフ",
+  "sceneMode": "シーンモード",
+  "sceneModeDesc": "ネットワークに応じてプロファイル・モード・出口ノードを自動切替",
+  "addScene": "シーンを追加",
+  "editScene": "シーンを編集",
+  "sceneTrigger": "トリガー",
+  "sceneTriggerSsid": "Wi-Fi名",
+  "sceneTriggerCellular": "モバイル通信",
+  "sceneTriggerFallback": "フォールバック",
+  "sceneSsidHint": "Wi-Fi名を入力（大文字・小文字を区別）",
+  "sceneTargetProfile": "対象プロファイル",
+  "sceneNoSwitch": "切り替えない",
+  "sceneTargetMode": "ルーティングモード",
+  "sceneKeepCurrent": "現状維持",
+  "sceneTargetProxy": "出口ノード",
+  "sceneDeleteConfirm": "このシーンを削除しますか？",
+  "sceneEmpty": "シーンがありません"
 }

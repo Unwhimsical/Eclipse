@@ -644,5 +644,21 @@
   "privateIpAnswer": "私有 IP 应答",
   "alwaysRealIp": "始终真实 IP",
   "paramOn": "开",
-  "paramOff": "关"
+  "paramOff": "关",
+  "sceneMode": "场景模式",
+  "sceneModeDesc": "按网络自动切换配置、路由模式与出口节点",
+  "addScene": "添加场景",
+  "editScene": "编辑场景",
+  "sceneTrigger": "触发条件",
+  "sceneTriggerSsid": "Wi-Fi 名称",
+  "sceneTriggerCellular": "蜂窝网络",
+  "sceneTriggerFallback": "默认场景",
+  "sceneSsidHint": "输入 Wi-Fi 名称（区分大小写）",
+  "sceneTargetProfile": "目标配置",
+  "sceneNoSwitch": "不切换",
+  "sceneTargetMode": "路由模式",
+  "sceneKeepCurrent": "保持当前",
+  "sceneTargetProxy": "出口节点",
+  "sceneDeleteConfirm": "确定删除该场景吗？",
+  "sceneEmpty": "暂无场景"
 }

@@ -644,5 +644,21 @@
   "privateIpAnswer": "Ответ приватным IP",
   "alwaysRealIp": "Всегда реальный IP",
   "paramOn": "Вкл.",
-  "paramOff": "Выкл."
+  "paramOff": "Выкл.",
+  "sceneMode": "Режим сцен",
+  "sceneModeDesc": "Автопереключение профиля, режима и выходного узла по сети",
+  "addScene": "Добавить сцену",
+  "editScene": "Редактировать сцену",
+  "sceneTrigger": "Триггер",
+  "sceneTriggerSsid": "Имя Wi-Fi",
+  "sceneTriggerCellular": "Сотовая сеть",
+  "sceneTriggerFallback": "Запасная сцена",
+  "sceneSsidHint": "Введите имя Wi-Fi (с учетом регистра)",
+  "sceneTargetProfile": "Целевой профиль",
+  "sceneNoSwitch": "Не переключать",
+  "sceneTargetMode": "Режим маршрутизации",
+  "sceneKeepCurrent": "Оставить как есть",
+  "sceneTargetProxy": "Выходной узел",
+  "sceneDeleteConfirm": "Удалить эту сцену?",
+  "sceneEmpty": "Сцен пока нет"
 }

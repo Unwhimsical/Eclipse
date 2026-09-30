@@ -459,3 +459,15 @@ class ProfileDisabledRuleIds extends _$ProfileDisabledRuleIds
     );
   }
 }
+
+@riverpod
+class SceneList extends _$SceneList {
+  @override
+  Stream<List<Scene>> build() {
+    return database.scenesDao.queryAll().watch();
+  }
+
+  Future<int> putScene(Scene scene) => database.scenesDao.put(scene);
+
+  Future<void> deleteScene(int id) => database.scenesDao.deleteScene(id);
+}

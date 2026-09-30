@@ -6,4 +6,5 @@ export 'config.dart';
 export 'core.dart';
 export 'module.dart';
 export 'profile.dart';
+export 'scene.dart';
 export 'state.dart';

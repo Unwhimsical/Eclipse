@@ -133,6 +133,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Добавить провайдеров прокси",
     ),
     "addRule": MessageLookupByLibrary.simpleMessage("Добавить правило"),
+    "addScene": MessageLookupByLibrary.simpleMessage("Добавить сцену"),
     "addSsid": MessageLookupByLibrary.simpleMessage("Добавить SSID"),
     "addSubscription": MessageLookupByLibrary.simpleMessage(
       "Добавить подписку",
@@ -434,6 +435,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Редактировать группу прокси",
     ),
     "editRule": MessageLookupByLibrary.simpleMessage("Редактировать правило"),
+    "editScene": MessageLookupByLibrary.simpleMessage("Редактировать сцену"),
     "editSsid": MessageLookupByLibrary.simpleMessage("Изменить SSID"),
     "emptyTip": m7,
     "en": MessageLookupByLibrary.simpleMessage("Английский"),
@@ -1104,6 +1106,36 @@ class MessageLookup extends MessageLookupByLibrary {
     "rulesCount": m26,
     "save": MessageLookupByLibrary.simpleMessage("Сохранить"),
     "saveChanges": MessageLookupByLibrary.simpleMessage("Сохранить изменения?"),
+    "sceneDeleteConfirm": MessageLookupByLibrary.simpleMessage(
+      "Удалить эту сцену?",
+    ),
+    "sceneEmpty": MessageLookupByLibrary.simpleMessage("Сцен пока нет"),
+    "sceneKeepCurrent": MessageLookupByLibrary.simpleMessage(
+      "Оставить как есть",
+    ),
+    "sceneMode": MessageLookupByLibrary.simpleMessage("Режим сцен"),
+    "sceneModeDesc": MessageLookupByLibrary.simpleMessage(
+      "Автопереключение профиля, режима и выходного узла по сети",
+    ),
+    "sceneNoSwitch": MessageLookupByLibrary.simpleMessage("Не переключать"),
+    "sceneSsidHint": MessageLookupByLibrary.simpleMessage(
+      "Введите имя Wi-Fi (с учетом регистра)",
+    ),
+    "sceneTargetMode": MessageLookupByLibrary.simpleMessage(
+      "Режим маршрутизации",
+    ),
+    "sceneTargetProfile": MessageLookupByLibrary.simpleMessage(
+      "Целевой профиль",
+    ),
+    "sceneTargetProxy": MessageLookupByLibrary.simpleMessage("Выходной узел"),
+    "sceneTrigger": MessageLookupByLibrary.simpleMessage("Триггер"),
+    "sceneTriggerCellular": MessageLookupByLibrary.simpleMessage(
+      "Сотовая сеть",
+    ),
+    "sceneTriggerFallback": MessageLookupByLibrary.simpleMessage(
+      "Запасная сцена",
+    ),
+    "sceneTriggerSsid": MessageLookupByLibrary.simpleMessage("Имя Wi-Fi"),
     "script": MessageLookupByLibrary.simpleMessage("Скрипт"),
     "scriptModeDesc": MessageLookupByLibrary.simpleMessage(
       "Режим скрипта: использует внешние скрипты-расширения для переопределения конфигурации в один клик",

@@ -103,6 +103,15 @@ class ExcludeSSIDs extends _$ExcludeSSIDs with AutoDisposeNotifierMixin {
   }
 }
 
+@riverpod
+class SceneModeEnabled extends _$SceneModeEnabled
+    with AutoDisposeNotifierMixin {
+  @override
+  bool build() {
+    return false;
+  }
+}
+
 @Riverpod(name: 'configProvider')
 Config _config(Ref ref) {
   final appSettingProps = ref.watch(appSettingProvider);
@@ -117,6 +126,7 @@ Config _config(Ref ref) {
   final proxiesStyleProps = ref.watch(proxiesStyleSettingProvider);
   final patchClashConfig = ref.watch(patchClashConfigProvider);
   final excludeSSIDs = ref.watch(excludeSSIDsProvider);
+  final sceneModeEnabled = ref.watch(sceneModeEnabledProvider);
   return Config(
     appSettingProps: appSettingProps,
     windowProps: windowProps,
@@ -130,6 +140,7 @@ Config _config(Ref ref) {
     proxiesStyleProps: proxiesStyleProps,
     patchClashConfig: patchClashConfig,
     excludeSSIDs: excludeSSIDs,
+    sceneModeEnabled: sceneModeEnabled,
   );
 }
 
@@ -153,5 +164,8 @@ List<Override> buildConfigOverrides(Config config) {
       (_, _) => config.patchClashConfig,
     ),
     excludeSSIDsProvider.overrideWithBuild((_, _) => config.excludeSSIDs),
+    sceneModeEnabledProvider.overrideWithBuild(
+      (_, _) => config.sceneModeEnabled,
+    ),
   ];
 }

@@ -17,6 +17,7 @@ part 'icons.dart';
 part 'links.dart';
 part 'profiles.dart';
 part 'rules.dart';
+part 'scenes.dart';
 part 'scripts.dart';
 
 @DriftDatabase(
@@ -27,14 +28,22 @@ part 'scripts.dart';
     ProfileRuleLinks,
     ProxyGroups,
     IconRecords,
+    Scenes,
   ],
-  daos: [ProfilesDao, ScriptsDao, RulesDao, ProxyGroupsDao, IconRecordsDao],
+  daos: [
+    ProfilesDao,
+    ScriptsDao,
+    RulesDao,
+    ProxyGroupsDao,
+    IconRecordsDao,
+    ScenesDao,
+  ],
 )
 class Database extends _$Database {
   Database([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   static LazyDatabase _openConnection() {
     return LazyDatabase(() async {
@@ -74,6 +83,9 @@ class Database extends _$Database {
         }
         if (from < 8) {
           await _addColumnIfMissing(m, profiles, profiles.proxyChains);
+        }
+        if (from < 9) {
+          await m.createTable(scenes);
         }
       },
     );

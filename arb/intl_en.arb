@@ -644,5 +644,21 @@
   "privateIpAnswer": "Private IP Answer",
   "alwaysRealIp": "Always Real IP",
   "paramOn": "On",
-  "paramOff": "Off"
+  "paramOff": "Off",
+  "sceneMode": "Scene Mode",
+  "sceneModeDesc": "Auto-switch profile, mode and exit node by network",
+  "addScene": "Add scene",
+  "editScene": "Edit scene",
+  "sceneTrigger": "Trigger",
+  "sceneTriggerSsid": "Wi-Fi name",
+  "sceneTriggerCellular": "Cellular",
+  "sceneTriggerFallback": "Fallback",
+  "sceneSsidHint": "Enter the Wi-Fi name (case-sensitive)",
+  "sceneTargetProfile": "Target profile",
+  "sceneNoSwitch": "Don't switch",
+  "sceneTargetMode": "Routing mode",
+  "sceneKeepCurrent": "Keep current",
+  "sceneTargetProxy": "Exit node",
+  "sceneDeleteConfirm": "Delete this scene?",
+  "sceneEmpty": "No scenes yet"
 }

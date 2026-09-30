@@ -3899,6 +3899,524 @@ class IconRecordsCompanion extends UpdateCompanion<IconRecord> {
   }
 }
 
+class $ScenesTable extends Scenes with TableInfo<$ScenesTable, RawScene> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ScenesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SceneTriggerType, String>
+  triggerType = GeneratedColumn<String>(
+    'trigger_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<SceneTriggerType>($ScenesTable.$convertertriggerType);
+  static const VerificationMeta _ssidMeta = const VerificationMeta('ssid');
+  @override
+  late final GeneratedColumn<String> ssid = GeneratedColumn<String>(
+    'ssid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _targetProfileIdMeta = const VerificationMeta(
+    'targetProfileId',
+  );
+  @override
+  late final GeneratedColumn<int> targetProfileId = GeneratedColumn<int>(
+    'target_profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<Mode?, String> mode =
+      GeneratedColumn<String>(
+        'mode',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<Mode?>($ScenesTable.$convertermoden);
+  static const VerificationMeta _targetProxyMeta = const VerificationMeta(
+    'targetProxy',
+  );
+  @override
+  late final GeneratedColumn<String> targetProxy = GeneratedColumn<String>(
+    'target_proxy',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _orderMeta = const VerificationMeta('order');
+  @override
+  late final GeneratedColumn<int> order = GeneratedColumn<int>(
+    'order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    triggerType,
+    ssid,
+    targetProfileId,
+    mode,
+    targetProxy,
+    order,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'scenes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RawScene> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('ssid')) {
+      context.handle(
+        _ssidMeta,
+        ssid.isAcceptableOrUnknown(data['ssid']!, _ssidMeta),
+      );
+    }
+    if (data.containsKey('target_profile_id')) {
+      context.handle(
+        _targetProfileIdMeta,
+        targetProfileId.isAcceptableOrUnknown(
+          data['target_profile_id']!,
+          _targetProfileIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('target_proxy')) {
+      context.handle(
+        _targetProxyMeta,
+        targetProxy.isAcceptableOrUnknown(
+          data['target_proxy']!,
+          _targetProxyMeta,
+        ),
+      );
+    }
+    if (data.containsKey('order')) {
+      context.handle(
+        _orderMeta,
+        order.isAcceptableOrUnknown(data['order']!, _orderMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RawScene map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RawScene(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      triggerType: $ScenesTable.$convertertriggerType.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}trigger_type'],
+        )!,
+      ),
+      ssid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ssid'],
+      ),
+      targetProfileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_profile_id'],
+      ),
+      mode: $ScenesTable.$convertermoden.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}mode'],
+        ),
+      ),
+      targetProxy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}target_proxy'],
+      ),
+      order: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}order'],
+      )!,
+    );
+  }
+
+  @override
+  $ScenesTable createAlias(String alias) {
+    return $ScenesTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SceneTriggerType, String, String>
+  $convertertriggerType = const EnumNameConverter<SceneTriggerType>(
+    SceneTriggerType.values,
+  );
+  static JsonTypeConverter2<Mode, String, String> $convertermode =
+      const EnumNameConverter<Mode>(Mode.values);
+  static JsonTypeConverter2<Mode?, String?, String?> $convertermoden =
+      JsonTypeConverter2.asNullable($convertermode);
+}
+
+class RawScene extends DataClass implements Insertable<RawScene> {
+  final int id;
+  final String name;
+  final SceneTriggerType triggerType;
+  final String? ssid;
+  final int? targetProfileId;
+  final Mode? mode;
+  final String? targetProxy;
+  final int order;
+  const RawScene({
+    required this.id,
+    required this.name,
+    required this.triggerType,
+    this.ssid,
+    this.targetProfileId,
+    this.mode,
+    this.targetProxy,
+    required this.order,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    {
+      map['trigger_type'] = Variable<String>(
+        $ScenesTable.$convertertriggerType.toSql(triggerType),
+      );
+    }
+    if (!nullToAbsent || ssid != null) {
+      map['ssid'] = Variable<String>(ssid);
+    }
+    if (!nullToAbsent || targetProfileId != null) {
+      map['target_profile_id'] = Variable<int>(targetProfileId);
+    }
+    if (!nullToAbsent || mode != null) {
+      map['mode'] = Variable<String>($ScenesTable.$convertermoden.toSql(mode));
+    }
+    if (!nullToAbsent || targetProxy != null) {
+      map['target_proxy'] = Variable<String>(targetProxy);
+    }
+    map['order'] = Variable<int>(order);
+    return map;
+  }
+
+  ScenesCompanion toCompanion(bool nullToAbsent) {
+    return ScenesCompanion(
+      id: Value(id),
+      name: Value(name),
+      triggerType: Value(triggerType),
+      ssid: ssid == null && nullToAbsent ? const Value.absent() : Value(ssid),
+      targetProfileId: targetProfileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(targetProfileId),
+      mode: mode == null && nullToAbsent ? const Value.absent() : Value(mode),
+      targetProxy: targetProxy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(targetProxy),
+      order: Value(order),
+    );
+  }
+
+  factory RawScene.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RawScene(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      triggerType: $ScenesTable.$convertertriggerType.fromJson(
+        serializer.fromJson<String>(json['triggerType']),
+      ),
+      ssid: serializer.fromJson<String?>(json['ssid']),
+      targetProfileId: serializer.fromJson<int?>(json['targetProfileId']),
+      mode: $ScenesTable.$convertermoden.fromJson(
+        serializer.fromJson<String?>(json['mode']),
+      ),
+      targetProxy: serializer.fromJson<String?>(json['targetProxy']),
+      order: serializer.fromJson<int>(json['order']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'triggerType': serializer.toJson<String>(
+        $ScenesTable.$convertertriggerType.toJson(triggerType),
+      ),
+      'ssid': serializer.toJson<String?>(ssid),
+      'targetProfileId': serializer.toJson<int?>(targetProfileId),
+      'mode': serializer.toJson<String?>(
+        $ScenesTable.$convertermoden.toJson(mode),
+      ),
+      'targetProxy': serializer.toJson<String?>(targetProxy),
+      'order': serializer.toJson<int>(order),
+    };
+  }
+
+  RawScene copyWith({
+    int? id,
+    String? name,
+    SceneTriggerType? triggerType,
+    Value<String?> ssid = const Value.absent(),
+    Value<int?> targetProfileId = const Value.absent(),
+    Value<Mode?> mode = const Value.absent(),
+    Value<String?> targetProxy = const Value.absent(),
+    int? order,
+  }) => RawScene(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    triggerType: triggerType ?? this.triggerType,
+    ssid: ssid.present ? ssid.value : this.ssid,
+    targetProfileId: targetProfileId.present
+        ? targetProfileId.value
+        : this.targetProfileId,
+    mode: mode.present ? mode.value : this.mode,
+    targetProxy: targetProxy.present ? targetProxy.value : this.targetProxy,
+    order: order ?? this.order,
+  );
+  RawScene copyWithCompanion(ScenesCompanion data) {
+    return RawScene(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      triggerType: data.triggerType.present
+          ? data.triggerType.value
+          : this.triggerType,
+      ssid: data.ssid.present ? data.ssid.value : this.ssid,
+      targetProfileId: data.targetProfileId.present
+          ? data.targetProfileId.value
+          : this.targetProfileId,
+      mode: data.mode.present ? data.mode.value : this.mode,
+      targetProxy: data.targetProxy.present
+          ? data.targetProxy.value
+          : this.targetProxy,
+      order: data.order.present ? data.order.value : this.order,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RawScene(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('triggerType: $triggerType, ')
+          ..write('ssid: $ssid, ')
+          ..write('targetProfileId: $targetProfileId, ')
+          ..write('mode: $mode, ')
+          ..write('targetProxy: $targetProxy, ')
+          ..write('order: $order')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    triggerType,
+    ssid,
+    targetProfileId,
+    mode,
+    targetProxy,
+    order,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RawScene &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.triggerType == this.triggerType &&
+          other.ssid == this.ssid &&
+          other.targetProfileId == this.targetProfileId &&
+          other.mode == this.mode &&
+          other.targetProxy == this.targetProxy &&
+          other.order == this.order);
+}
+
+class ScenesCompanion extends UpdateCompanion<RawScene> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<SceneTriggerType> triggerType;
+  final Value<String?> ssid;
+  final Value<int?> targetProfileId;
+  final Value<Mode?> mode;
+  final Value<String?> targetProxy;
+  final Value<int> order;
+  const ScenesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.triggerType = const Value.absent(),
+    this.ssid = const Value.absent(),
+    this.targetProfileId = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.targetProxy = const Value.absent(),
+    this.order = const Value.absent(),
+  });
+  ScenesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required SceneTriggerType triggerType,
+    this.ssid = const Value.absent(),
+    this.targetProfileId = const Value.absent(),
+    this.mode = const Value.absent(),
+    this.targetProxy = const Value.absent(),
+    this.order = const Value.absent(),
+  }) : name = Value(name),
+       triggerType = Value(triggerType);
+  static Insertable<RawScene> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<String>? triggerType,
+    Expression<String>? ssid,
+    Expression<int>? targetProfileId,
+    Expression<String>? mode,
+    Expression<String>? targetProxy,
+    Expression<int>? order,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (triggerType != null) 'trigger_type': triggerType,
+      if (ssid != null) 'ssid': ssid,
+      if (targetProfileId != null) 'target_profile_id': targetProfileId,
+      if (mode != null) 'mode': mode,
+      if (targetProxy != null) 'target_proxy': targetProxy,
+      if (order != null) 'order': order,
+    });
+  }
+
+  ScenesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<SceneTriggerType>? triggerType,
+    Value<String?>? ssid,
+    Value<int?>? targetProfileId,
+    Value<Mode?>? mode,
+    Value<String?>? targetProxy,
+    Value<int>? order,
+  }) {
+    return ScenesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      triggerType: triggerType ?? this.triggerType,
+      ssid: ssid ?? this.ssid,
+      targetProfileId: targetProfileId ?? this.targetProfileId,
+      mode: mode ?? this.mode,
+      targetProxy: targetProxy ?? this.targetProxy,
+      order: order ?? this.order,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (triggerType.present) {
+      map['trigger_type'] = Variable<String>(
+        $ScenesTable.$convertertriggerType.toSql(triggerType.value),
+      );
+    }
+    if (ssid.present) {
+      map['ssid'] = Variable<String>(ssid.value);
+    }
+    if (targetProfileId.present) {
+      map['target_profile_id'] = Variable<int>(targetProfileId.value);
+    }
+    if (mode.present) {
+      map['mode'] = Variable<String>(
+        $ScenesTable.$convertermoden.toSql(mode.value),
+      );
+    }
+    if (targetProxy.present) {
+      map['target_proxy'] = Variable<String>(targetProxy.value);
+    }
+    if (order.present) {
+      map['order'] = Variable<int>(order.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ScenesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('triggerType: $triggerType, ')
+          ..write('ssid: $ssid, ')
+          ..write('targetProfileId: $targetProfileId, ')
+          ..write('mode: $mode, ')
+          ..write('targetProxy: $targetProxy, ')
+          ..write('order: $order')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(e);
   $DatabaseManager get managers => $DatabaseManager(this);
@@ -3910,6 +4428,7 @@ abstract class _$Database extends GeneratedDatabase {
   );
   late final $ProxyGroupsTable proxyGroups = $ProxyGroupsTable(this);
   late final $IconRecordsTable iconRecords = $IconRecordsTable(this);
+  late final $ScenesTable scenes = $ScenesTable(this);
   late final Index idxRuleTarget = Index(
     'idx_rule_target',
     'CREATE INDEX idx_rule_target ON rules (rule_target)',
@@ -3931,6 +4450,7 @@ abstract class _$Database extends GeneratedDatabase {
   late final RulesDao rulesDao = RulesDao(this as Database);
   late final ProxyGroupsDao proxyGroupsDao = ProxyGroupsDao(this as Database);
   late final IconRecordsDao iconRecordsDao = IconRecordsDao(this as Database);
+  late final ScenesDao scenesDao = ScenesDao(this as Database);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3942,6 +4462,7 @@ abstract class _$Database extends GeneratedDatabase {
     profileRuleLinks,
     proxyGroups,
     iconRecords,
+    scenes,
     idxRuleTarget,
     idxProfileSceneOrder,
     idxProfileNameOrder,
@@ -6493,6 +7014,258 @@ typedef $$IconRecordsTableProcessedTableManager =
       IconRecord,
       PrefetchHooks Function()
     >;
+typedef $$ScenesTableCreateCompanionBuilder =
+    ScenesCompanion Function({
+      Value<int> id,
+      required String name,
+      required SceneTriggerType triggerType,
+      Value<String?> ssid,
+      Value<int?> targetProfileId,
+      Value<Mode?> mode,
+      Value<String?> targetProxy,
+      Value<int> order,
+    });
+typedef $$ScenesTableUpdateCompanionBuilder =
+    ScenesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<SceneTriggerType> triggerType,
+      Value<String?> ssid,
+      Value<int?> targetProfileId,
+      Value<Mode?> mode,
+      Value<String?> targetProxy,
+      Value<int> order,
+    });
+
+class $$ScenesTableFilterComposer extends Composer<_$Database, $ScenesTable> {
+  $$ScenesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SceneTriggerType, SceneTriggerType, String>
+  get triggerType => $composableBuilder(
+    column: $table.triggerType,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get ssid => $composableBuilder(
+    column: $table.ssid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get targetProfileId => $composableBuilder(
+    column: $table.targetProfileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<Mode?, Mode, String> get mode =>
+      $composableBuilder(
+        column: $table.mode,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get targetProxy => $composableBuilder(
+    column: $table.targetProxy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get order => $composableBuilder(
+    column: $table.order,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ScenesTableOrderingComposer extends Composer<_$Database, $ScenesTable> {
+  $$ScenesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get triggerType => $composableBuilder(
+    column: $table.triggerType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ssid => $composableBuilder(
+    column: $table.ssid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get targetProfileId => $composableBuilder(
+    column: $table.targetProfileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get targetProxy => $composableBuilder(
+    column: $table.targetProxy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get order => $composableBuilder(
+    column: $table.order,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ScenesTableAnnotationComposer
+    extends Composer<_$Database, $ScenesTable> {
+  $$ScenesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SceneTriggerType, String> get triggerType =>
+      $composableBuilder(
+        column: $table.triggerType,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get ssid =>
+      $composableBuilder(column: $table.ssid, builder: (column) => column);
+
+  GeneratedColumn<int> get targetProfileId => $composableBuilder(
+    column: $table.targetProfileId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<Mode?, String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<String> get targetProxy => $composableBuilder(
+    column: $table.targetProxy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get order =>
+      $composableBuilder(column: $table.order, builder: (column) => column);
+}
+
+class $$ScenesTableTableManager
+    extends
+        RootTableManager<
+          _$Database,
+          $ScenesTable,
+          RawScene,
+          $$ScenesTableFilterComposer,
+          $$ScenesTableOrderingComposer,
+          $$ScenesTableAnnotationComposer,
+          $$ScenesTableCreateCompanionBuilder,
+          $$ScenesTableUpdateCompanionBuilder,
+          (RawScene, BaseReferences<_$Database, $ScenesTable, RawScene>),
+          RawScene,
+          PrefetchHooks Function()
+        > {
+  $$ScenesTableTableManager(_$Database db, $ScenesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ScenesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ScenesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ScenesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<SceneTriggerType> triggerType = const Value.absent(),
+                Value<String?> ssid = const Value.absent(),
+                Value<int?> targetProfileId = const Value.absent(),
+                Value<Mode?> mode = const Value.absent(),
+                Value<String?> targetProxy = const Value.absent(),
+                Value<int> order = const Value.absent(),
+              }) => ScenesCompanion(
+                id: id,
+                name: name,
+                triggerType: triggerType,
+                ssid: ssid,
+                targetProfileId: targetProfileId,
+                mode: mode,
+                targetProxy: targetProxy,
+                order: order,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required SceneTriggerType triggerType,
+                Value<String?> ssid = const Value.absent(),
+                Value<int?> targetProfileId = const Value.absent(),
+                Value<Mode?> mode = const Value.absent(),
+                Value<String?> targetProxy = const Value.absent(),
+                Value<int> order = const Value.absent(),
+              }) => ScenesCompanion.insert(
+                id: id,
+                name: name,
+                triggerType: triggerType,
+                ssid: ssid,
+                targetProfileId: targetProfileId,
+                mode: mode,
+                targetProxy: targetProxy,
+                order: order,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ScenesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$Database,
+      $ScenesTable,
+      RawScene,
+      $$ScenesTableFilterComposer,
+      $$ScenesTableOrderingComposer,
+      $$ScenesTableAnnotationComposer,
+      $$ScenesTableCreateCompanionBuilder,
+      $$ScenesTableUpdateCompanionBuilder,
+      (RawScene, BaseReferences<_$Database, $ScenesTable, RawScene>),
+      RawScene,
+      PrefetchHooks Function()
+    >;
 
 class $DatabaseManager {
   final _$Database _db;
@@ -6509,6 +7282,8 @@ class $DatabaseManager {
       $$ProxyGroupsTableTableManager(_db, _db.proxyGroups);
   $$IconRecordsTableTableManager get iconRecords =>
       $$IconRecordsTableTableManager(_db, _db.iconRecords);
+  $$ScenesTableTableManager get scenes =>
+      $$ScenesTableTableManager(_db, _db.scenes);
 }
 
 mixin _$ProfilesDaoMixin on DatabaseAccessor<Database> {
@@ -6582,4 +7357,16 @@ class IconRecordsDaoManager {
   IconRecordsDaoManager(this._db);
   $$IconRecordsTableTableManager get iconRecords =>
       $$IconRecordsTableTableManager(_db.attachedDatabase, _db.iconRecords);
+}
+
+mixin _$ScenesDaoMixin on DatabaseAccessor<Database> {
+  $ScenesTable get scenes => attachedDatabase.scenes;
+  ScenesDaoManager get managers => ScenesDaoManager(this);
+}
+
+class ScenesDaoManager {
+  final _$ScenesDaoMixin _db;
+  ScenesDaoManager(this._db);
+  $$ScenesTableTableManager get scenes =>
+      $$ScenesTableTableManager(_db.attachedDatabase, _db.scenes);
 }

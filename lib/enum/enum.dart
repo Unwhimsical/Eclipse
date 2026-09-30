@@ -93,6 +93,9 @@ extension UsedProxyExtension on UsedProxy {
 
 enum Mode { rule, global, direct }
 
+/// Trigger type of an auto-switch scene.
+enum SceneTriggerType { ssid, cellular, fallback }
+
 enum ViewMode { mobile, laptop, desktop }
 
 enum LogLevel { debug, info, warning, error, silent }

@@ -828,3 +828,47 @@ abstract class _$ProfileDisabledRuleIds extends $StreamNotifier<List<int>> {
     return element.handleCreate(ref, () => build(_$args));
   }
 }
+
+@ProviderFor(SceneList)
+final sceneListProvider = SceneListProvider._();
+
+final class SceneListProvider
+    extends $StreamNotifierProvider<SceneList, List<Scene>> {
+  SceneListProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'sceneListProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$sceneListHash();
+
+  @$internal
+  @override
+  SceneList create() => SceneList();
+}
+
+String _$sceneListHash() => r'dee7a3991a479638cc62ce9db9ef191c658b7902';
+
+abstract class _$SceneList extends $StreamNotifier<List<Scene>> {
+  Stream<List<Scene>> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Scene>>, List<Scene>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Scene>>, List<Scene>>,
+              AsyncValue<List<Scene>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

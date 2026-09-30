@@ -5334,6 +5334,146 @@ class AppLocalizations {
   String get paramOff {
     return Intl.message('Off', name: 'paramOff', desc: '', args: []);
   }
+
+  /// `Scene Mode`
+  String get sceneMode {
+    return Intl.message('Scene Mode', name: 'sceneMode', desc: '', args: []);
+  }
+
+  /// `Auto-switch profile, mode and exit node by network`
+  String get sceneModeDesc {
+    return Intl.message(
+      'Auto-switch profile, mode and exit node by network',
+      name: 'sceneModeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add scene`
+  String get addScene {
+    return Intl.message('Add scene', name: 'addScene', desc: '', args: []);
+  }
+
+  /// `Edit scene`
+  String get editScene {
+    return Intl.message('Edit scene', name: 'editScene', desc: '', args: []);
+  }
+
+  /// `Trigger`
+  String get sceneTrigger {
+    return Intl.message('Trigger', name: 'sceneTrigger', desc: '', args: []);
+  }
+
+  /// `Wi-Fi name`
+  String get sceneTriggerSsid {
+    return Intl.message(
+      'Wi-Fi name',
+      name: 'sceneTriggerSsid',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cellular`
+  String get sceneTriggerCellular {
+    return Intl.message(
+      'Cellular',
+      name: 'sceneTriggerCellular',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fallback`
+  String get sceneTriggerFallback {
+    return Intl.message(
+      'Fallback',
+      name: 'sceneTriggerFallback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter the Wi-Fi name (case-sensitive)`
+  String get sceneSsidHint {
+    return Intl.message(
+      'Enter the Wi-Fi name (case-sensitive)',
+      name: 'sceneSsidHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Target profile`
+  String get sceneTargetProfile {
+    return Intl.message(
+      'Target profile',
+      name: 'sceneTargetProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Don't switch`
+  String get sceneNoSwitch {
+    return Intl.message(
+      'Don\'t switch',
+      name: 'sceneNoSwitch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Routing mode`
+  String get sceneTargetMode {
+    return Intl.message(
+      'Routing mode',
+      name: 'sceneTargetMode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Keep current`
+  String get sceneKeepCurrent {
+    return Intl.message(
+      'Keep current',
+      name: 'sceneKeepCurrent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exit node`
+  String get sceneTargetProxy {
+    return Intl.message(
+      'Exit node',
+      name: 'sceneTargetProxy',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete this scene?`
+  String get sceneDeleteConfirm {
+    return Intl.message(
+      'Delete this scene?',
+      name: 'sceneDeleteConfirm',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No scenes yet`
+  String get sceneEmpty {
+    return Intl.message(
+      'No scenes yet',
+      name: 'sceneEmpty',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

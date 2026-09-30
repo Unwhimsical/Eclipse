@@ -10,6 +10,7 @@ import 'package:fl_clash/views/application_setting.dart';
 import 'package:fl_clash/views/backup_and_restore.dart';
 import 'package:fl_clash/views/config/config.dart';
 import 'package:fl_clash/views/hotkey.dart';
+import 'package:fl_clash/views/scene/scene_page.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,6 +75,7 @@ class _ToolViewState extends ConsumerState<ToolsView> {
         if (system.isDesktop) const _HotkeyItem(),
         if (system.isWindows) const _LoopbackItem(),
         if (system.isAndroid) const _AccessItem(),
+        if (system.isAndroid) const _SceneModeItem(),
         const _ConfigItem(),
         const _AdvancedConfigItem(),
         if (system.isMobile) const _CaItem(),
@@ -221,6 +223,20 @@ class _AccessItem extends StatelessWidget {
       title: Text(context.appLocalizations.accessControl),
       subtitle: Text(context.appLocalizations.accessControlDesc),
       widget: const AccessView(),
+    );
+  }
+}
+
+class _SceneModeItem extends StatelessWidget {
+  const _SceneModeItem();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListItem.open(
+      leading: const Icon(Icons.auto_awesome),
+      title: Text(context.appLocalizations.sceneMode),
+      subtitle: Text(context.appLocalizations.sceneModeDesc),
+      widget: const SceneView(),
     );
   }
 }
