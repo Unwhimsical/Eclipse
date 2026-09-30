@@ -4,6 +4,7 @@ import 'package:fl_clash/models/state.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/proxies/list.dart';
 import 'package:fl_clash/views/proxies/providers.dart';
+import 'package:fl_clash/views/proxy_chain/proxy_chain_editor.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,6 +27,21 @@ class _ProxiesViewState extends ConsumerState<ProxiesView> {
   List<Widget> _buildActions(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     return [
+      IconButton(
+        icon: const Icon(Icons.link),
+        tooltip: '代理链',
+        onPressed: () {
+          final profileId = ref.read(currentProfileIdProvider);
+          if (profileId == null) {
+            dialogs.showNotifier('当前没有配置', level: MessageLevel.warning);
+            return;
+          }
+          BaseNavigator.push(
+            context,
+            ProxyChainEditorPage(profileId: profileId),
+          );
+        },
+      ),
       if (_isTab)
         IconButton(
           tooltip: context.appLocalizations.scrollToSelected,

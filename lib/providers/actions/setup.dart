@@ -372,6 +372,7 @@ class SetupAction extends _$SetupAction {
         bodyRewrites: setupState.bodyRewrites,
         mitmHostnames: setupState.mitmHostnames,
         generalSettings: setupState.generalSettings,
+        proxyChains: setupState.proxyChains,
         matchTarget: setupState.matchTarget,
       ),
     );

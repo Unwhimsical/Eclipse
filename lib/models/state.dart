@@ -362,6 +362,7 @@ abstract class MakeRealProfileState with _$MakeRealProfileState {
     @Default([]) List<String> bodyRewrites,
     @Default([]) List<String> mitmHostnames,
     @Default(GeneralSettings()) GeneralSettings generalSettings,
+    @Default({}) Map<String, String> proxyChains,
     String? matchTarget,
   }) = _MakeRealProfileState;
 }
@@ -397,6 +398,7 @@ abstract class SetupState with _$SetupState {
     @Default([]) List<String> bodyRewrites,
     @Default([]) List<String> mitmHostnames,
     @Default(GeneralSettings()) GeneralSettings generalSettings,
+    @Default({}) Map<String, String> proxyChains,
     String? matchTarget,
   }) = _SetupState;
 }

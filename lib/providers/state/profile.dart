@@ -80,6 +80,7 @@ Future<SetupState> setupState(Ref ref, int? profileId) async {
         ? (profile?.mitmHostnames ?? const [])
         : const [],
     generalSettings: profile?.generalSettings ?? const GeneralSettings(),
+    proxyChains: profile?.proxyChains ?? const {},
     matchTarget: overwriteType == OverwriteType.standard
         ? profile?.matchTarget
         : null,

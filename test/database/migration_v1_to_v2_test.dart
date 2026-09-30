@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:fl_clash/database/database.dart' as fl;
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -60,6 +61,12 @@ void _downgradeToV6(Database raw) {
   raw.execute('PRAGMA user_version = 6');
 }
 
+/// Schema version 7 had no per-profile `proxy_chains`.
+void _downgradeToV7(Database raw) {
+  raw.execute('ALTER TABLE profiles DROP COLUMN proxy_chains');
+  raw.execute('PRAGMA user_version = 7');
+}
+
 Set<String> _columnsOf(Database raw, String table) => {
   for (final row in raw.select('PRAGMA table_info($table)'))
     row['name'] as String,
@@ -104,7 +111,7 @@ void main() {
 
     await openAndMigrate();
 
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
   });
 
   test('the v3 upgrade adds match_target to profiles', () async {
@@ -114,7 +121,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
   });
 
   test(
@@ -126,7 +133,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('match_target'));
-      expect(_userVersion(raw), 7);
+      expect(_userVersion(raw), 8);
     },
   );
 
@@ -201,7 +208,7 @@ void main() {
 
     final database = await openAndMigrate();
 
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
     expect(await database.customSelect('SELECT * FROM rules').get(), isEmpty);
   });
 
@@ -211,7 +218,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'rules'), before);
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
     expect(_hasTable(raw, 'proxy_groups'), isTrue);
   });
 
@@ -227,7 +234,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['hosts', 'url_rewrites', 'header_rewrites']),
     );
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
   });
 
   test('the v4 upgrade preserves existing profile rows', () async {
@@ -260,7 +267,7 @@ void main() {
       _columnsOf(raw, 'profiles'),
       containsAll(<String>['mitm_enabled', 'mitm_hostnames']),
     );
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
   });
 
   test('the v5 upgrade preserves existing profile rows', () async {
@@ -289,7 +296,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('mitm_hostnames'));
-      expect(_userVersion(raw), 7);
+      expect(_userVersion(raw), 8);
     },
   );
 
@@ -306,7 +313,7 @@ void main() {
         _columnsOf(raw, 'profiles'),
         containsAll(<String>['map_local', 'body_rewrites']),
       );
-      expect(_userVersion(raw), 7);
+      expect(_userVersion(raw), 8);
     },
   );
 
@@ -336,7 +343,7 @@ void main() {
       await openAndMigrate();
 
       expect(_columnsOf(raw, 'profiles'), contains('body_rewrites'));
-      expect(_userVersion(raw), 7);
+      expect(_userVersion(raw), 8);
     },
   );
 
@@ -347,7 +354,7 @@ void main() {
     await openAndMigrate();
 
     expect(_columnsOf(raw, 'profiles'), contains('general_settings'));
-    expect(_userVersion(raw), 7);
+    expect(_userVersion(raw), 8);
   });
 
   test('the v7 upgrade preserves existing profile rows', () async {
@@ -365,5 +372,44 @@ void main() {
     expect(profiles.single.label, 'keep me');
     expect(profiles.single.generalSettings.dnsServers, isEmpty);
     expect(profiles.single.generalSettings.ipv6, isNull);
+  });
+
+  test('the v8 upgrade adds the per-profile proxy chains column', () async {
+    _downgradeToV7(raw);
+    expect(_columnsOf(raw, 'profiles'), isNot(contains('proxy_chains')));
+
+    await openAndMigrate();
+
+    expect(_columnsOf(raw, 'profiles'), contains('proxy_chains'));
+    expect(_userVersion(raw), 8);
+  });
+
+  test('the v8 upgrade preserves existing profile rows', () async {
+    _downgradeToV7(raw);
+    raw.execute(
+      'INSERT INTO profiles (id, label, url, overwrite_type, '
+      'auto_update_duration_millis, auto_update, selected_map, unfold_set) '
+      "VALUES (1, 'keep me', '', 'standard', 0, 0, '{}', '[]')",
+    );
+
+    final database = await openAndMigrate();
+
+    final profiles = await database.profilesDao.query().get();
+    expect(profiles, hasLength(1));
+    expect(profiles.single.label, 'keep me');
+    expect(profiles.single.proxyChains, isEmpty);
+  });
+
+  test('proxy chains round-trip through the profiles table', () async {
+    final database = await openAndMigrate();
+    final dao = database.profilesDao;
+    final profile = Profile.normal(
+      label: 'chains',
+    ).copyWith(proxyChains: {'NodeA': 'NodeB', 'NodeB': 'NodeC'});
+    await dao.putAll([profile.toCompanion()]);
+
+    final reloaded = await dao.query().get();
+    expect(reloaded, hasLength(1));
+    expect(reloaded.single.proxyChains, {'NodeA': 'NodeB', 'NodeB': 'NodeC'});
   });
 }

@@ -333,6 +333,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     data.mapLocal,
     data.bodyRewrites,
   );
+  applyProxyChains(rawConfig, data.proxyChains);
   await _injectModuleHosts(rawConfig);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
@@ -499,6 +500,24 @@ Future<void> _injectMitmProxy(
     rawConfig['proxies'] = proxies;
     rules.insertAll(0, mitmRulesForHosts(hosts));
   } catch (_) {}
+}
+
+@visibleForTesting
+void applyProxyChains(Map rawConfig, Map<String, String> chains) {
+  if (chains.isEmpty) return;
+  final proxies = rawConfig['proxies'];
+  if (proxies is! List) return;
+  final names = <String>{
+    for (final proxy in proxies)
+      if (proxy is Map && proxy['name'] is String) proxy['name'] as String,
+  };
+  final clean = sanitizeProxyChains(chains, names);
+  if (clean.isEmpty || hasProxyChainLoop(clean)) return;
+  for (final proxy in proxies) {
+    if (proxy is! Map) continue;
+    final via = clean[proxy['name']];
+    if (via != null) proxy['dialer-proxy'] = via;
+  }
 }
 
 @visibleForTesting

@@ -81,6 +81,7 @@ abstract class Profile with _$Profile {
     @Default([]) List<String> bodyRewrites,
     @Default(false) bool mitmEnabled,
     @Default([]) List<String> mitmHostnames,
+    @Default({}) Map<String, String> proxyChains,
     @Default(GeneralSettings()) GeneralSettings generalSettings,
     @Default(OverwriteType.standard) OverwriteType overwriteType,
     int? scriptId,

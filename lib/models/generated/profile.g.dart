@@ -130,6 +130,11 @@ _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  proxyChains:
+      (json['proxyChains'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ) ??
+      const {},
   generalSettings: json['generalSettings'] == null
       ? const GeneralSettings()
       : GeneralSettings.fromJson(
@@ -161,6 +166,7 @@ Map<String, dynamic> _$ProfileToJson(_Profile instance) => <String, dynamic>{
   'bodyRewrites': instance.bodyRewrites,
   'mitmEnabled': instance.mitmEnabled,
   'mitmHostnames': instance.mitmHostnames,
+  'proxyChains': instance.proxyChains,
   'generalSettings': instance.generalSettings,
   'overwriteType': _$OverwriteTypeEnumMap[instance.overwriteType]!,
   'scriptId': instance.scriptId,

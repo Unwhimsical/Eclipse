@@ -37,12 +37,13 @@ void main() {
       ],
       mitmEnabled: true,
       mitmHostnames: const ['mitm.example.com'],
+      proxyChains: const {'A': 'B'},
       generalSettings: const GeneralSettings(),
       order: 3,
     );
 
-    expect(profile.toColumns(true), hasLength(22));
-    expect(profile.toCompanion(true).toColumns(true), hasLength(22));
+    expect(profile.toColumns(true), hasLength(23));
+    expect(profile.toCompanion(true).toColumns(true), hasLength(23));
     expect(RawProfile.fromJson(profile.toJson()).toJson(), profile.toJson());
     expect(profile.copyWith(label: 'Next').label, 'Next');
     expect(
@@ -77,11 +78,12 @@ void main() {
       bodyRewrites: [],
       mitmEnabled: false,
       mitmHostnames: [],
+      proxyChains: {},
       generalSettings: GeneralSettings(),
     );
-    expect(emptyProfile.toColumns(true), hasLength(16));
-    expect(emptyProfile.toColumns(false), hasLength(22));
-    expect(emptyProfile.toCompanion(true).toColumns(true), hasLength(16));
+    expect(emptyProfile.toColumns(true), hasLength(17));
+    expect(emptyProfile.toColumns(false), hasLength(23));
+    expect(emptyProfile.toCompanion(true).toColumns(true), hasLength(17));
 
     final insertedProfile = ProfilesCompanion.insert(
       label: 'Inserted',
