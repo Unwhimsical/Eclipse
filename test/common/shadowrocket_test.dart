@@ -481,10 +481,7 @@ hostname = %APPEND%,example.com,*.example.org
       final doc = yaml.loadYaml(text) as Map;
       // skip-proxy stays on the TUN path: no DIRECT rules are forced.
       final rules = doc['rules'] as List;
-      expect(
-        rules.where((r) => (r as String).endsWith(',DIRECT')),
-        isEmpty,
-      );
+      expect(rules.where((r) => (r as String).endsWith(',DIRECT')), isEmpty);
       // dns
       final dns = doc['dns'] as Map;
       expect(dns['direct-nameserver'], ['114.114.114.114']);
