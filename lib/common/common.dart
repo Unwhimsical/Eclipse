@@ -27,7 +27,6 @@ export 'link.dart';
 export 'lock.dart';
 export 'measure.dart';
 export 'mixin.dart';
-export 'mitm_store.dart';
 export 'module_store.dart';
 export 'navigator.dart';
 export 'network.dart';
