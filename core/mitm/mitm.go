@@ -26,6 +26,9 @@ type Config struct {
 	// (REJECT-DICT/ARRAY/200/IMG/TINYGIF/VIDEO from [Rule]) as graceful
 	// empty HTTP responses. Mihomo itself only ever sees plain REJECT.
 	RejectRules []RejectRule
+
+	// UARules matches the request User-Agent header; see useragent.go.
+	UARules []UARejectRule
 }
 
 // RejectRule maps a hostname pattern (same wildcard syntax as Hostnames)
@@ -136,6 +139,8 @@ func (p *Proxy) UpdateConfig(cfg Config) {
 	p.config.Scripts = cfg.Scripts
 	p.config.MapLocal = cfg.MapLocal
 	p.config.BodyRewrites = cfg.BodyRewrites
+	p.config.RejectRules = cfg.RejectRules
+	p.config.UARules = cfg.UARules
 	if p.scripts != nil {
 		p.scripts.Set(cfg.Scripts)
 	}

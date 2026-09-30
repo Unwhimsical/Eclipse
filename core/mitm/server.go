@@ -106,6 +106,13 @@ func (p *Proxy) handleHTTP(conn net.Conn, req *http.Request, isTLS bool) {
 		_ = w.finish()
 		return
 	}
+	// USER-AGENT granular rejects: match the request User-Agent header.
+	if res := p.applyUARejectRules(req); res != nil {
+		w := newConnWriter(conn, req)
+		writeRewriteResult(w, res)
+		_ = w.finish()
+		return
+	}
 	// Header rewrites: modify request headers before forwarding upstream.
 	p.applyHeaderRewrites(req, fullURL)
 	p.forward(conn, req, isTLS)
@@ -227,6 +234,8 @@ func (p *Proxy) forward(conn net.Conn, req *http.Request, isTLS bool) {
 			finalBody, haveFinal = rb, true
 		}
 	}
+
+	p.applyResponseHeaderRewrites(resp, out.URL.String())
 
 	w := newConnWriter(conn, req)
 	for k, vv := range resp.Header {

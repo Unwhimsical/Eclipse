@@ -35,50 +35,71 @@ func splitNameValue(s string) (name, value string, ok bool) {
 	return name, value, name != ""
 }
 
+func isResponseHeaderAction(action string) bool {
+	return strings.HasPrefix(strings.ToLower(action), "response-header-")
+}
+
+func applyHeaderAction(h http.Header, action string, args []string) {
+	switch strings.ToLower(action) {
+	case "header-del":
+		if len(args) >= 1 && args[0] != "" {
+			h.Del(args[0])
+		}
+	case "header-add":
+		if len(args) >= 1 {
+			if name, value, ok := splitNameValue(args[0]); ok {
+				h.Add(name, value)
+			}
+		}
+	case "header-replace":
+		if len(args) >= 1 {
+			if name, value, ok := splitNameValue(args[0]); ok {
+				h.Set(name, value)
+			}
+		}
+	case "header-replace-regex":
+		if len(args) >= 3 && args[0] != "" {
+			re, err := regexp.Compile(args[1])
+			if err != nil {
+				return
+			}
+			vals := h.Values(args[0])
+			if len(vals) == 0 {
+				return
+			}
+			out := make([]string, len(vals))
+			for i, v := range vals {
+				out[i] = re.ReplaceAllString(v, args[2])
+			}
+			h.Del(args[0])
+			for _, v := range out {
+				h.Add(args[0], v)
+			}
+		}
+	}
+}
+
 func (p *Proxy) applyHeaderRewrites(req *http.Request, urlStr string) {
 	p.mu.RLock()
 	rules := p.config.HeaderRewrites
 	p.mu.RUnlock()
 	for _, r := range rules {
-		if r.re == nil || !r.re.MatchString(urlStr) {
+		if r.re == nil || !r.re.MatchString(urlStr) || isResponseHeaderAction(r.Action) {
 			continue
 		}
-		switch strings.ToLower(r.Action) {
-		case "header-del":
-			if len(r.Args) >= 1 && r.Args[0] != "" {
-				req.Header.Del(r.Args[0])
-			}
-		case "header-add":
-			if len(r.Args) >= 1 {
-				if name, value, ok := splitNameValue(r.Args[0]); ok {
-					req.Header.Add(name, value)
-				}
-			}
-		case "header-replace":
-			if len(r.Args) >= 1 {
-				if name, value, ok := splitNameValue(r.Args[0]); ok {
-					req.Header.Set(name, value)
-				}
-			}
-		case "header-replace-regex":
-			if len(r.Args) >= 3 && r.Args[0] != "" {
-				re, err := regexp.Compile(r.Args[1])
-				if err != nil {
-					continue
-				}
-				vals := req.Header.Values(r.Args[0])
-				if len(vals) == 0 {
-					continue
-				}
-				out := make([]string, len(vals))
-				for i, v := range vals {
-					out[i] = re.ReplaceAllString(v, r.Args[2])
-				}
-				req.Header.Del(r.Args[0])
-				for _, v := range out {
-					req.Header.Add(r.Args[0], v)
-				}
-			}
+		applyHeaderAction(req.Header, r.Action, r.Args)
+	}
+}
+
+func (p *Proxy) applyResponseHeaderRewrites(resp *http.Response, urlStr string) {
+	p.mu.RLock()
+	rules := p.config.HeaderRewrites
+	p.mu.RUnlock()
+	for _, r := range rules {
+		if r.re == nil || !r.re.MatchString(urlStr) || !isResponseHeaderAction(r.Action) {
+			continue
 		}
+		base := strings.ToLower(r.Action)[len("response-header-"):]
+		applyHeaderAction(resp.Header, "header-"+base, r.Args)
 	}
 }
