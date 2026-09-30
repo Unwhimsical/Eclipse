@@ -43,7 +43,7 @@ void main() {
 
     expect(data.hosts['localhost'], '127.0.0.1');
     expect(data.mitm['enable'], 'true');
-    final hostname = data.mitm['hostname'] as String? ?? '';
+    final hostname = data.mitm['hostname'] ?? '';
     expect(hostname.contains('gs-loc.apple.com'), isTrue);
     expect(data.general['dns-server'], '119.29.29.29');
     expect(data.general['skip-proxy'], '192.168.0.0/16');
