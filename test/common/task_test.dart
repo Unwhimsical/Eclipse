@@ -659,4 +659,61 @@ void main() {
     expect(encoded, contains('\n'));
     expect(await mapListTask([1, 2, 3], _double), [2, 4, 6]);
   });
+
+  test('ProxyGroup toConfigMap excludes internal fields and nulls', () {
+    final group = ProxyGroup(
+      id: 1,
+      profileId: 9,
+      name: 'Select',
+      type: GroupType.Selector,
+      proxies: ['DIRECT'],
+      url: 'http://example.com',
+    );
+    final map = group.toConfigMap();
+    expect(map['name'], 'Select');
+    expect(map['type'], 'select');
+    expect(map['proxies'], ['DIRECT']);
+    expect(map['url'], 'http://example.com');
+    expect(map.containsKey('id'), isFalse);
+    expect(map.containsKey('profileId'), isFalse);
+    expect(map.containsKey('filter'), isFalse);
+  });
+
+  test('applyFrontProxy sets dialer-proxy for valid proxy name', () {
+    final rawConfig = <String, dynamic>{
+      'proxies': [
+        {'name': 'proxy1', 'type': 'ss'},
+        {'name': 'proxy2', 'type': 'vmess'},
+      ],
+    };
+    applyFrontProxy(rawConfig, 'proxy1');
+    expect(rawConfig['dialer-proxy'], 'proxy1');
+  });
+
+  test('applyFrontProxy ignores null, empty, and unknown proxy names', () {
+    final rawConfig = <String, dynamic>{
+      'proxies': [
+        {'name': 'proxy1', 'type': 'ss'},
+      ],
+    };
+    applyFrontProxy(rawConfig, null);
+    expect(rawConfig.containsKey('dialer-proxy'), isFalse);
+    applyFrontProxy(rawConfig, '  ');
+    expect(rawConfig.containsKey('dialer-proxy'), isFalse);
+    applyFrontProxy(rawConfig, 'unknown');
+    expect(rawConfig.containsKey('dialer-proxy'), isFalse);
+  });
+
+  test('applyCompatibilityMode disables auto-route when enabled', () {
+    final tun = <String, dynamic>{'auto-route': true, 'enable': true};
+    applyCompatibilityMode(tun, true);
+    expect(tun['auto-route'], isFalse);
+    expect(tun['enable'], isTrue);
+  });
+
+  test('applyCompatibilityMode leaves tun unchanged when disabled', () {
+    final tun = <String, dynamic>{'auto-route': true};
+    applyCompatibilityMode(tun, false);
+    expect(tun['auto-route'], isTrue);
+  });
 }
