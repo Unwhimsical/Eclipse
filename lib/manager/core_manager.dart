@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/core/core.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -9,6 +10,7 @@ import 'package:fl_clash/providers/app.dart';
 import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/core.dart';
 import 'package:fl_clash/providers/state.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -92,7 +94,12 @@ class _CoreContainerState extends ConsumerState<CoreManager>
 
   @override
   void onRequest(TrackerInfo trackerInfo) async {
-    ref.read(requestsProvider.notifier).addRequest(trackerInfo);
+    final networkType = networkTypeOfConnectivity(
+      ref.read(currentConnectivityProvider),
+    );
+    ref
+        .read(requestsProvider.notifier)
+        .addRequest(trackerInfo.copyWith(networkType: networkType));
     super.onRequest(trackerInfo);
   }
 
@@ -131,4 +138,15 @@ class _CoreContainerState extends ConsumerState<CoreManager>
         .handleCoreUpdate(geoType, updating, skipped, error);
     super.onGeoUpdate(geoType, updating, skipped, error);
   }
+}
+
+@visibleForTesting
+String? networkTypeOfConnectivity(List<ConnectivityResult> results) {
+  if (results.isEmpty) return null;
+  if (results.contains(ConnectivityResult.wifi)) return 'wifi';
+  if (results.contains(ConnectivityResult.mobile)) return 'cellular';
+  if (results.every((result) => result == ConnectivityResult.none)) {
+    return 'none';
+  }
+  return 'other';
 }

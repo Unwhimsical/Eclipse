@@ -56,6 +56,7 @@ class _ConnectivityManagerState extends ConsumerState<ConnectivityManager> {
 
   void _handleResults(List<ConnectivityResult> results) {
     _onWifi = results.contains(ConnectivityResult.wifi);
+    ref.read(currentConnectivityProvider.notifier).value = results;
     unawaited(_updateSsid());
     widget.onConnectivityChanged?.call(results);
   }
