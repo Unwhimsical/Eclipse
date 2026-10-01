@@ -929,7 +929,7 @@ final class CurrentPageLabelProvider
   }
 }
 
-String _$currentPageLabelHash() => r'ccdbe5d0e0d2c324f74b3e2086d3e581740dd9bf';
+String _$currentPageLabelHash() => r'aca138e1b5a8119be35ee3924b2ea8f2a8e026cd';
 
 abstract class _$CurrentPageLabel extends $Notifier<PageLabel> {
   PageLabel build();
@@ -1949,6 +1949,61 @@ abstract class _$CurrentSSID extends $Notifier<String?> {
             as $ClassProviderElement<
               AnyNotifier<String?, String?>,
               String?,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(CurrentConnectivity)
+final currentConnectivityProvider = CurrentConnectivityProvider._();
+
+final class CurrentConnectivityProvider
+    extends $NotifierProvider<CurrentConnectivity, List<ConnectivityResult>> {
+  CurrentConnectivityProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentConnectivityProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentConnectivityHash();
+
+  @$internal
+  @override
+  CurrentConnectivity create() => CurrentConnectivity();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<ConnectivityResult> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<ConnectivityResult>>(value),
+    );
+  }
+}
+
+String _$currentConnectivityHash() =>
+    r'09f4686a59f98bfa54d33b40e5d1c09c457afd69';
+
+abstract class _$CurrentConnectivity
+    extends $Notifier<List<ConnectivityResult>> {
+  List<ConnectivityResult> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<List<ConnectivityResult>, List<ConnectivityResult>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<ConnectivityResult>, List<ConnectivityResult>>,
+              List<ConnectivityResult>,
               Object?,
               Object?
             >;

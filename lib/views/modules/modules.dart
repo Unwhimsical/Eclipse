@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fl_clash/common/common.dart';
 import 'module_argument_editor.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -71,10 +73,16 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     );
     if (!mounted) return;
     if (info == null) {
-      dialogs.showNotifier('下载失败或未识别到有效模块', level: MessageLevel.warning);
+      dialogs.showNotifier(
+        appLocalizations.moduleDownloadFailed,
+        level: MessageLevel.warning,
+      );
       return;
     }
-    dialogs.showNotifier('已导入模块：${info.name}', level: MessageLevel.success);
+    dialogs.showNotifier(
+      appLocalizations.moduleImported(info.name),
+      level: MessageLevel.success,
+    );
     await _refresh();
   }
 
@@ -86,23 +94,30 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     );
     if (!mounted) return;
     if (info == null) {
-      dialogs.showNotifier('未识别到有效模块', level: MessageLevel.warning);
+      dialogs.showNotifier(
+        currentAppLocalizations.moduleInvalid,
+        level: MessageLevel.warning,
+      );
       return;
     }
-    dialogs.showNotifier('已导入模块：${info.name}', level: MessageLevel.success);
+    dialogs.showNotifier(
+      currentAppLocalizations.moduleImported(info.name),
+      level: MessageLevel.success,
+    );
     await _refresh();
   }
 
   void _showImportMenu() {
+    final appLocalizations = context.appLocalizations;
     dialogs.showCommonDialog(
       child: CommonDialog(
-        title: '导入模块',
+        title: appLocalizations.importModule,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListItem(
               leading: const Icon(Icons.file_open),
-              title: const Text('从 .sgmodule 文件导入'),
+              title: Text(appLocalizations.importModuleFromFile),
               onTap: () {
                 Navigator.of(context).pop();
                 _handleImport();
@@ -110,7 +125,7 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
             ),
             ListItem(
               leading: const Icon(Icons.link),
-              title: const Text('从 URL 导入'),
+              title: Text(appLocalizations.importFromUrl),
               onTap: () {
                 Navigator.of(context).pop();
                 _handleImportFromUrl();
@@ -130,7 +145,9 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
   Future<void> _handleDelete(ModuleInfo info) async {
     final confirmed = await dialogs.showMessage(
       title: currentAppLocalizations.tip,
-      message: TextSpan(text: '删除模块「${info.name}」？'),
+      message: TextSpan(
+        text: currentAppLocalizations.deleteModuleConfirm(info.name),
+      ),
     );
     if (confirmed != true) return;
     if (info.enabled) {
@@ -141,54 +158,66 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
   }
 
   Future<void> _showDetail(ModuleInfo info) async {
+    final appLocalizations = context.appLocalizations;
     final raw = await moduleStore.readRaw(info.id);
     final declared = raw == null ? null : parseSgmodule(raw);
     final args = declared?.arguments ?? const <ModuleArgument>[];
     if (!mounted) return;
-    dialogs.showCommonDialog(
-      child: CommonDialog(
-        title: info.name,
-        actions: [
-          if (args.isNotEmpty)
-            TextButton(
-              onPressed: () async {
-                final saved = await dialogs.showCommonDialog<bool>(
-                  child: ModuleArgumentEditorDialog(
-                    info: info,
-                    arguments: args,
-                    descriptions: declared?.argumentDescriptions ?? const {},
+    unawaited(
+      dialogs.showCommonDialog(
+        child: CommonDialog(
+          title: info.name,
+          actions: [
+            if (args.isNotEmpty)
+              TextButton(
+                onPressed: () async {
+                  final saved = await dialogs.showCommonDialog<bool>(
+                    child: ModuleArgumentEditorDialog(
+                      info: info,
+                      arguments: args,
+                      descriptions: declared?.argumentDescriptions ?? const {},
+                    ),
+                  );
+                  if (saved == true) {
+                    await _refresh();
+                  }
+                },
+                child: Text(appLocalizations.editArguments),
+              ),
+          ],
+          child: SizedBox(
+            width: 300,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (info.desc.isNotEmpty) Text(info.desc),
+                if (info.author != null)
+                  Text(appLocalizations.moduleAuthor(info.author!)),
+                const SizedBox(height: 8),
+                Text(appLocalizations.moduleRuleCount(info.ruleCount)),
+                Text(appLocalizations.moduleHostCount(info.hostCount)),
+                Text(appLocalizations.moduleRewriteCount(info.rewriteCount)),
+                Text(appLocalizations.moduleScriptCount(info.scriptCount)),
+                if (info.needsMitm)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(appLocalizations.moduleMitmNote),
                   ),
-                );
-                if (saved == true) {
-                  await _refresh();
-                }
-              },
-              child: const Text('编辑参数'),
+              ],
             ),
-        ],
-        child: SizedBox(
-          width: 300,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (info.desc.isNotEmpty) Text(info.desc),
-              if (info.author != null) Text('作者：${info.author}'),
-              const SizedBox(height: 8),
-              Text('规则：${info.ruleCount}'),
-              Text('Host：${info.hostCount}'),
-              Text('URL 重写：${info.rewriteCount}'),
-              Text('脚本：${info.scriptCount}'),
-              if (info.needsMitm)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text('含需要 MITM 解密的内容，暂以静态规则生效'),
-                ),
-            ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _handleReorder(int oldIndex, int newIndex) async {
+    setState(() {
+      final item = _modules.removeAt(oldIndex);
+      _modules.insert(newIndex, item);
+    });
+    await moduleStore.saveOrder(_modules);
   }
 
   @override
@@ -199,21 +228,24 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
       isLoading: _loading,
       floatingActionButton: FloatingActionButton(
         onPressed: _showImportMenu,
+        tooltip: appLocalizations.importModule,
         child: const Icon(Icons.add),
       ),
       body: NullStatusSwitcher(
         isEmpty: _modules.isEmpty,
         nullStatus: NullStatus(
-          label: '暂无模块，点击 + 导入 .sgmodule',
+          label: appLocalizations.noModulesDesc,
           illustration: NullStatusIllustration.profile,
         ),
-        child: ListView.builder(
+        child: ReorderableListView.builder(
           itemCount: _modules.length,
+          onReorderItem: _handleReorder,
           itemBuilder: (_, index) {
             final info = _modules[index];
             return ListItem(
+              key: ValueKey(info.id),
               leading: Icon(
-                Icons.extension,
+                Icons.extension_outlined,
                 color: info.enabled ? null : context.colorScheme.outline,
               ),
               title: Text(
@@ -222,7 +254,11 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
                 overflow: TextOverflow.ellipsis,
               ),
               subtitle: Text(
-                '规则 ${info.ruleCount} · 重写 ${info.rewriteCount} · 脚本 ${info.scriptCount}',
+                appLocalizations.moduleStatsSummary(
+                  info.ruleCount,
+                  info.rewriteCount,
+                  info.scriptCount,
+                ),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -230,6 +266,13 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
                   Switch(
                     value: info.enabled,
                     onChanged: (value) => _handleToggle(info, value),
+                  ),
+                  ReorderableDragStartListener(
+                    index: index,
+                    child: const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: Icon(Icons.drag_handle_outlined),
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outline),

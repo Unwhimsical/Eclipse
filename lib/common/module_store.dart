@@ -127,6 +127,8 @@ class ModuleStore {
     );
   }
 
+  Future<void> saveOrder(List<ModuleInfo> modules) => _saveIndex(modules);
+
   Future<String?> readRaw(String id) async {
     final file = File(await moduleFilePath(id));
     if (!await file.exists()) return null;

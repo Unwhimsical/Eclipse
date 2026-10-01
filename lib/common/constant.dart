@@ -110,7 +110,7 @@ const toolsStoreKey = PageStorageKey<String>('tools');
 const settingsStoreKey = PageStorageKey<String>('settings');
 const profilesStoreKey = PageStorageKey<String>('profiles');
 
-const defaultPrimaryColor = 0XFFD8C0C3;
+const defaultPrimaryColor = 0xFF8B7CF6;
 
 double getWidgetHeight(num lines) {
   final space = 14.mAp;

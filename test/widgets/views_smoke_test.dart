@@ -26,6 +26,7 @@ import 'package:fl_clash/widgets/inherited.dart';
 import 'package:fl_clash/widgets/paged_sheet.dart';
 import 'package:fl_clash/widgets/sheet.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -37,17 +38,26 @@ Finder _portField(String label) =>
     find.ancestor(of: find.text(label), matching: find.byType(TextFormField));
 
 void main() {
+  setUpAll(() {
+    globalState.packageInfo = PackageInfo(
+      appName: 'Eclipse',
+      packageName: 'com.eclipse.clash',
+      version: '1.0.0',
+      buildNumber: '1',
+    );
+  });
+
   final cases = <String, Widget>{
     'home': const HomeView(),
-    'proxies hub': const ProxiesHubView(),
-    'rules hub': const RulesHubView(),
     'proxies': const ProxiesView(),
     'profiles': const ProfilesView(),
+    'data': const DataView(),
     'requests': const RequestsView(),
     'resources': const ResourcesView(),
     'logs': const LogsView(),
-    'tools': const ToolsView(),
     'settings': const SettingsView(),
+    'appearance': const AppearanceView(),
+    'about': const AboutView(),
     'basic config': const ConfigView(),
     'dns config': const Scaffold(body: DnsListView()),
     'network config': const Scaffold(body: NetworkListView()),
@@ -106,11 +116,11 @@ void main() {
   }
 
   final settingDestinations = <String, Type>{
-    'Theme': ThemeView,
-    'Backup and restore': BackupAndRestore,
+    'Appearance': AppearanceView,
     'Basic configuration': ConfigView,
     'Advanced configuration': AdvancedConfigView,
     'Application': ApplicationSettingView,
+    'About': AboutView,
   };
 
   for (final entry in settingDestinations.entries) {
@@ -141,7 +151,10 @@ void main() {
       await tester.scrollUntilVisible(
         target,
         500,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: find.descendant(
+          of: find.byType(SettingsView),
+          matching: find.byType(Scrollable),
+        ),
       );
       await tester.tap(target);
       await tester.pumpAndSettle();
@@ -150,37 +163,6 @@ void main() {
       expect(tester.takeException(), null);
     });
   }
-
-  testWidgets('tools opens the rewrite menu', (tester) async {
-    tester.view.physicalSize = const Size(1400, 1000);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-
-    final container = ProviderContainer(
-      overrides: [profilesProvider.overrideWith(TestProfiles.new)],
-    );
-    addTearDown(container.dispose);
-    globalState.container = container;
-    container
-        .read(viewSizeProvider.notifier)
-        .update((_) => const Size(1400, 1000));
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: const TestApp(child: ToolsView()),
-      ),
-    );
-    await tester.pump();
-
-    await tester.tap(find.text('Rewrite'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('Map Local'), findsOneWidget);
-    expect(find.text('Body Rewrite'), findsOneWidget);
-    expect(tester.takeException(), null);
-  });
 
   testWidgets('user agent dialog applies a preset', (tester) async {
     tester.view.physicalSize = const Size(1000, 800);

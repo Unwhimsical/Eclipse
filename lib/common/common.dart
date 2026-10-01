@@ -11,6 +11,7 @@ export 'datetime.dart';
 export 'dialog.dart';
 export 'exception.dart';
 export 'file.dart';
+export 'feature_flags.dart';
 export 'fixed.dart';
 export 'function.dart';
 export 'future.dart';

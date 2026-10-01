@@ -56,9 +56,9 @@ class SceneView extends ConsumerWidget {
                 .update((_) => value),
           ),
           if (system.isIOS)
-            const ListTile(
-              leading: Icon(Icons.info_outline),
-              title: Text('iOS 仅在 App 处于前台时检测网络变化并切换场景'),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: Text(appLocalizations.sceneIosForegroundNote),
             ),
           scenes.when(
             data: (list) {

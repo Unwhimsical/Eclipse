@@ -52,7 +52,10 @@ class _RulesViewState extends ConsumerState<RulesView> {
       return response.data ?? '';
     });
     if (content == null || content.isEmpty || !mounted) {
-      dialogs.showNotifier('下载失败或内容为空', level: MessageLevel.warning);
+      dialogs.showNotifier(
+        appLocalizations.rulesDownloadFailed,
+        level: MessageLevel.warning,
+      );
       return;
     }
     await _importConfContent(content);
@@ -62,24 +65,31 @@ class _RulesViewState extends ConsumerState<RulesView> {
     final ConfData conf = parseConf(content);
     if (conf.rules.isEmpty) {
       if (!mounted) return;
-      dialogs.showNotifier('.conf 中没有找到规则', level: MessageLevel.warning);
+      dialogs.showNotifier(
+        currentAppLocalizations.noRulesInConf,
+        level: MessageLevel.warning,
+      );
       return;
     }
     final count = await ShadowrocketImport.importRules(ref, conf.rules);
     if (!mounted) return;
-    dialogs.showNotifier('已导入 $count 条规则', level: MessageLevel.success);
+    dialogs.showNotifier(
+      currentAppLocalizations.rulesImported(count),
+      level: MessageLevel.success,
+    );
   }
 
   void _showImportMenu() {
+    final appLocalizations = context.appLocalizations;
     dialogs.showCommonDialog(
       child: CommonDialog(
-        title: '导入规则',
+        title: appLocalizations.importRules,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListItem(
               leading: const Icon(Icons.file_open),
-              title: const Text('从 .conf 文件导入'),
+              title: Text(appLocalizations.importRulesFromFile),
               onTap: () {
                 Navigator.of(context).pop();
                 _handleImportConf();
@@ -87,7 +97,7 @@ class _RulesViewState extends ConsumerState<RulesView> {
             ),
             ListItem(
               leading: const Icon(Icons.link),
-              title: const Text('从 URL 导入'),
+              title: Text(appLocalizations.importFromUrl),
               onTap: () {
                 Navigator.of(context).pop();
                 _handleImportConfFromUrl();
@@ -106,13 +116,13 @@ class _RulesViewState extends ConsumerState<RulesView> {
       title: appLocalizations.rules,
       actions: [
         IconButton(
-          icon: const Icon(Icons.tune),
+          icon: const Icon(Icons.tune_outlined),
           tooltip: appLocalizations.rewrite,
           onPressed: () => showRewriteMenu(context, ref),
         ),
         IconButton(
-          icon: const Icon(Icons.file_open),
-          tooltip: '导入 .conf 规则',
+          icon: const Icon(Icons.file_open_outlined),
+          tooltip: appLocalizations.importConfRules,
           onPressed: _showImportMenu,
         ),
       ],

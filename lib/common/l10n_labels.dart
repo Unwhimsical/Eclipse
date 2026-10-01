@@ -15,6 +15,7 @@ extension PageLabelL10n on PageLabel {
       PageLabel.rules => appLocalizations.rules,
       PageLabel.modules => appLocalizations.modules,
       PageLabel.tools => appLocalizations.tools,
+      PageLabel.data => appLocalizations.data,
       PageLabel.settings => appLocalizations.settings,
       PageLabel.logs => appLocalizations.logs,
       PageLabel.requests => appLocalizations.requests,
@@ -38,6 +39,7 @@ extension PageLabelL10n on PageLabel {
       PageLabel.rules ||
       PageLabel.modules ||
       PageLabel.tools ||
+      PageLabel.data ||
       PageLabel.settings => null,
     };
   }

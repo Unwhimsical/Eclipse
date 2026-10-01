@@ -1,9 +1,12 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/pages/scan.dart';
 import 'package:fl_clash/providers/action.dart';
+import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,28 +59,61 @@ class AddProfileView extends ConsumerWidget {
     }
   }
 
+  Future<void> _handlePasteImport(WidgetRef ref) async {
+    final appLocalizations = context.appLocalizations;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (text.isEmpty) {
+      dialogs.showNotifier(
+        appLocalizations.clipboardImportFailed,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    final label = await ShadowrocketImport.importShareLinks(ref, text: text);
+    dialogs.showNotifier(
+      label ?? appLocalizations.clipboardImportFailed,
+      level: label == null ? MessageLevel.warning : MessageLevel.success,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     return ListView(
+      padding: const EdgeInsets.all(16),
       children: [
-        ListItem(
-          leading: const Icon(Icons.qr_code_sharp),
-          title: Text(appLocalizations.qrcode),
-          subtitle: Text(appLocalizations.qrcodeDesc),
-          onTap: () => _toScan(ref),
-        ),
-        ListItem(
-          leading: const Icon(Icons.upload_file_sharp),
-          title: Text(appLocalizations.file),
-          subtitle: Text(appLocalizations.fileDesc),
-          onTap: () => _handleAddProfileFormFile(ref),
-        ),
-        ListItem(
-          leading: const Icon(Icons.cloud_download_sharp),
-          title: Text(appLocalizations.url),
-          subtitle: Text(appLocalizations.urlDesc),
-          onTap: () => _toAdd(ref),
+        EclipseSection(
+          children: [
+            EclipseTile(
+              icon: Icons.qr_code_rounded,
+              title: appLocalizations.qrcode,
+              subtitle: appLocalizations.qrcodeDesc,
+              showChevron: true,
+              onTap: () => _toScan(ref),
+            ),
+            EclipseTile(
+              icon: Icons.content_paste_rounded,
+              title: appLocalizations.pasteImport,
+              subtitle: appLocalizations.pasteImportDesc,
+              showChevron: true,
+              onTap: () => _handlePasteImport(ref),
+            ),
+            EclipseTile(
+              icon: Icons.upload_file_outlined,
+              title: appLocalizations.file,
+              subtitle: appLocalizations.fileDesc,
+              showChevron: true,
+              onTap: () => _handleAddProfileFormFile(ref),
+            ),
+            EclipseTile(
+              icon: Icons.cloud_download_outlined,
+              title: appLocalizations.url,
+              subtitle: appLocalizations.urlDesc,
+              showChevron: true,
+              onTap: () => _toAdd(ref),
+            ),
+          ],
         ),
       ],
     );

@@ -107,6 +107,7 @@ abstract class TrackerInfo with _$TrackerInfo {
     required String rulePayload,
     int? downloadSpeed,
     int? uploadSpeed,
+    String? networkType,
   }) = _TrackerInfo;
 
   factory TrackerInfo.fromJson(Map<String, Object?> json) =>
@@ -140,6 +141,16 @@ extension TrackerInfoExt on TrackerInfo {
       return '$process($uid)'.trim();
     }
     return process.trim();
+  }
+
+  /// Final outbound classification from the chain tail: chains run
+  /// outer-to-inner, so the last entry is where the request actually left.
+  String get outboundType {
+    final last = chains.isNotEmpty ? chains.last : '';
+    if (last == 'DIRECT') return 'direct';
+    if (last.startsWith('REJECT')) return 'reject';
+    if (last.isEmpty) return 'unknown';
+    return 'proxy';
   }
 }
 

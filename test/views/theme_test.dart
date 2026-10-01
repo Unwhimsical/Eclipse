@@ -26,7 +26,7 @@ void main() {
 
   tearDown(() => container.dispose());
 
-  Future<void> pumpThemeView(WidgetTester tester) async {
+  Future<void> pumpView(WidgetTester tester, Widget view) async {
     tester.view.physicalSize = const Size(1400, 1400);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
@@ -35,23 +35,31 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const TestApp(child: ThemeView()),
+        child: TestApp(child: view),
       ),
     );
     await tester.pumpAndSettle();
+  }
+
+  Future<void> pumpThemeView(WidgetTester tester) async {
+    await pumpView(tester, const ThemeView());
+  }
+
+  Future<void> pumpAppearanceView(WidgetTester tester) async {
+    await pumpView(tester, const AppearanceView());
   }
 
   ThemeProps readTheme() => container.read(themeSettingProvider);
 
   group('theme mode', () {
     testWidgets('defaults to the dark theme', (tester) async {
-      await pumpThemeView(tester);
+      await pumpAppearanceView(tester);
 
       expect(readTheme().themeMode, ThemeMode.dark);
     });
 
     testWidgets('switches to light and back to dark', (tester) async {
-      await pumpThemeView(tester);
+      await pumpAppearanceView(tester);
 
       await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();

@@ -5,7 +5,9 @@ import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/config/config_detail.dart';
 import 'package:fl_clash/views/profiles/overwrite/overwrite.dart';
+import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:material_ui/material_ui.dart';
@@ -323,6 +325,24 @@ class ProfileItem extends ConsumerWidget {
     BaseNavigator.push(context, OverwriteView(profileId: id));
   }
 
+  Future<void> _handleDuplicateProfile(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    final appLocalizations = context.appLocalizations;
+    final profilesAction = ref.read(profilesActionProvider.notifier);
+    final core = ref.read(coreHandlerProvider);
+    final newProfile = await globalState.safeRun<Profile>(() async {
+      final bytes = await (await profile.file).readAsBytes();
+      return Profile.normal(
+        label: '${profile.realLabel} ${appLocalizations.profileCopySuffix}',
+      ).saveFile(bytes, validate: core.validateConfig);
+    }, title: appLocalizations.duplicateProfile);
+    if (newProfile != null) {
+      profilesAction.putProfile(newProfile);
+    }
+  }
+
   List<CommonPopupMenuItem> _menuItems(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final isUrl = profile.type == ProfileType.url;
@@ -330,6 +350,15 @@ class ProfileItem extends ConsumerWidget {
     final hasSubscriptionInfo =
         isUrl && subscriptionInfo != null && subscriptionInfo.total > 0;
     return [
+      CommonPopupMenuItem(
+        icon: Icons.tune_outlined,
+        label: appLocalizations.configDetail,
+        onPressed: () {
+          unawaited(
+            BaseNavigator.push(context, ConfigDetailPage(profile: profile)),
+          );
+        },
+      ),
       CommonPopupMenuItem(
         icon: Icons.edit_outlined,
         label: appLocalizations.edit,
@@ -342,6 +371,13 @@ class ProfileItem extends ConsumerWidget {
         label: appLocalizations.preview,
         onPressed: () {
           _handlePreview(context);
+        },
+      ),
+      CommonPopupMenuItem(
+        icon: Icons.content_copy_outlined,
+        label: appLocalizations.duplicateProfile,
+        onPressed: () {
+          _handleDuplicateProfile(context, ref);
         },
       ),
       if (isUrl)
@@ -386,6 +422,18 @@ class ProfileItem extends ConsumerWidget {
               _handleExportFile(context);
             },
           ),
+          CommonPopupMenuItem(
+            icon: Icons.restart_alt_outlined,
+            label: appLocalizations.restoreDefault,
+            onPressed: () {
+              unawaited(
+                BaseNavigator.push(
+                  context,
+                  ComingSoonView(title: appLocalizations.restoreDefault),
+                ),
+              );
+            },
+          ),
         ],
       ),
       CommonPopupMenuItem(
@@ -403,7 +451,7 @@ class ProfileItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return CommonCard(
       enterActionsOnRight: true,
-      radius: AppCorner.xl,
+      radius: AppCorner.md,
       isSelected: profile.id == groupValue,
       onPressed: () {
         onChanged(profile.id);

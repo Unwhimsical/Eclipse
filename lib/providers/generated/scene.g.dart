@@ -40,7 +40,7 @@ final class SceneModeProvider extends $NotifierProvider<SceneMode, void> {
   }
 }
 
-String _$sceneModeHash() => r'5a4e8007f15ed117cc1aaaad4ab90be5194516c2';
+String _$sceneModeHash() => r'1800849ba01f5747b176264074791e12b1a76ad3';
 
 abstract class _$SceneMode extends $Notifier<void> {
   void build();

@@ -69,7 +69,12 @@ void main() {
     final mobile = container.read(currentNavigationItemsStateProvider).value;
     expect(
       mobile.map((item) => item.label),
-      containsAll([PageLabel.dashboard, PageLabel.config, PageLabel.tools]),
+      containsAll([
+        PageLabel.dashboard,
+        PageLabel.config,
+        PageLabel.data,
+        PageLabel.settings,
+      ]),
     );
     expect(
       mobile.map((item) => item.label),
@@ -81,13 +86,13 @@ void main() {
         .update((_) => const Size(1200, 800));
     container
         .read(currentPageLabelProvider.notifier)
-        .toPage(PageLabel.connections);
+        .toPage(PageLabel.settings);
     final desktop = container.read(navigationStateProvider);
     expect(desktop.viewMode, ViewMode.desktop);
     expect(desktop.currentIndex, greaterThan(0));
     expect(
       desktop.navigationItems[desktop.currentIndex].label,
-      PageLabel.connections,
+      PageLabel.settings,
     );
 
     container

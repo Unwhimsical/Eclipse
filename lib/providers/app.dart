@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' show Locale;
 
 import 'package:dio/dio.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -557,6 +558,15 @@ class CurrentSSID extends _$CurrentSSID with AutoDisposeNotifierMixin {
   @override
   String? build() {
     return null;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class CurrentConnectivity extends _$CurrentConnectivity
+    with AutoDisposeNotifierMixin {
+  @override
+  List<ConnectivityResult> build() {
+    return const [];
   }
 }
 

@@ -9,7 +9,8 @@ import 'package:fl_clash/pages/home.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/application_setting.dart';
-import 'package:fl_clash/views/tools.dart';
+import 'package:fl_clash/views/data_view.dart';
+import 'package:fl_clash/views/settings/settings.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:fl_clash/views/navigation.dart';
 import 'package:material_ui/material_ui.dart';
@@ -199,7 +200,7 @@ void main() {
                 NavigationItem(
                   icon: const Icon(Icons.space_dashboard),
                   label: PageLabel.dashboard,
-                  builder: (_) => const ToolsView(
+                  builder: (_) => const _StatefulContent(
                     key: GlobalObjectKey(PageLabel.dashboard),
                   ),
                 ),
@@ -273,8 +274,9 @@ void main() {
                 NavigationItem(
                   icon: const Icon(Icons.construction),
                   label: PageLabel.tools,
-                  builder: (_) =>
-                      const ToolsView(key: GlobalObjectKey(PageLabel.tools)),
+                  builder: (_) => const _StatefulContent(
+                    key: GlobalObjectKey(PageLabel.tools),
+                  ),
                 ),
               ],
             ),
@@ -293,7 +295,7 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(find.byType(ToolsView), findsOneWidget);
+      expect(find.byType(_StatefulContent), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
 
       for (var width = 520.0; width <= 1200; width += 20) {
@@ -304,7 +306,7 @@ void main() {
       }
       await tester.pump(const Duration(milliseconds: 301));
       expect(tester.takeException(), isNull);
-      expect(find.byType(ToolsView), findsOneWidget);
+      expect(find.byType(_StatefulContent), findsOneWidget);
       expect(find.byType(NavigationRail), findsOneWidget);
       expect(container.read(currentPageLabelProvider), PageLabel.tools);
 
@@ -316,7 +318,7 @@ void main() {
       }
       await tester.pump(const Duration(milliseconds: 301));
       expect(tester.takeException(), isNull);
-      expect(find.byType(ToolsView), findsOneWidget);
+      expect(find.byType(_StatefulContent), findsOneWidget);
       expect(container.read(currentPageLabelProvider), PageLabel.tools);
     },
   );
@@ -388,21 +390,29 @@ void main() {
       );
       await tester.pump();
 
+      final settingsScrollable = find.descendant(
+        of: find.byType(SettingsView),
+        matching: find.byType(Scrollable),
+      );
       final applicationItem = find.text('Application');
       await tester.scrollUntilVisible(
         applicationItem,
         500,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: settingsScrollable,
       );
       await tester.tap(applicationItem);
       await tester.pumpAndSettle();
       expect(find.byType(ApplicationSettingView), findsOneWidget);
 
+      final appSettingsScrollable = find.descendant(
+        of: find.byType(ApplicationSettingView),
+        matching: find.byType(Scrollable),
+      );
       final logItem = find.text('Logcat');
       await tester.scrollUntilVisible(
         logItem,
         500,
-        scrollable: find.byType(Scrollable).first,
+        scrollable: appSettingsScrollable,
       );
       await tester.tap(logItem);
       await tester.pumpAndSettle();
@@ -872,6 +882,62 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('eclipse navigation exposes four tabs in shadowrocket order', (
+    tester,
+  ) async {
+    final items = navigation.getItems(openLogs: true, hasProxies: true);
+    expect(items.map((item) => item.label).toList(), [
+      PageLabel.dashboard,
+      PageLabel.config,
+      PageLabel.data,
+      PageLabel.settings,
+    ]);
+
+    tester.view.physicalSize = const Size(500, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final container = ProviderContainer(
+      overrides: [
+        navigationItemsStateProvider.overrideWithValue(
+          NavigationItemsState(value: items),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+    globalState.container = container;
+    container.read(viewSizeProvider.notifier).value = const Size(500, 900);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const TestApp(includeNavigatorKey: false, child: HomePage()),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(NavigationBar), findsOneWidget);
+    Finder tabLabel(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+    for (final label in ['Home', 'Config', 'Data', 'Settings']) {
+      expect(tabLabel(label), findsOneWidget);
+    }
+
+    await tester.tap(tabLabel('Data'));
+    await tester.pumpAndSettle();
+    expect(find.byType(DataView), findsOneWidget);
+    expect(container.read(currentPageLabelProvider), PageLabel.data);
+
+    await tester.tap(tabLabel('Settings'));
+    await tester.pumpAndSettle();
+    expect(find.byType(SettingsView), findsOneWidget);
+    expect(container.read(currentPageLabelProvider), PageLabel.settings);
+    expect(tester.takeException(), isNull);
+  });
 }
 
 class _ThemeManagedTestApp extends StatelessWidget {
