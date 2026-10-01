@@ -5474,6 +5474,81 @@ class AppLocalizations {
       args: [],
     );
   }
+
+  /// `Home`
+  String get home {
+    return Intl.message('Home', name: 'home', desc: '', args: []);
+  }
+
+  /// `Config`
+  String get config {
+    return Intl.message('Config', name: 'config', desc: '', args: []);
+  }
+
+  /// `Rewrite`
+  String get rewrite {
+    return Intl.message('Rewrite', name: 'rewrite', desc: '', args: []);
+  }
+
+  /// `Map Local`
+  String get mapLocal {
+    return Intl.message('Map Local', name: 'mapLocal', desc: '', args: []);
+  }
+
+  /// `Replace matched request responses with local content`
+  String get mapLocalDesc {
+    return Intl.message(
+      'Replace matched request responses with local content',
+      name: 'mapLocalDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Body Rewrite`
+  String get bodyRewrite {
+    return Intl.message(
+      'Body Rewrite',
+      name: 'bodyRewrite',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rewrite request/response body with regex or jq`
+  String get bodyRewriteDesc {
+    return Intl.message(
+      'Rewrite request/response body with regex or jq',
+      name: 'bodyRewriteDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `CA Center`
+  String get caCenter {
+    return Intl.message('CA Center', name: 'caCenter', desc: '', args: []);
+  }
+
+  /// `Generate the MITM root certificate, with install and trust guidance`
+  String get caCenterDesc {
+    return Intl.message(
+      'Generate the MITM root certificate, with install and trust guidance',
+      name: 'caCenterDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No profile selected`
+  String get noProfileSelected {
+    return Intl.message(
+      'No profile selected',
+      name: 'noProfileSelected',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

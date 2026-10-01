@@ -660,5 +660,15 @@
   "sceneKeepCurrent": "現状維持",
   "sceneTargetProxy": "出口ノード",
   "sceneDeleteConfirm": "このシーンを削除しますか？",
-  "sceneEmpty": "シーンがありません"
+  "sceneEmpty": "シーンがありません",
+  "home": "ホーム",
+  "config": "設定",
+  "rewrite": "書き換え",
+  "mapLocal": "Map Local",
+  "mapLocalDesc": "一致したリクエストのレスポンスをローカルコンテンツに置換",
+  "bodyRewrite": "Body Rewrite",
+  "bodyRewriteDesc": "正規表現やjqでリクエスト/レスポンスボディを書き換え",
+  "caCenter": "CAセンター",
+  "caCenterDesc": "MITMルート証明書を生成し、インストールと信頼設定を案内",
+  "noProfileSelected": "プロファイルが選択されていません"
 }

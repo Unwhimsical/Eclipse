@@ -1,7 +1,7 @@
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/state.dart';
 import 'package:fl_clash/state.dart';
-import 'package:fl_clash/views/dashboard/dashboard.dart';
+import 'package:fl_clash/views/home/home.dart';
 import 'package:fl_clash/widgets/grid.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/test_app.dart';
 
 void main() {
-  testWidgets('dashboard uses 12 columns from 480 logical pixels', (
+  testWidgets('home grid uses 12 columns from 480 logical pixels', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(511, 1000);
@@ -31,7 +31,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const TestApp(child: DashboardView()),
+        child: const TestApp(child: HomeView()),
       ),
     );
     await tester.pump();
@@ -48,7 +48,7 @@ void main() {
     expect(tester.takeException(), null);
   });
 
-  testWidgets('dashboard limits a wide grid to 16 centered columns', (
+  testWidgets('home grid fills a wide screen up to the max width', (
     tester,
   ) async {
     tester.view.physicalSize = const Size(1600, 1000);
@@ -69,7 +69,7 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: const TestApp(child: DashboardView()),
+        child: const TestApp(child: HomeView()),
       ),
     );
     await tester.pump();

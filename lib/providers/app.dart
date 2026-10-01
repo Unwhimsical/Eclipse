@@ -208,7 +208,7 @@ class CurrentPageLabel extends _$CurrentPageLabel
   }
 
   void toProfiles() {
-    toPage(PageLabel.profiles);
+    toPage(PageLabel.config);
   }
 }
 

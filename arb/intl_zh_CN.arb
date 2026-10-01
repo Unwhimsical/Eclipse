@@ -660,5 +660,15 @@
   "sceneKeepCurrent": "保持当前",
   "sceneTargetProxy": "出口节点",
   "sceneDeleteConfirm": "确定删除该场景吗？",
-  "sceneEmpty": "暂无场景"
+  "sceneEmpty": "暂无场景",
+  "home": "主页",
+  "config": "配置",
+  "rewrite": "改写",
+  "mapLocal": "Map Local",
+  "mapLocalDesc": "将匹配请求的响应替换为本地内容",
+  "bodyRewrite": "Body Rewrite",
+  "bodyRewriteDesc": "用正则或 jq 改写请求/响应正文",
+  "caCenter": "CA 中心",
+  "caCenterDesc": "生成 MITM 根证书，安装与信任引导",
+  "noProfileSelected": "当前没有配置"
 }

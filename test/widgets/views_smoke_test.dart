@@ -38,13 +38,16 @@ Finder _portField(String label) =>
 
 void main() {
   final cases = <String, Widget>{
-    'dashboard': const DashboardView(),
+    'home': const HomeView(),
+    'proxies hub': const ProxiesHubView(),
+    'rules hub': const RulesHubView(),
     'proxies': const ProxiesView(),
     'profiles': const ProfilesView(),
     'requests': const RequestsView(),
     'resources': const ResourcesView(),
     'logs': const LogsView(),
     'tools': const ToolsView(),
+    'settings': const SettingsView(),
     'basic config': const ConfigView(),
     'dns config': const Scaffold(body: DnsListView()),
     'network config': const Scaffold(body: NetworkListView()),
@@ -102,7 +105,7 @@ void main() {
     });
   }
 
-  final toolDestinations = <String, Type>{
+  final settingDestinations = <String, Type>{
     'Theme': ThemeView,
     'Backup and restore': BackupAndRestore,
     'Basic configuration': ConfigView,
@@ -110,8 +113,8 @@ void main() {
     'Application': ApplicationSettingView,
   };
 
-  for (final entry in toolDestinations.entries) {
-    testWidgets('tools opens ${entry.key}', (tester) async {
+  for (final entry in settingDestinations.entries) {
+    testWidgets('settings opens ${entry.key}', (tester) async {
       tester.view.physicalSize = const Size(1400, 1000);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.resetPhysicalSize);
@@ -129,7 +132,7 @@ void main() {
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container,
-          child: const TestApp(child: ToolsView()),
+          child: const TestApp(child: SettingsView()),
         ),
       );
       await tester.pump();
@@ -147,6 +150,37 @@ void main() {
       expect(tester.takeException(), null);
     });
   }
+
+  testWidgets('tools opens the rewrite menu', (tester) async {
+    tester.view.physicalSize = const Size(1400, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final container = ProviderContainer(
+      overrides: [profilesProvider.overrideWith(TestProfiles.new)],
+    );
+    addTearDown(container.dispose);
+    globalState.container = container;
+    container
+        .read(viewSizeProvider.notifier)
+        .update((_) => const Size(1400, 1000));
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const TestApp(child: ToolsView()),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Rewrite'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Map Local'), findsOneWidget);
+    expect(find.text('Body Rewrite'), findsOneWidget);
+    expect(tester.takeException(), null);
+  });
 
   testWidgets('user agent dialog applies a preset', (tester) async {
     tester.view.physicalSize = const Size(1000, 800);

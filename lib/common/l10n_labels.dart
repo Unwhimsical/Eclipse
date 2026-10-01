@@ -7,13 +7,15 @@ extension PageLabelL10n on PageLabel {
   String get label {
     final appLocalizations = currentAppLocalizations;
     return switch (this) {
-      PageLabel.dashboard => appLocalizations.dashboard,
+      PageLabel.dashboard => appLocalizations.home,
+      PageLabel.config => appLocalizations.config,
       PageLabel.proxies => appLocalizations.proxies,
       PageLabel.profiles => appLocalizations.profiles,
       PageLabel.subscriptions => appLocalizations.subscriptions,
       PageLabel.rules => appLocalizations.rules,
       PageLabel.modules => appLocalizations.modules,
       PageLabel.tools => appLocalizations.tools,
+      PageLabel.settings => appLocalizations.settings,
       PageLabel.logs => appLocalizations.logs,
       PageLabel.requests => appLocalizations.requests,
       PageLabel.resources => appLocalizations.resources,
@@ -29,12 +31,14 @@ extension PageLabelL10n on PageLabel {
       PageLabel.resources => appLocalizations.resourcesDesc,
       PageLabel.connections => appLocalizations.connectionsDesc,
       PageLabel.dashboard ||
+      PageLabel.config ||
       PageLabel.proxies ||
       PageLabel.profiles ||
       PageLabel.subscriptions ||
       PageLabel.rules ||
       PageLabel.modules ||
-      PageLabel.tools => null,
+      PageLabel.tools ||
+      PageLabel.settings => null,
     };
   }
 }

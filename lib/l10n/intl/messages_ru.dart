@@ -247,9 +247,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "blockConnection": MessageLookupByLibrary.simpleMessage(
       "Заблокировать соединение",
     ),
+    "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body Rewrite"),
+    "bodyRewriteDesc": MessageLookupByLibrary.simpleMessage(
+      "Изменять тело запроса/ответа через regex или jq",
+    ),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("Исключённые домены"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "Действует только при включённом системном прокси",
+    ),
+    "caCenter": MessageLookupByLibrary.simpleMessage("CA-центр"),
+    "caCenterDesc": MessageLookupByLibrary.simpleMessage(
+      "Создание корневого сертификата MITM, установка и доверие",
     ),
     "cacheCorrupt": MessageLookupByLibrary.simpleMessage(
       "Кэш повреждён. Очистить его?",
@@ -294,6 +302,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "colorSchemes": MessageLookupByLibrary.simpleMessage("Цветовые схемы"),
     "columns": MessageLookupByLibrary.simpleMessage("Столбцы"),
     "compatible": MessageLookupByLibrary.simpleMessage("Режим совместимости"),
+    "config": MessageLookupByLibrary.simpleMessage("Конфиг"),
     "configDataDetected": MessageLookupByLibrary.simpleMessage(
       "В конфигурации обнаружены данные",
     ),
@@ -535,6 +544,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "hideFromList": MessageLookupByLibrary.simpleMessage("Скрыть из списка"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("Скрыть пароль"),
+    "home": MessageLookupByLibrary.simpleMessage("Главная"),
     "host": MessageLookupByLibrary.simpleMessage("Хост"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("Добавить записи hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage(
@@ -689,6 +699,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Для снятия ограничения loopback у UWP-приложений",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Свободный"),
+    "mapLocal": MessageLookupByLibrary.simpleMessage("Map Local"),
+    "mapLocalDesc": MessageLookupByLibrary.simpleMessage(
+      "Заменять ответы подходящих запросов локальным содержимым",
+    ),
     "matchSourceIp": MessageLookupByLibrary.simpleMessage(
       "Сопоставлять IP источника",
     ),
@@ -755,6 +769,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "noNetwork": MessageLookupByLibrary.simpleMessage("Нет сети"),
     "noNetworkApp": MessageLookupByLibrary.simpleMessage("Приложения без сети"),
+    "noProfileSelected": MessageLookupByLibrary.simpleMessage(
+      "Профиль не выбран",
+    ),
     "noRecords": MessageLookupByLibrary.simpleMessage("Записей пока нет"),
     "noResolve": MessageLookupByLibrary.simpleMessage("Не разрешать IP"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage(
@@ -974,6 +991,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restoreSuccess": MessageLookupByLibrary.simpleMessage(
       "Восстановление выполнено",
     ),
+    "rewrite": MessageLookupByLibrary.simpleMessage("Перезапись"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("Адреса маршрутов"),
     "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
       "Настроить прослушиваемые адреса маршрутов",

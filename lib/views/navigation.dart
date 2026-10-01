@@ -15,46 +15,44 @@ class Navigation implements NavigationPort {
     return [
       NavigationItem(
         keep: false,
-        icon: const Icon(Icons.space_dashboard),
+        icon: const Icon(Icons.home_rounded),
         label: PageLabel.dashboard,
         builder: (_) =>
-            const DashboardView(key: GlobalObjectKey(PageLabel.dashboard)),
+            const HomeView(key: GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
-        icon: const Icon(Icons.article),
+        icon: const Icon(Icons.description_outlined),
+        label: PageLabel.config,
+        builder: (_) =>
+            const ProfilesView(key: GlobalObjectKey(PageLabel.config)),
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.hub_outlined),
         label: PageLabel.proxies,
         builder: (_) =>
-            const ProxiesView(key: GlobalObjectKey(PageLabel.proxies)),
+            const ProxiesHubView(key: GlobalObjectKey(PageLabel.proxies)),
         modes: hasProxies
             ? [NavigationItemMode.mobile, NavigationItemMode.desktop]
             : [],
       ),
       NavigationItem(
-        icon: const Icon(Icons.subscriptions),
-        label: PageLabel.subscriptions,
-        builder: (_) => const SubscriptionsView(
-          key: GlobalObjectKey(PageLabel.subscriptions),
-        ),
-        modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
-      ),
-      NavigationItem(
         icon: const Icon(Icons.rule),
         label: PageLabel.rules,
-        builder: (_) => const RulesView(key: GlobalObjectKey(PageLabel.rules)),
+        builder: (_) =>
+            const RulesHubView(key: GlobalObjectKey(PageLabel.rules)),
         modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
       ),
       NavigationItem(
-        icon: const Icon(Icons.extension),
-        label: PageLabel.modules,
-        builder: (_) =>
-            const ModulesView(key: GlobalObjectKey(PageLabel.modules)),
+        icon: const Icon(Icons.handyman_outlined),
+        label: PageLabel.tools,
+        builder: (_) => const ToolsView(key: GlobalObjectKey(PageLabel.tools)),
         modes: const [NavigationItemMode.mobile, NavigationItemMode.desktop],
       ),
       NavigationItem(
-        icon: const Icon(Icons.folder),
-        label: PageLabel.profiles,
+        icon: const Icon(Icons.settings_outlined),
+        label: PageLabel.settings,
         builder: (_) =>
-            const ProfilesView(key: GlobalObjectKey(PageLabel.profiles)),
+            const SettingsView(key: GlobalObjectKey(PageLabel.settings)),
       ),
       NavigationItem(
         icon: const Icon(Icons.view_timeline),
@@ -84,12 +82,6 @@ class Navigation implements NavigationPort {
         modes: openLogs
             ? [NavigationItemMode.desktop, NavigationItemMode.more]
             : [],
-      ),
-      NavigationItem(
-        icon: const Icon(Icons.construction),
-        label: PageLabel.tools,
-        builder: (_) => const ToolsView(key: GlobalObjectKey(PageLabel.tools)),
-        modes: [NavigationItemMode.desktop, NavigationItemMode.mobile],
       ),
     ];
   }

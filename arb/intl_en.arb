@@ -660,5 +660,15 @@
   "sceneKeepCurrent": "Keep current",
   "sceneTargetProxy": "Exit node",
   "sceneDeleteConfirm": "Delete this scene?",
-  "sceneEmpty": "No scenes yet"
+  "sceneEmpty": "No scenes yet",
+  "home": "Home",
+  "config": "Config",
+  "rewrite": "Rewrite",
+  "mapLocal": "Map Local",
+  "mapLocalDesc": "Replace matched request responses with local content",
+  "bodyRewrite": "Body Rewrite",
+  "bodyRewriteDesc": "Rewrite request/response body with regex or jq",
+  "caCenter": "CA Center",
+  "caCenterDesc": "Generate the MITM root certificate, with install and trust guidance",
+  "noProfileSelected": "No profile selected"
 }

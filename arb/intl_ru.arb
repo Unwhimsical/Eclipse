@@ -660,5 +660,15 @@
   "sceneKeepCurrent": "Оставить как есть",
   "sceneTargetProxy": "Выходной узел",
   "sceneDeleteConfirm": "Удалить эту сцену?",
-  "sceneEmpty": "Сцен пока нет"
+  "sceneEmpty": "Сцен пока нет",
+  "home": "Главная",
+  "config": "Конфиг",
+  "rewrite": "Перезапись",
+  "mapLocal": "Map Local",
+  "mapLocalDesc": "Заменять ответы подходящих запросов локальным содержимым",
+  "bodyRewrite": "Body Rewrite",
+  "bodyRewriteDesc": "Изменять тело запроса/ответа через regex или jq",
+  "caCenter": "CA-центр",
+  "caCenterDesc": "Создание корневого сертификата MITM, установка и доверие",
+  "noProfileSelected": "Профиль не выбран"
 }

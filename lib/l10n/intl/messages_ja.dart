@@ -191,9 +191,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "bind": MessageLookupByLibrary.simpleMessage("連携"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("ブラックリストモード"),
     "blockConnection": MessageLookupByLibrary.simpleMessage("接続をブロック"),
+    "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body Rewrite"),
+    "bodyRewriteDesc": MessageLookupByLibrary.simpleMessage(
+      "正規表現やjqでリクエスト/レスポンスボディを書き換え",
+    ),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("除外ドメイン"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "システムプロキシが有効な場合のみ適用されます",
+    ),
+    "caCenter": MessageLookupByLibrary.simpleMessage("CAセンター"),
+    "caCenterDesc": MessageLookupByLibrary.simpleMessage(
+      "MITMルート証明書を生成し、インストールと信頼設定を案内",
     ),
     "cacheCorrupt": MessageLookupByLibrary.simpleMessage(
       "キャッシュが破損しています。クリアしますか？",
@@ -224,6 +232,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "colorSchemes": MessageLookupByLibrary.simpleMessage("カラースキーム"),
     "columns": MessageLookupByLibrary.simpleMessage("列数"),
     "compatible": MessageLookupByLibrary.simpleMessage("互換モード"),
+    "config": MessageLookupByLibrary.simpleMessage("設定"),
     "configDataDetected": MessageLookupByLibrary.simpleMessage(
       "設定内にデータが見つかりました",
     ),
@@ -421,6 +430,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "hideFromList": MessageLookupByLibrary.simpleMessage("リストから隠す"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("パスワードを隠す"),
+    "home": MessageLookupByLibrary.simpleMessage("ホーム"),
     "host": MessageLookupByLibrary.simpleMessage("ホスト"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("Hostsを追加します"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("ホットキーが競合しています"),
@@ -548,6 +558,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "loopback": MessageLookupByLibrary.simpleMessage("ループバック解除ツール"),
     "loopbackDesc": MessageLookupByLibrary.simpleMessage("UWPのループバック解除に使用します"),
     "loose": MessageLookupByLibrary.simpleMessage("ゆったり"),
+    "mapLocal": MessageLookupByLibrary.simpleMessage("Map Local"),
+    "mapLocalDesc": MessageLookupByLibrary.simpleMessage(
+      "一致したリクエストのレスポンスをローカルコンテンツに置換",
+    ),
     "matchSourceIp": MessageLookupByLibrary.simpleMessage("送信元IPにマッチ"),
     "matchTarget": MessageLookupByLibrary.simpleMessage("MATCH-TARGET"),
     "matchTargetDesc": MessageLookupByLibrary.simpleMessage(
@@ -600,6 +614,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "noLongerRemind": MessageLookupByLibrary.simpleMessage("今後表示しない"),
     "noNetwork": MessageLookupByLibrary.simpleMessage("ネットワークがありません"),
     "noNetworkApp": MessageLookupByLibrary.simpleMessage("ネットワーク不使用アプリ"),
+    "noProfileSelected": MessageLookupByLibrary.simpleMessage(
+      "プロファイルが選択されていません",
+    ),
     "noRecords": MessageLookupByLibrary.simpleMessage("記録がありません"),
     "noResolve": MessageLookupByLibrary.simpleMessage("IPを解決しない"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage("ホスト名を解決しない"),
@@ -763,6 +780,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restoreStrategyCompatible": MessageLookupByLibrary.simpleMessage("互換"),
     "restoreStrategyOverride": MessageLookupByLibrary.simpleMessage("上書き"),
     "restoreSuccess": MessageLookupByLibrary.simpleMessage("復元が完了しました"),
+    "rewrite": MessageLookupByLibrary.simpleMessage("書き換え"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("ルートアドレス"),
     "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
       "リッスンするルートアドレスを設定します",

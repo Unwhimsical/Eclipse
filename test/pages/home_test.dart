@@ -341,7 +341,7 @@ void main() {
       globalState.container = container;
       container
           .read(currentPageLabelProvider.notifier)
-          .toPage(PageLabel.profiles);
+          .toPage(PageLabel.config);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -365,7 +365,7 @@ void main() {
   );
 
   testWidgets(
-    'desktop navigation keeps the tools route when logs are enabled',
+    'desktop navigation keeps the settings route when logs are enabled',
     (tester) async {
       tester.view.physicalSize = const Size(1400, 1000);
       tester.view.devicePixelRatio = 1;
@@ -376,7 +376,9 @@ void main() {
       addTearDown(container.dispose);
       globalState.container = container;
       container.read(viewSizeProvider.notifier).value = const Size(1400, 1000);
-      container.read(currentPageLabelProvider.notifier).toPage(PageLabel.tools);
+      container
+          .read(currentPageLabelProvider.notifier)
+          .toPage(PageLabel.settings);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(

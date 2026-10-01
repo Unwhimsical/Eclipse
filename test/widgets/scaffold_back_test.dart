@@ -7,7 +7,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/access.dart';
-import 'package:fl_clash/views/dashboard/dashboard.dart';
+import 'package:fl_clash/views/home/home.dart';
 import 'package:fl_clash/views/logs.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
@@ -266,7 +266,7 @@ void main() {
         child: _DashboardTestApp(
           child: _PageActivityTestScope(
             isActive: isActive,
-            child: const DashboardView(),
+            child: const HomeView(),
           ),
         ),
       ),
@@ -408,7 +408,7 @@ void main() {
 class _DashboardTestApp extends StatelessWidget {
   final Widget child;
 
-  const _DashboardTestApp({this.child = const DashboardView()});
+  const _DashboardTestApp({this.child = const HomeView()});
 
   @override
   Widget build(BuildContext context) {

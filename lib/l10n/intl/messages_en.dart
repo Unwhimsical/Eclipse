@@ -239,9 +239,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "bind": MessageLookupByLibrary.simpleMessage("Bind"),
     "blacklistMode": MessageLookupByLibrary.simpleMessage("Blacklist mode"),
     "blockConnection": MessageLookupByLibrary.simpleMessage("Block connection"),
+    "bodyRewrite": MessageLookupByLibrary.simpleMessage("Body Rewrite"),
+    "bodyRewriteDesc": MessageLookupByLibrary.simpleMessage(
+      "Rewrite request/response body with regex or jq",
+    ),
     "bypassDomain": MessageLookupByLibrary.simpleMessage("Bypass domains"),
     "bypassDomainDesc": MessageLookupByLibrary.simpleMessage(
       "Only takes effect while the system proxy is enabled",
+    ),
+    "caCenter": MessageLookupByLibrary.simpleMessage("CA Center"),
+    "caCenterDesc": MessageLookupByLibrary.simpleMessage(
+      "Generate the MITM root certificate, with install and trust guidance",
     ),
     "cacheCorrupt": MessageLookupByLibrary.simpleMessage(
       "The cache is corrupted. Clear it?",
@@ -284,6 +292,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "colorSchemes": MessageLookupByLibrary.simpleMessage("Color schemes"),
     "columns": MessageLookupByLibrary.simpleMessage("Columns"),
     "compatible": MessageLookupByLibrary.simpleMessage("Compatibility mode"),
+    "config": MessageLookupByLibrary.simpleMessage("Config"),
     "configDataDetected": MessageLookupByLibrary.simpleMessage(
       "Data detected in the configuration",
     ),
@@ -519,6 +528,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "hideFromList": MessageLookupByLibrary.simpleMessage("Hide from list"),
     "hidePassword": MessageLookupByLibrary.simpleMessage("Hide password"),
+    "home": MessageLookupByLibrary.simpleMessage("Home"),
     "host": MessageLookupByLibrary.simpleMessage("Host"),
     "hostsDesc": MessageLookupByLibrary.simpleMessage("Append hosts"),
     "hotkeyConflict": MessageLookupByLibrary.simpleMessage("Hotkey conflict"),
@@ -669,6 +679,10 @@ class MessageLookup extends MessageLookupByLibrary {
       "Used for UWP loopback exemption",
     ),
     "loose": MessageLookupByLibrary.simpleMessage("Loose"),
+    "mapLocal": MessageLookupByLibrary.simpleMessage("Map Local"),
+    "mapLocalDesc": MessageLookupByLibrary.simpleMessage(
+      "Replace matched request responses with local content",
+    ),
     "matchSourceIp": MessageLookupByLibrary.simpleMessage("Match source IP"),
     "matchTarget": MessageLookupByLibrary.simpleMessage("MATCH-TARGET"),
     "matchTargetDesc": MessageLookupByLibrary.simpleMessage(
@@ -733,6 +747,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "noNetwork": MessageLookupByLibrary.simpleMessage("No network"),
     "noNetworkApp": MessageLookupByLibrary.simpleMessage("No-network apps"),
+    "noProfileSelected": MessageLookupByLibrary.simpleMessage(
+      "No profile selected",
+    ),
     "noRecords": MessageLookupByLibrary.simpleMessage("No records"),
     "noResolve": MessageLookupByLibrary.simpleMessage("Don\'t resolve IP"),
     "noResolveHostname": MessageLookupByLibrary.simpleMessage(
@@ -930,6 +947,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "restoreSuccess": MessageLookupByLibrary.simpleMessage(
       "Restore successful",
     ),
+    "rewrite": MessageLookupByLibrary.simpleMessage("Rewrite"),
     "routeAddress": MessageLookupByLibrary.simpleMessage("Route addresses"),
     "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
       "Configure the listened route addresses",

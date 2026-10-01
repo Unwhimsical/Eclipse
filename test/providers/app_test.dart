@@ -205,7 +205,7 @@ void main() {
 
     test('toProfiles changes page', () {
       container.read(currentPageLabelProvider.notifier).toProfiles();
-      expect(container.read(currentPageLabelProvider), PageLabel.profiles);
+      expect(container.read(currentPageLabelProvider), PageLabel.config);
     });
   });
 
