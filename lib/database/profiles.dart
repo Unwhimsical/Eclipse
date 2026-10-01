@@ -66,6 +66,11 @@ class Profiles extends Table {
       .map(const StringMapConverter())
       .withDefault(const Constant('{}'))();
 
+  TextColumn get frontProxyId => text().nullable()();
+  BoolColumn get compatibilityMode =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get disableStun => boolean().withDefault(const Constant(false))();
+
   IntColumn get order => integer().nullable()();
 
   @override
@@ -161,6 +166,9 @@ extension RawProfilExt on RawProfile {
       mitmEnabled: mitmEnabled,
       mitmHostnames: mitmHostnames,
       proxyChains: proxyChains,
+      frontProxyId: frontProxyId,
+      compatibilityMode: compatibilityMode,
+      disableStun: disableStun,
       generalSettings: generalSettings,
       overwriteType: overwriteType,
       scriptId: scriptId,
@@ -191,6 +199,9 @@ extension ProfilesCompanionExt on Profile {
       mitmEnabled: Value(mitmEnabled),
       mitmHostnames: Value(mitmHostnames),
       proxyChains: Value(proxyChains),
+      frontProxyId: Value(frontProxyId),
+      compatibilityMode: Value(compatibilityMode),
+      disableStun: Value(disableStun),
       generalSettings: Value(generalSettings),
       overwriteType: overwriteType,
       scriptId: Value(scriptId),

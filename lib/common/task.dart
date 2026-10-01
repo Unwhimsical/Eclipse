@@ -186,6 +186,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   rawConfig['authentication'] = data.authentication;
   rawConfig['skip-auth-prefixes'] = [];
   rawConfig['mode'] = realPatchConfig.mode.name;
+  applyFrontProxy(rawConfig, data.frontProxyId);
   if (rawConfig['tun'] == null) {
     rawConfig['tun'] = {};
   }
@@ -195,6 +196,8 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
   rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
   rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
+  rawConfig['tun']['udp'] = realPatchConfig.tun.udp;
+  applyCompatibilityMode(rawConfig['tun'], data.compatibilityMode);
   rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
   rawConfig['geo-auto-update'] = realPatchConfig.geoAutoUpdate;
   rawConfig['geo-update-interval'] = realPatchConfig.geoUpdateInterval;
@@ -321,7 +324,9 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     rules = data.rules.map((item) => item.rawValue).toList();
   }
   if (data.proxyGroups.isNotEmpty) {
-    rawConfig['proxy-groups'] = data.proxyGroups;
+    rawConfig['proxy-groups'] = data.proxyGroups
+        .map((group) => group.toConfigMap())
+        .toList();
   }
   final parsedModules = await _parseEnabledModules();
   await _orderRulesByModules(rules, parsedModules);
@@ -337,6 +342,7 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   );
   applyProxyChains(rawConfig, data.proxyChains);
   await _injectModuleHosts(rawConfig, parsedModules);
+  applyDisableStun(rules, data.disableStun);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
@@ -498,6 +504,45 @@ Future<void> _injectMitmProxy(
 }
 
 @visibleForTesting
+@visibleForTesting
+void applyDisableStun(List<String> rules, bool disableStun) {
+  // STUN must be rejected before every other rule (including module rules)
+  // so WebRTC cannot leak the real IP behind the proxy.
+  if (disableStun) {
+    rules.insertAll(0, const [
+      'AND,((PROTOCOL,UDP),(DEST-PORT,3478)),REJECT',
+      'AND,((PROTOCOL,UDP),(DEST-PORT,5349)),REJECT',
+    ]);
+  }
+}
+
+@visibleForTesting
+void applyCompatibilityMode(Map tun, bool compatibilityMode) {
+  // Keeps the TUN interface up for the core's own traffic but never installs
+  // it as the default route; apps that break behind a full tunnel keep
+  // working, while HTTP(S) apps can still use the system proxy option.
+  if (compatibilityMode) {
+    tun['auto-route'] = false;
+  }
+}
+
+@visibleForTesting
+void applyFrontProxy(Map rawConfig, String? frontProxyId) {
+  final name = frontProxyId?.trim();
+  if (name?.isNotEmpty != true) return;
+  final proxies = rawConfig['proxies'];
+  if (proxies is! List) return;
+  final names = <String>{
+    for (final proxy in proxies)
+      if (proxy is Map && proxy['name'] is String) proxy['name'] as String,
+  };
+  // The core rejects a dialer-proxy that names nothing in this config, so a
+  // stale selection is dropped instead of failing the whole apply.
+  if (names.contains(name)) {
+    rawConfig['dialer-proxy'] = name;
+  }
+}
+
 void applyProxyChains(Map rawConfig, Map<String, String> chains) {
   if (chains.isEmpty) return;
   final proxies = rawConfig['proxies'];
