@@ -43,6 +43,10 @@ void main() {
     globalState.appEnv = 'dev';
   });
 
+  test('isPre reflects the dev app environment', () {
+    expect(globalState.isPre, isTrue);
+  });
+
   testWidgets('toggles developer mode through the header switch', (
     tester,
   ) async {

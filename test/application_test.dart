@@ -146,4 +146,10 @@ void main() {
     const app = Application();
     expect(app.createState(), isA<ApplicationState>());
   });
+
+  test('ApplicationState ignores lifecycle changes when not mounted', () {
+    final state = const Application().createState() as ApplicationState;
+    state.didChangeAppLifecycleState(AppLifecycleState.paused);
+    state.didChangeAppLifecycleState(AppLifecycleState.resumed);
+  });
 }
