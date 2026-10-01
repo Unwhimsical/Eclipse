@@ -5,7 +5,9 @@ import 'package:fl_clash/common/permission.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/on_demand/on_demand_extras.dart';
 import 'package:fl_clash/views/profiles/overwrite/custom/widgets.dart';
+import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -385,6 +387,17 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     return CommonScaffold(
       body: CustomScrollView(
         slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: EclipseOpenTile(
+                icon: Icons.tune_outlined,
+                title: context.appLocalizations.onDemandExtras,
+                subtitle: context.appLocalizations.onDemandExtrasDesc,
+                page: const OnDemandExtrasView(),
+              ),
+            ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(child: _buildPrerequisites()),

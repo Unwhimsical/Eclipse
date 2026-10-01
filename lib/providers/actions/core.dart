@@ -116,6 +116,14 @@ class CoreAction extends _$CoreAction {
     return operation;
   }
 
+  Future<void> stopCore() async {
+    try {
+      await _core.stop();
+    } finally {
+      ref.read(coreStatusProvider.notifier).value = CoreStatus.disconnected;
+    }
+  }
+
   Future<bool> _runRestartWorker() async {
     try {
       ref.read(coreStatusProvider.notifier).value = CoreStatus.connecting;

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/window.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/bootstrap.dart';
 import 'package:fl_clash/common/system_dns.dart';
 import 'package:fl_clash/l10n/l10n.dart';
@@ -12,6 +13,8 @@ import 'package:fl_clash/manager/manager.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/clipboard_watcher/clipboard_watcher.dart';
+import 'package:fl_clash/views/theme/eclipse_theme.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,9 +59,11 @@ class Application extends ConsumerStatefulWidget {
   ConsumerState<Application> createState() => ApplicationState();
 }
 
-class ApplicationState extends ConsumerState<Application> {
+class ApplicationState extends ConsumerState<Application>
+    with WidgetsBindingObserver {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
+  DateTime? _lastAlwaysOnAttempt;
 
   final _pageTransitionsTheme = const PageTransitionsTheme(
     builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -70,12 +75,27 @@ class ApplicationState extends ConsumerState<Application> {
   );
 
   ColorScheme _getAppColorScheme({required Brightness brightness}) {
-    return ref.read(genColorSchemeProvider(brightness));
+    final scheme = ref.read(genColorSchemeProvider(brightness)).eclipse;
+    return _isEclipseDefault(brightness) ? scheme.eclipsePrimary : scheme;
+  }
+
+  bool _isEclipseDefault(Brightness brightness) {
+    final custom = ref.read(
+      themeSettingProvider.select((state) => state.primaryColor),
+    );
+    if (custom != null) return custom == defaultPrimaryColor;
+    final seeds = ref.read(dynamicColorProvider);
+    final seed = brightness == Brightness.dark
+        ? seeds.darkSeed
+        : seeds.lightSeed;
+    if (seed != null) return false;
+    return seeds.accentColor == const Color(defaultPrimaryColor);
   }
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     SystemNavigator.setFrameworkHandlesBack(true);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       if (globalState.navigatorKey.currentContext != null) {
@@ -128,6 +148,47 @@ class ApplicationState extends ConsumerState<Application> {
     });
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state != AppLifecycleState.paused || !mounted) return;
+    unawaited(_disconnectOnSleep());
+  }
+
+  Future<void> _disconnectOnSleep() async {
+    if (!await FeatureFlags.getBool(FeatureFlags.onDemandDisconnectOnSleep)) {
+      return;
+    }
+    if (!ref.read(isStartProvider)) return;
+    await ref.read(coreActionProvider.notifier).stopCore();
+  }
+
+  Future<void> _handleUnexpectedVpnDrop() async {
+    final results = await Future.wait([
+      FeatureFlags.getBool(
+        FeatureFlags.onDemandShowDisconnectInfo,
+        fallback: true,
+      ),
+      FeatureFlags.getBool(FeatureFlags.onDemandAlwaysOn),
+    ]);
+    final showInfo = results[0];
+    final alwaysOn = results[1];
+    if (showInfo && mounted) {
+      dialogs.showNotifier(
+        currentAppLocalizations.disconnected,
+        level: MessageLevel.warning,
+      );
+    }
+    if (!alwaysOn) return;
+    final now = DateTime.now();
+    if (_lastAlwaysOnAttempt != null &&
+        now.difference(_lastAlwaysOnAttempt!) < const Duration(seconds: 30)) {
+      return;
+    }
+    _lastAlwaysOnAttempt = now;
+    await ref.read(coreActionProvider.notifier).startCore();
+  }
+
   Future<void> _handleConnectivityChanged(
     List<ConnectivityResult> results,
   ) async {
@@ -138,6 +199,8 @@ class ApplicationState extends ConsumerState<Application> {
     final hasVpn = results.contains(ConnectivityResult.vpn);
     if (_preHasVpn == hasVpn) {
       ref.read(checkIpNumProvider.notifier).add();
+    } else if (_preHasVpn && !hasVpn && ref.read(isStartProvider)) {
+      unawaited(_handleUnexpectedVpnDrop());
     }
     _preHasVpn = hasVpn;
   }
@@ -182,15 +245,20 @@ class ApplicationState extends ConsumerState<Application> {
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
             colorScheme: _getAppColorScheme(brightness: Brightness.light),
-          ).withAppShapes,
+          ).withAppShapes.eclipse,
           darkTheme: ThemeData(
             useMaterial3: true,
             pageTransitionsTheme: _pageTransitionsTheme,
             colorScheme: _getAppColorScheme(
               brightness: Brightness.dark,
             ).toPureBlack(themeProps.pureBlack),
-          ).withAppShapes,
-          home: child!,
+          ).withAppShapes.eclipse,
+          home: ClipboardLinkWatcher(
+            onLinkDetected: (link) async {
+              await ShadowrocketImport.importShareLinks(ref, text: link);
+            },
+            child: child!,
+          ),
         );
       },
       child: const HomePage(),
@@ -199,6 +267,7 @@ class ApplicationState extends ConsumerState<Application> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     linkManager.destroy();
     _autoUpdateProfilesTaskTimer?.cancel();
     super.dispose();
