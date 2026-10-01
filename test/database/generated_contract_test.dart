@@ -83,7 +83,7 @@ void main() {
       mitmHostnames: [],
       proxyChains: {},
       generalSettings: GeneralSettings(),
-      frontProxyId: null,
+      frontProxyId: 'empty-proxy',
       compatibilityMode: false,
       disableStun: false,
     );
