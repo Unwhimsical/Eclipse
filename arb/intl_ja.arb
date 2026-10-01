@@ -7,6 +7,7 @@
   "proxies": "プロキシ",
   "profile": "プロファイル",
   "profiles": "プロファイル",
+  "profileFiles": "設定ファイル",
   "tools": "ツール",
   "logs": "ログ",
   "logsDesc": "キャプチャしたログの記録",

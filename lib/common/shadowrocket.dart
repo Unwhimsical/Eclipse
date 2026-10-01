@@ -493,6 +493,23 @@ class ConfData {
   }
 }
 
+final _confSectionPattern = RegExp(
+  r'^\s*\[(General|Proxy|Proxy Group|Rule|Host|URL Rewrite|Header Rewrite|Body Rewrite|Map Local|Script|MITM)\]',
+  multiLine: true,
+  caseSensitive: false,
+);
+
+final _sgmoduleMarkerPattern = RegExp(
+  r'^\s*#!\s*(name|desc|author|icon)\s*=',
+  multiLine: true,
+  caseSensitive: false,
+);
+
+bool isShadowrocketConfText(String text) => _confSectionPattern.hasMatch(text);
+
+/// Check before [isShadowrocketConfText]: modules also have `[Section]`s.
+bool isSgmoduleText(String text) => _sgmoduleMarkerPattern.hasMatch(text);
+
 /// Parse a Shadowrocket `.conf` text into proxies / proxy-groups / rules.
 ConfData parseConf(String content) {
   final proxies = <Map<String, dynamic>>[];

@@ -19,8 +19,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  // The Config tab embeds the module list, which reads SharedPreferences.
+  SharedPreferences.setMockInitialValues({});
+
   setUp(() {
     navigationPort = navigation;
     addTearDown(() => navigationPort = null);

@@ -7,6 +7,7 @@
   "proxies": "代理",
   "profile": "配置",
   "profiles": "配置",
+  "profileFiles": "配置文件",
   "tools": "工具",
   "logs": "日志",
   "logsDesc": "日志捕获记录",

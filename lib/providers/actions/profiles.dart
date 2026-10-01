@@ -96,12 +96,18 @@ class ProfilesAction extends _$ProfilesAction {
     }
   }
 
-  Future<void> addProfileFormFile() async {
+  Future<void> addProfileFormFile({WidgetRef? widgetRef}) async {
     final platformFile = await globalState.safeRun(picker.pickerFile);
     if (platformFile == null) return;
     final bytes = await platformFile.readBytes();
     globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
     ref.read(currentPageLabelProvider.notifier).toProfiles();
+    final handled = await globalState.loadingRun<bool>(
+      tag: LoadingTag.profiles,
+      () => _importPickedFile(platformFile.name, bytes, widgetRef),
+      title: currentAppLocalizations.addProfile,
+    );
+    if (handled == true) return;
     final profile = await globalState.loadingRun(
       tag: LoadingTag.profiles,
       () async {
@@ -116,23 +122,108 @@ class ProfilesAction extends _$ProfilesAction {
     }
   }
 
-  Future<void> addProfileFormURL(String url) async {
+  /// Routes a picked `.conf`/`.sgmodule` to the Shadowrocket importers.
+  /// Needs the caller's [WidgetRef]; without it falls back to Clash YAML.
+  Future<bool> _importPickedFile(
+    String fileName,
+    Uint8List bytes,
+    WidgetRef? widgetRef,
+  ) async {
+    if (widgetRef == null) return false;
+    final text = _tryDecodeText(bytes);
+    if (text == null) return false;
+    final lowerName = fileName.toLowerCase();
+    final appLocalizations = currentAppLocalizations;
+    if (lowerName.endsWith('.sgmodule') || isSgmoduleText(text)) {
+      final info = await globalState.safeRun(
+        () => ShadowrocketImport.importModule(
+          widgetRef,
+          raw: text,
+          fileName: fileName,
+        ),
+      );
+      dialogs.showNotifier(
+        info?.name ?? appLocalizations.clipboardImportFailed,
+        level: info == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return true;
+    }
+    if (lowerName.endsWith('.conf') || isShadowrocketConfText(text)) {
+      final label = await globalState.safeRun(
+        () => ShadowrocketImport.importConf(
+          widgetRef,
+          content: text,
+          fileName: fileName,
+        ),
+      );
+      dialogs.showNotifier(
+        label ?? appLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return true;
+    }
+    return false;
+  }
+
+  String? _tryDecodeText(Uint8List bytes) {
+    try {
+      return utf8.decode(bytes);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> addProfileFormURL(String url, {WidgetRef? widgetRef}) async {
     if (globalState.navigatorKey.currentState?.canPop() ?? false) {
       globalState.navigatorKey.currentState?.popUntil((route) => route.isFirst);
     }
     ref.read(currentPageLabelProvider.notifier).value = PageLabel.config;
-    final profile = await globalState.loadingRun(
+    await globalState.loadingRun(
       tag: LoadingTag.profiles,
-      () async {
-        return Profile.normal(
-          url: url,
-        ).update(validate: (path) => _core.validateConfig(path));
-      },
+      () => _importFromUrl(url, widgetRef),
       title: currentAppLocalizations.addProfile,
     );
-    if (profile != null) {
-      putProfile(profile);
+  }
+
+  /// Downloads [url] once, then routes Shadowrocket formats to importers.
+  Future<void> _importFromUrl(String url, WidgetRef? widgetRef) async {
+    final response = await request.getFileResponseForUrl(url);
+    final bytes = response.data ?? Uint8List.fromList([]);
+    final text = _tryDecodeText(bytes);
+    final appLocalizations = currentAppLocalizations;
+    final lowerUrl = url.toLowerCase();
+    if (widgetRef != null &&
+        text != null &&
+        (lowerUrl.endsWith('.sgmodule') || isSgmoduleText(text))) {
+      final info = await ShadowrocketImport.importModule(
+        widgetRef,
+        raw: text,
+        fileName: ShadowrocketImport.fileNameFromUrl(url),
+      );
+      dialogs.showNotifier(
+        info?.name ?? appLocalizations.clipboardImportFailed,
+        level: info == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
     }
+    if (widgetRef != null &&
+        text != null &&
+        (lowerUrl.endsWith('.conf') || isShadowrocketConfText(text))) {
+      final label = await ShadowrocketImport.importConf(
+        widgetRef,
+        content: text,
+        fileName: ShadowrocketImport.fileNameFromUrl(url),
+      );
+      dialogs.showNotifier(
+        label ?? appLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
+    }
+    final profile = await Profile.normal(
+      url: url,
+    ).applyResponse(response, validate: (path) => _core.validateConfig(path));
+    putProfile(profile);
   }
 
   void setProfileAndAutoApply(Profile profile) {

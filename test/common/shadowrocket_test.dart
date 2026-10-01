@@ -684,4 +684,75 @@ example.com = 1.2.3.4
       expect(parseShareLink('ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@:8388'), isNull);
     });
   });
+
+  group('conf / sgmodule detection', () {
+    const pureRuleConf = '''
+[General]
+bypass-system = true
+
+[Rule]
+DOMAIN-SUFFIX,example.com,PROXY
+IP-CIDR,10.0.0.0/8,DIRECT
+
+[Host]
+example.com = 1.2.3.4
+
+[MITM]
+enable = true
+hostname = %APPEND%example.com
+''';
+
+    const sgmodule = '''
+#!name=AdBlock
+
+[Rule]
+DOMAIN-SUFFIX,ads.example.com,REJECT
+
+[MITM]
+hostname = %APPEND%ads.example.com
+''';
+
+    const clashYaml = '''
+proxies:
+  - name: test
+    type: ss
+    server: example.com
+    port: 8388
+''';
+
+    test('detects pure-rule conf without [Proxy]', () {
+      expect(isShadowrocketConfText(pureRuleConf), isTrue);
+      expect(isSgmoduleText(pureRuleConf), isFalse);
+    });
+
+    test('detects conf with [Proxy] section', () {
+      expect(
+        isShadowrocketConfText('[Proxy]\ntest = ss, example.com, 8388\n'),
+        isTrue,
+      );
+    });
+
+    test('detects sgmodule by metadata header', () {
+      expect(isSgmoduleText(sgmodule), isTrue);
+    });
+
+    test('sgmodule wins over conf detection', () {
+      // Modules also contain [Rule]; callers must check sgmodule first.
+      expect(isShadowrocketConfText(sgmodule), isTrue);
+      expect(isSgmoduleText(sgmodule), isTrue);
+    });
+
+    test('rejects Clash YAML', () {
+      expect(isShadowrocketConfText(clashYaml), isFalse);
+      expect(isSgmoduleText(clashYaml), isFalse);
+    });
+
+    test('rejects share links and random text', () {
+      expect(
+        isShadowrocketConfText('ss://YWVzLTI1Ni1nY206cGFzc3dvcmQ=@h:8388'),
+        isFalse,
+      );
+      expect(isSgmoduleText('just some text\nwith [brackets]'), isFalse);
+    });
+  });
 }

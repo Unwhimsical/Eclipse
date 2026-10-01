@@ -1056,6 +1056,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "profileDuplicated": MessageLookupByLibrary.simpleMessage(
       "Config duplicated",
     ),
+    "profileFiles": MessageLookupByLibrary.simpleMessage("Config Files"),
     "profileHasUpdate": MessageLookupByLibrary.simpleMessage(
       "The profile has been modified. Turn off auto update?",
     ),

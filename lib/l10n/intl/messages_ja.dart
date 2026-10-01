@@ -889,6 +889,7 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage("自動更新間隔を入力してください"),
     "profileCopySuffix": MessageLookupByLibrary.simpleMessage("コピー"),
     "profileDuplicated": MessageLookupByLibrary.simpleMessage("設定を複製しました"),
+    "profileFiles": MessageLookupByLibrary.simpleMessage("設定ファイル"),
     "profileHasUpdate": MessageLookupByLibrary.simpleMessage(
       "プロファイルが変更されています。自動更新を無効にしますか？",
     ),

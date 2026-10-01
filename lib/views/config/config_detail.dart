@@ -3,7 +3,6 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/views/ca/ca.dart';
 import 'package:fl_clash/views/config/scripts.dart';
 import 'package:fl_clash/views/config/line_editors.dart';
-import 'package:fl_clash/views/modules/modules.dart';
 import 'package:fl_clash/views/profiles/edit.dart';
 import 'package:fl_clash/views/profiles/overwrite/custom/groups.dart';
 import 'package:fl_clash/views/proxies/proxies.dart';
@@ -111,11 +110,6 @@ class ConfigDetailPage extends ConsumerWidget {
                 title: appLocalizations.script,
                 icon: Icons.code_outlined,
                 page: const ScriptsView(),
-              ),
-              EclipseOpenTile(
-                title: appLocalizations.modules,
-                icon: Icons.extension_outlined,
-                page: const ModulesView(),
               ),
             ],
           ),

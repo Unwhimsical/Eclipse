@@ -4,6 +4,7 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/pages/scan.dart';
 import 'package:fl_clash/providers/action.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +17,11 @@ class AddProfileView extends ConsumerWidget {
   const AddProfileView({super.key, required this.context});
 
   Future<void> _handleAddProfileFormFile(WidgetRef ref) async {
-    unawaited(ref.read(profilesActionProvider.notifier).addProfileFormFile());
+    unawaited(
+      ref
+          .read(profilesActionProvider.notifier)
+          .addProfileFormFile(widgetRef: ref),
+    );
   }
 
   Future<void> _toScan(WidgetRef ref) async {
@@ -28,7 +33,7 @@ class AddProfileView extends ConsumerWidget {
     final url = await BaseNavigator.push(context, const ScanPage());
     if (url != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(profilesAction.addProfileFormURL(url));
+        unawaited(profilesAction.addProfileFormURL(url, widgetRef: ref));
       });
     }
   }
@@ -55,7 +60,7 @@ class AddProfileView extends ConsumerWidget {
       ),
     );
     if (url != null) {
-      unawaited(profilesAction.addProfileFormURL(url));
+      unawaited(profilesAction.addProfileFormURL(url, widgetRef: ref));
     }
   }
 
@@ -67,6 +72,26 @@ class AddProfileView extends ConsumerWidget {
       dialogs.showNotifier(
         appLocalizations.clipboardImportFailed,
         level: MessageLevel.warning,
+      );
+      return;
+    }
+    if (isSgmoduleText(text)) {
+      final info = await globalState.safeRun(
+        () => ShadowrocketImport.importModule(ref, raw: text),
+      );
+      dialogs.showNotifier(
+        info?.name ?? appLocalizations.clipboardImportFailed,
+        level: info == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
+    }
+    if (isShadowrocketConfText(text)) {
+      final label = await globalState.safeRun(
+        () => ShadowrocketImport.importConf(ref, content: text),
+      );
+      dialogs.showNotifier(
+        label ?? appLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
       );
       return;
     }

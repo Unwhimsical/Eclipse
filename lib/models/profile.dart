@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -210,6 +211,16 @@ extension ProfileExtension on Profile {
 
   Future<Profile> update({required ValidateConfig validate}) async {
     final response = await request.getFileResponseForUrl(url);
+    return applyResponse(response, validate: validate);
+  }
+
+  /// Builds the profile from an already-downloaded response, so callers that
+  /// peeked at the bytes (e.g. to detect a Shadowrocket `.conf`) can reuse
+  /// the same download instead of fetching twice.
+  Future<Profile> applyResponse(
+    Response<Uint8List> response, {
+    required ValidateConfig validate,
+  }) async {
     final disposition = response.headers.value('content-disposition');
     final userinfo = response.headers.value('subscription-userinfo');
     return copyWith(

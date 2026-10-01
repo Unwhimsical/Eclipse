@@ -769,6 +769,7 @@ class MessageLookup extends MessageLookupByLibrary {
         MessageLookupByLibrary.simpleMessage("请输入自动更新间隔时间"),
     "profileCopySuffix": MessageLookupByLibrary.simpleMessage("副本"),
     "profileDuplicated": MessageLookupByLibrary.simpleMessage("配置已复制"),
+    "profileFiles": MessageLookupByLibrary.simpleMessage("配置文件"),
     "profileHasUpdate": MessageLookupByLibrary.simpleMessage(
       "配置文件已经修改,是否关闭自动更新 ",
     ),

@@ -10,6 +10,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/test_profiles.dart';
 
@@ -65,6 +66,12 @@ Future<ProviderContainer> pumpProfiles(
 }
 
 void main() {
+  // The embedded module list reads SharedPreferences; mock it so the
+  // module section finishes loading in tests.
+  setUpAll(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('arrow right from a profile card focuses its more button', (
     tester,
   ) async {
@@ -132,5 +139,15 @@ void main() {
     expect(find.byType(CommonDialog), findsOneWidget);
     expect(find.byType(SubscriptionInfoDetailView), findsOneWidget);
     expect(find.text(currentAppLocalizations.subscriptionInfo), findsOneWidget);
+  });
+
+  testWidgets('config tab shows profile files and modules sections', (
+    tester,
+  ) async {
+    await pumpProfiles(tester, profiles: [urlProfile('url')]);
+    await tester.pumpAndSettle();
+
+    expect(find.text(currentAppLocalizations.profileFiles), findsOneWidget);
+    expect(find.text(currentAppLocalizations.modules), findsOneWidget);
   });
 }

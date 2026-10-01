@@ -5,20 +5,30 @@ import 'module_argument_editor.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/module.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Modules tab: imported `.sgmodule` files, in the style of
-/// Shadowrocket's module list.
-class ModulesView extends ConsumerStatefulWidget {
-  const ModulesView({super.key});
+/// Module list without a scaffold, in Shadowrocket's module-list style.
+/// Embedded in the Config tab next to the profile list.
+class ModuleListView extends ConsumerStatefulWidget {
+  const ModuleListView({
+    super.key,
+    this.reorderable = false,
+    this.showHeader = true,
+  });
+
+  /// Drag-reorder rows. Off when embedded in another scroll view.
+  final bool reorderable;
+
+  final bool showHeader;
 
   @override
-  ConsumerState<ModulesView> createState() => _ModulesViewState();
+  ModuleListViewState createState() => ModuleListViewState();
 }
 
-class _ModulesViewState extends ConsumerState<ModulesView> {
+class ModuleListViewState extends ConsumerState<ModuleListView> {
   List<ModuleInfo> _modules = [];
   bool _loading = true;
 
@@ -29,7 +39,12 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
   }
 
   Future<void> _refresh() async {
-    final modules = await moduleStore.list();
+    List<ModuleInfo> modules = const [];
+    try {
+      modules = await moduleStore.list();
+    } catch (_) {
+      // Storage failures leave an empty list instead of a stuck spinner.
+    }
     if (!mounted) return;
     setState(() {
       _modules = modules;
@@ -107,7 +122,7 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     await _refresh();
   }
 
-  void _showImportMenu() {
+  void showImportMenu() {
     final appLocalizations = context.appLocalizations;
     dialogs.showCommonDialog(
       child: CommonDialog(
@@ -220,72 +235,118 @@ class _ModulesViewState extends ConsumerState<ModulesView> {
     await moduleStore.saveOrder(_modules);
   }
 
+  Widget _buildRow(ModuleInfo info, int index) {
+    final appLocalizations = context.appLocalizations;
+    return ListItem(
+      key: ValueKey(info.id),
+      leading: Icon(
+        Icons.extension_outlined,
+        color: info.enabled ? null : context.colorScheme.outline,
+      ),
+      title: Text(info.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitle: Text(
+        appLocalizations.moduleStatsSummary(
+          info.ruleCount,
+          info.rewriteCount,
+          info.scriptCount,
+        ),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Switch(
+            value: info.enabled,
+            onChanged: (value) => _handleToggle(info, value),
+          ),
+          if (widget.reorderable)
+            ReorderableDragStartListener(
+              index: index,
+              child: const Padding(
+                padding: EdgeInsets.all(8),
+                child: Icon(Icons.drag_handle_outlined),
+              ),
+            ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: appLocalizations.delete,
+            onPressed: () => _handleDelete(info),
+          ),
+        ],
+      ),
+      onTap: () => _showDetail(info),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    final emptyStatus = NullStatus(
+      label: appLocalizations.noModulesDesc,
+      illustration: NullStatusIllustration.profile,
+    );
+    final Widget listView = widget.reorderable
+        ? ReorderableListView.builder(
+            itemCount: _modules.length,
+            onReorderItem: _handleReorder,
+            itemBuilder: (_, index) => _buildRow(_modules[index], index),
+          )
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _modules.length,
+            itemBuilder: (_, index) => _buildRow(_modules[index], index),
+          );
+    final Widget body;
+    if (_loading) {
+      body = const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    } else if (widget.reorderable) {
+      body = NullStatusSwitcher(
+        isEmpty: _modules.isEmpty,
+        nullStatus: emptyStatus,
+        child: listView,
+      );
+    } else {
+      // No animated switcher here: StackFit.expand needs bounded height.
+      body = _modules.isEmpty ? emptyStatus : listView;
+    }
+    if (!widget.showHeader) return body;
+    return EclipseSection(
+      title: appLocalizations.modules,
+      trailing: IconButton(
+        icon: const Icon(Icons.add),
+        tooltip: appLocalizations.importModule,
+        onPressed: showImportMenu,
+      ),
+      children: [body],
+    );
+  }
+}
+
+/// Full-page module management.
+class ModulesView extends ConsumerStatefulWidget {
+  const ModulesView({super.key});
+
+  @override
+  ConsumerState<ModulesView> createState() => _ModulesViewState();
+}
+
+class _ModulesViewState extends ConsumerState<ModulesView> {
+  final _listKey = GlobalKey<ModuleListViewState>();
+
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     return CommonScaffold(
       title: appLocalizations.modules,
-      isLoading: _loading,
       floatingActionButton: FloatingActionButton(
-        onPressed: _showImportMenu,
+        onPressed: () => _listKey.currentState?.showImportMenu(),
         tooltip: appLocalizations.importModule,
         child: const Icon(Icons.add),
       ),
-      body: NullStatusSwitcher(
-        isEmpty: _modules.isEmpty,
-        nullStatus: NullStatus(
-          label: appLocalizations.noModulesDesc,
-          illustration: NullStatusIllustration.profile,
-        ),
-        child: ReorderableListView.builder(
-          itemCount: _modules.length,
-          onReorderItem: _handleReorder,
-          itemBuilder: (_, index) {
-            final info = _modules[index];
-            return ListItem(
-              key: ValueKey(info.id),
-              leading: Icon(
-                Icons.extension_outlined,
-                color: info.enabled ? null : context.colorScheme.outline,
-              ),
-              title: Text(
-                info.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                appLocalizations.moduleStatsSummary(
-                  info.ruleCount,
-                  info.rewriteCount,
-                  info.scriptCount,
-                ),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Switch(
-                    value: info.enabled,
-                    onChanged: (value) => _handleToggle(info, value),
-                  ),
-                  ReorderableDragStartListener(
-                    index: index,
-                    child: const Padding(
-                      padding: EdgeInsets.all(8),
-                      child: Icon(Icons.drag_handle_outlined),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline),
-                    tooltip: appLocalizations.delete,
-                    onPressed: () => _handleDelete(info),
-                  ),
-                ],
-              ),
-              onTap: () => _showDetail(info),
-            );
-          },
-        ),
-      ),
+      body: ModuleListView(key: _listKey, reorderable: true, showHeader: false),
     );
   }
 }

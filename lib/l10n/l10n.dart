@@ -95,6 +95,16 @@ class AppLocalizations {
     return Intl.message('Profiles', name: 'profiles', desc: '', args: []);
   }
 
+  /// `Config Files`
+  String get profileFiles {
+    return Intl.message(
+      'Config Files',
+      name: 'profileFiles',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Tools`
   String get tools {
     return Intl.message('Tools', name: 'tools', desc: '', args: []);

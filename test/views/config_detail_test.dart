@@ -24,8 +24,9 @@ void main() {
     expect(find.byType(ConfigDetailPage), findsOneWidget);
     expect(find.text('work config'), findsOneWidget);
     // One EclipseOpenTile per sub page: general + 2 proxies + 7 rules +
-    // 3 other (CA, script, modules). The list builds lazily, so collect
-    // titles while scrolling through it.
+    // 2 other (CA, script). Modules are global and live on the Config tab,
+    // not inside a single config's detail page. The list builds lazily,
+    // so collect titles while scrolling through it.
     final seen = <String>{};
     Future<void> collect() async {
       await tester.pump();
@@ -51,7 +52,7 @@ void main() {
     await collect();
     await scrollUp();
     await collect();
-    expect(seen, hasLength(13));
+    expect(seen, hasLength(12));
   });
 
   testWidgets('ConfigDetailPage shows the https decryption entry', (

@@ -133,7 +133,9 @@ class ApplicationState extends ConsumerState<Application>
       );
       if (res != true) return;
       unawaited(
-        ref.read(profilesActionProvider.notifier).addProfileFormURL(url),
+        ref
+            .read(profilesActionProvider.notifier)
+            .addProfileFormURL(url, widgetRef: ref),
       );
     });
   }

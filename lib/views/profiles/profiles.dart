@@ -6,6 +6,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/config/config_detail.dart';
+import 'package:fl_clash/views/modules/modules.dart';
 import 'package:fl_clash/views/profiles/overwrite/overwrite.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
@@ -121,17 +122,69 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
           title: appLocalizations.profiles,
           floatingActionButton: _buildFAB(),
           actions: _buildActions(state.profiles),
-          body: NullStatusSwitcher(
-            isEmpty: state.profiles.isEmpty,
-            nullStatus: NullStatus(
-              label: appLocalizations.nullProfileDesc,
-              illustration: NullStatusIllustration.profile,
-            ),
-            child: _ProfilesGrid(
-              profiles: state.profiles,
-              currentProfileId: state.currentProfileId,
-              spacing: spacing,
-            ),
+          body: LayoutBuilder(
+            builder: (_, constraints) {
+              final columns = getProfilesColumns(
+                constraints.maxWidth - _gridHorizontalPadding * 2,
+                spacing: spacing,
+                minItemWidth: profileItemMinWidth.ap,
+              );
+              final bottomInset = BottomInsetScope.of(context);
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                      child: Text(
+                        appLocalizations.profileFiles,
+                        style: context.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (state.profiles.isEmpty)
+                    SliverToBoxAdapter(
+                      child: NullStatus(
+                        label: appLocalizations.nullProfileDesc,
+                        illustration: NullStatusIllustration.profile,
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: _gridHorizontalPadding,
+                      ),
+                      sliver: SliverMasonryGrid.count(
+                        key: profilesStoreKey,
+                        crossAxisCount: columns,
+                        mainAxisSpacing: spacing,
+                        crossAxisSpacing: spacing,
+                        childCount: state.profiles.length,
+                        itemBuilder: (context, index) {
+                          final profile = state.profiles[index];
+                          return ProfileItem(
+                            profile: profile,
+                            groupValue: state.currentProfileId,
+                            onChanged: (profileId) {
+                              ref
+                                      .read(currentProfileIdProvider.notifier)
+                                      .value =
+                                  profileId;
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(16, 8, 16, 16 + bottomInset),
+                      child: const ModuleListView(),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -139,55 +192,7 @@ class _ProfilesViewState extends ConsumerState<ProfilesView> {
   }
 }
 
-class _ProfilesGrid extends ConsumerWidget {
-  const _ProfilesGrid({
-    required this.profiles,
-    required this.currentProfileId,
-    required this.spacing,
-  });
-
-  static const _horizontalPadding = 16.0;
-
-  final List<Profile> profiles;
-  final int? currentProfileId;
-  final double spacing;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return LayoutBuilder(
-      builder: (_, constraints) {
-        final columns = getProfilesColumns(
-          constraints.maxWidth - _horizontalPadding * 2,
-          spacing: spacing,
-          minItemWidth: profileItemMinWidth.ap,
-        );
-        return MasonryGridView.count(
-          key: profilesStoreKey,
-          padding: EdgeInsets.only(
-            left: _horizontalPadding,
-            right: _horizontalPadding,
-            top: 16,
-            bottom: 16 + BottomInsetScope.of(context),
-          ),
-          crossAxisCount: columns,
-          mainAxisSpacing: spacing,
-          crossAxisSpacing: spacing,
-          itemCount: profiles.length,
-          itemBuilder: (context, index) {
-            final profile = profiles[index];
-            return ProfileItem(
-              profile: profile,
-              groupValue: currentProfileId,
-              onChanged: (profileId) {
-                ref.read(currentProfileIdProvider.notifier).value = profileId;
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-}
+const _gridHorizontalPadding = 16.0;
 
 class ProfileItem extends ConsumerWidget {
   final Profile profile;
