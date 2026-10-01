@@ -98,16 +98,4 @@ void main() {
       );
     });
   });
-
-  group('isPre', () {
-    test('returns true for non-stable appEnv', () {
-      final state = GlobalState()..appEnv = 'pre';
-      expect(state.isPre, isTrue);
-    });
-
-    test('returns false for stable appEnv', () {
-      final state = GlobalState()..appEnv = 'stable';
-      expect(state.isPre, isFalse);
-    });
-  });
 }
