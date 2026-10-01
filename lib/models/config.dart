@@ -90,7 +90,7 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(true) bool checkCertificate,
     @Default('') String customUserAgent,
     @Default(defaultTestUrl) String delayTestUrl,
-    @Default(DelayTestMethod.tcp) DelayTestMethod delayTestMethod,
+    @Default(DelayTestMethod.connect) DelayTestMethod delayTestMethod,
   }) = _AppSettingProps;
 
   factory AppSettingProps.fromJson(Map<String, Object?> json) =>

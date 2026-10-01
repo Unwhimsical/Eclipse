@@ -40,7 +40,7 @@ _AppSettingProps _$AppSettingPropsFromJson(
   delayTestUrl: json['delayTestUrl'] as String? ?? defaultTestUrl,
   delayTestMethod:
       $enumDecodeNullable(_$DelayTestMethodEnumMap, json['delayTestMethod']) ??
-      DelayTestMethod.tcp,
+      DelayTestMethod.connect,
 );
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>

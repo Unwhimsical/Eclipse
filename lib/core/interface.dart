@@ -44,7 +44,7 @@ mixin CoreInterface {
   Future<Delay?> asyncTestDelay(
     String url,
     String proxyName, [
-    DelayTestMethod method = DelayTestMethod.tcp,
+    DelayTestMethod? method,
   ]);
 
   Future<String> updateConfig(UpdateParams updateParams);
@@ -408,13 +408,13 @@ abstract class CoreHandlerInterface with CoreInterface {
   Future<Delay?> asyncTestDelay(
     String url,
     String proxyName, [
-    DelayTestMethod method = DelayTestMethod.tcp,
+    DelayTestMethod? method,
   ]) async {
     final delayParams = {
       'proxy-name': proxyName,
       'timeout': delayTestTimeoutDuration.inMilliseconds,
       'test-url': url,
-      'method': method.name,
+      if (method != null) 'method': method.name,
     };
     final data = await _invokeMethod<Map<String, dynamic>>(
       method: CoreMethod.asyncTestDelay,
