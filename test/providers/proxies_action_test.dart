@@ -312,7 +312,9 @@ void main() {
     test('marks the node pending while it runs, then records it', () async {
       late ProviderContainer container;
       final observed = <bool>[];
-      when(() => core.asyncTestDelay(_testUrl, 'HK-01')).thenAnswer((_) async {
+      when(() => core.asyncTestDelay(_testUrl, 'HK-01', any())).thenAnswer((
+        _,
+      ) async {
         observed.add(
           container.read(pendingDelayTestsProvider).contains(_delayKey),
         );
@@ -329,7 +331,7 @@ void main() {
 
     test('keeps the last measurement when the Core does not answer', () async {
       when(
-        () => core.asyncTestDelay(_testUrl, 'HK-01'),
+        () => core.asyncTestDelay(_testUrl, 'HK-01', any()),
       ).thenAnswer((_) async => null);
       final container = _delayContainer(buildContainer);
       container
@@ -344,7 +346,7 @@ void main() {
 
     test('falls back to untested when a throwing call had no value', () async {
       when(
-        () => core.asyncTestDelay(_testUrl, 'HK-01'),
+        () => core.asyncTestDelay(_testUrl, 'HK-01', any()),
       ).thenThrow(StateError('channel is gone'));
       final container = _delayContainer(buildContainer);
 
@@ -361,13 +363,13 @@ void main() {
 
       expect(container.read(delayDataSourceProvider), isEmpty);
       expect(container.read(pendingDelayTestsProvider), isEmpty);
-      verifyNever(() => core.asyncTestDelay(any(), any()));
+      verifyNever(() => core.asyncTestDelay(any(), any(), any()));
     });
   });
 
   group('delayTest', () {
     test('measures every proxy and bumps the sort counter', () async {
-      when(() => core.asyncTestDelay(_testUrl, any())).thenAnswer(
+      when(() => core.asyncTestDelay(_testUrl, any(), any())).thenAnswer(
         (invocation) async => Delay(
           name: invocation.positionalArguments[1] as String,
           url: _testUrl,
@@ -389,19 +391,21 @@ void main() {
     });
 
     test('probes a node that appears twice only once', () async {
-      when(() => core.asyncTestDelay(_testUrl, 'HK-01')).thenAnswer(
+      when(() => core.asyncTestDelay(_testUrl, 'HK-01', any())).thenAnswer(
         (_) async => const Delay(name: 'HK-01', url: _testUrl, value: 10),
       );
       final container = _delayContainer(buildContainer);
 
       await actionOf(container).delayTest(const [_proxy, _proxy]);
 
-      verify(() => core.asyncTestDelay(_testUrl, 'HK-01')).called(1);
+      verify(() => core.asyncTestDelay(_testUrl, 'HK-01', any())).called(1);
     });
 
     test('stops the run once the transport is gone', () async {
       var calls = 0;
-      when(() => core.asyncTestDelay(_testUrl, any())).thenAnswer((_) async {
+      when(() => core.asyncTestDelay(_testUrl, any(), any())).thenAnswer((
+        _,
+      ) async {
         calls++;
         throw const CoreMethodException(
           code: 'transport_disconnected',
@@ -424,7 +428,7 @@ void main() {
 
     test('a proxy that answers nothing leaves the rest of the run', () async {
       var calls = 0;
-      when(() => core.asyncTestDelay(_testUrl, any())).thenAnswer((
+      when(() => core.asyncTestDelay(_testUrl, any(), any())).thenAnswer((
         invocation,
       ) async {
         calls++;
@@ -451,7 +455,7 @@ void main() {
 
     test('a proxy that fails leaves the rest of the run', () async {
       var calls = 0;
-      when(() => core.asyncTestDelay(_testUrl, any())).thenAnswer((
+      when(() => core.asyncTestDelay(_testUrl, any(), any())).thenAnswer((
         invocation,
       ) async {
         calls++;
@@ -482,7 +486,7 @@ void main() {
     test('drops every spinner when the Core goes away mid-run', () async {
       final release = Completer<Delay?>();
       when(
-        () => core.asyncTestDelay(_testUrl, any()),
+        () => core.asyncTestDelay(_testUrl, any(), any()),
       ).thenAnswer((_) => release.future);
       final container = _delayContainer(buildContainer);
       container.read(coreStatusProvider.notifier).value = CoreStatus.connected;
