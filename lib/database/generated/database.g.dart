@@ -237,6 +237,47 @@ class $ProfilesTable extends Profiles
     requiredDuringInsert: false,
     defaultValue: const Constant('{}'),
   ).withConverter<Map<String, String>>($ProfilesTable.$converterproxyChains);
+  static const VerificationMeta _frontProxyIdMeta = const VerificationMeta(
+    'frontProxyId',
+  );
+  @override
+  late final GeneratedColumn<String> frontProxyId = GeneratedColumn<String>(
+    'front_proxy_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _compatibilityModeMeta = const VerificationMeta(
+    'compatibilityMode',
+  );
+  @override
+  late final GeneratedColumn<bool> compatibilityMode = GeneratedColumn<bool>(
+    'compatibility_mode',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("compatibility_mode" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _disableStunMeta = const VerificationMeta(
+    'disableStun',
+  );
+  @override
+  late final GeneratedColumn<bool> disableStun = GeneratedColumn<bool>(
+    'disable_stun',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("disable_stun" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _orderMeta = const VerificationMeta('order');
   @override
   late final GeneratedColumn<int> order = GeneratedColumn<int>(
@@ -270,6 +311,9 @@ class $ProfilesTable extends Profiles
     mitmHostnames,
     generalSettings,
     proxyChains,
+    frontProxyId,
+    compatibilityMode,
+    disableStun,
     order,
   ];
   @override
@@ -361,6 +405,33 @@ class $ProfilesTable extends Profiles
         mitmEnabled.isAcceptableOrUnknown(
           data['mitm_enabled']!,
           _mitmEnabledMeta,
+        ),
+      );
+    }
+    if (data.containsKey('front_proxy_id')) {
+      context.handle(
+        _frontProxyIdMeta,
+        frontProxyId.isAcceptableOrUnknown(
+          data['front_proxy_id']!,
+          _frontProxyIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('compatibility_mode')) {
+      context.handle(
+        _compatibilityModeMeta,
+        compatibilityMode.isAcceptableOrUnknown(
+          data['compatibility_mode']!,
+          _compatibilityModeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('disable_stun')) {
+      context.handle(
+        _disableStunMeta,
+        disableStun.isAcceptableOrUnknown(
+          data['disable_stun']!,
+          _disableStunMeta,
         ),
       );
     }
@@ -491,6 +562,18 @@ class $ProfilesTable extends Profiles
           data['${effectivePrefix}proxy_chains'],
         )!,
       ),
+      frontProxyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}front_proxy_id'],
+      ),
+      compatibilityMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}compatibility_mode'],
+      )!,
+      disableStun: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}disable_stun'],
+      )!,
       order: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}order'],
@@ -554,6 +637,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
   final List<String> mitmHostnames;
   final GeneralSettings generalSettings;
   final Map<String, String> proxyChains;
+  final String? frontProxyId;
+  final bool compatibilityMode;
+  final bool disableStun;
   final int? order;
   const RawProfile({
     required this.id,
@@ -578,6 +664,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     required this.mitmHostnames,
     required this.generalSettings,
     required this.proxyChains,
+    this.frontProxyId,
+    required this.compatibilityMode,
+    required this.disableStun,
     this.order,
   });
   @override
@@ -663,6 +752,11 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
         $ProfilesTable.$converterproxyChains.toSql(proxyChains),
       );
     }
+    if (!nullToAbsent || frontProxyId != null) {
+      map['front_proxy_id'] = Variable<String>(frontProxyId);
+    }
+    map['compatibility_mode'] = Variable<bool>(compatibilityMode);
+    map['disable_stun'] = Variable<bool>(disableStun);
     if (!nullToAbsent || order != null) {
       map['order'] = Variable<int>(order);
     }
@@ -703,6 +797,11 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       mitmHostnames: Value(mitmHostnames),
       generalSettings: Value(generalSettings),
       proxyChains: Value(proxyChains),
+      frontProxyId: frontProxyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(frontProxyId),
+      compatibilityMode: Value(compatibilityMode),
+      disableStun: Value(disableStun),
       order: order == null && nullToAbsent
           ? const Value.absent()
           : Value(order),
@@ -749,6 +848,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       proxyChains: serializer.fromJson<Map<String, String>>(
         json['proxyChains'],
       ),
+      frontProxyId: serializer.fromJson<String?>(json['frontProxyId']),
+      compatibilityMode: serializer.fromJson<bool>(json['compatibilityMode']),
+      disableStun: serializer.fromJson<bool>(json['disableStun']),
       order: serializer.fromJson<int?>(json['order']),
     );
   }
@@ -784,6 +886,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       'mitmHostnames': serializer.toJson<List<String>>(mitmHostnames),
       'generalSettings': serializer.toJson<GeneralSettings>(generalSettings),
       'proxyChains': serializer.toJson<Map<String, String>>(proxyChains),
+      'frontProxyId': serializer.toJson<String?>(frontProxyId),
+      'compatibilityMode': serializer.toJson<bool>(compatibilityMode),
+      'disableStun': serializer.toJson<bool>(disableStun),
       'order': serializer.toJson<int?>(order),
     };
   }
@@ -811,6 +916,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     List<String>? mitmHostnames,
     GeneralSettings? generalSettings,
     Map<String, String>? proxyChains,
+    Value<String?> frontProxyId = const Value.absent(),
+    bool? compatibilityMode,
+    bool? disableStun,
     Value<int?> order = const Value.absent(),
   }) => RawProfile(
     id: id ?? this.id,
@@ -842,6 +950,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     mitmHostnames: mitmHostnames ?? this.mitmHostnames,
     generalSettings: generalSettings ?? this.generalSettings,
     proxyChains: proxyChains ?? this.proxyChains,
+    frontProxyId: frontProxyId.present ? frontProxyId.value : this.frontProxyId,
+    compatibilityMode: compatibilityMode ?? this.compatibilityMode,
+    disableStun: disableStun ?? this.disableStun,
     order: order.present ? order.value : this.order,
   );
   RawProfile copyWithCompanion(ProfilesCompanion data) {
@@ -898,6 +1009,15 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
       proxyChains: data.proxyChains.present
           ? data.proxyChains.value
           : this.proxyChains,
+      frontProxyId: data.frontProxyId.present
+          ? data.frontProxyId.value
+          : this.frontProxyId,
+      compatibilityMode: data.compatibilityMode.present
+          ? data.compatibilityMode.value
+          : this.compatibilityMode,
+      disableStun: data.disableStun.present
+          ? data.disableStun.value
+          : this.disableStun,
       order: data.order.present ? data.order.value : this.order,
     );
   }
@@ -927,6 +1047,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           ..write('mitmHostnames: $mitmHostnames, ')
           ..write('generalSettings: $generalSettings, ')
           ..write('proxyChains: $proxyChains, ')
+          ..write('frontProxyId: $frontProxyId, ')
+          ..write('compatibilityMode: $compatibilityMode, ')
+          ..write('disableStun: $disableStun, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -956,6 +1079,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
     mitmHostnames,
     generalSettings,
     proxyChains,
+    frontProxyId,
+    compatibilityMode,
+    disableStun,
     order,
   ]);
   @override
@@ -984,6 +1110,9 @@ class RawProfile extends DataClass implements Insertable<RawProfile> {
           other.mitmHostnames == this.mitmHostnames &&
           other.generalSettings == this.generalSettings &&
           other.proxyChains == this.proxyChains &&
+          other.frontProxyId == this.frontProxyId &&
+          other.compatibilityMode == this.compatibilityMode &&
+          other.disableStun == this.disableStun &&
           other.order == this.order);
 }
 
@@ -1010,6 +1139,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
   final Value<List<String>> mitmHostnames;
   final Value<GeneralSettings> generalSettings;
   final Value<Map<String, String>> proxyChains;
+  final Value<String?> frontProxyId;
+  final Value<bool> compatibilityMode;
+  final Value<bool> disableStun;
   final Value<int?> order;
   const ProfilesCompanion({
     this.id = const Value.absent(),
@@ -1034,6 +1166,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.mitmHostnames = const Value.absent(),
     this.generalSettings = const Value.absent(),
     this.proxyChains = const Value.absent(),
+    this.frontProxyId = const Value.absent(),
+    this.compatibilityMode = const Value.absent(),
+    this.disableStun = const Value.absent(),
     this.order = const Value.absent(),
   });
   ProfilesCompanion.insert({
@@ -1059,6 +1194,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     this.mitmHostnames = const Value.absent(),
     this.generalSettings = const Value.absent(),
     this.proxyChains = const Value.absent(),
+    this.frontProxyId = const Value.absent(),
+    this.compatibilityMode = const Value.absent(),
+    this.disableStun = const Value.absent(),
     this.order = const Value.absent(),
   }) : label = Value(label),
        url = Value(url),
@@ -1090,6 +1228,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Expression<String>? mitmHostnames,
     Expression<String>? generalSettings,
     Expression<String>? proxyChains,
+    Expression<String>? frontProxyId,
+    Expression<bool>? compatibilityMode,
+    Expression<bool>? disableStun,
     Expression<int>? order,
   }) {
     return RawValuesInsertable({
@@ -1116,6 +1257,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       if (mitmHostnames != null) 'mitm_hostnames': mitmHostnames,
       if (generalSettings != null) 'general_settings': generalSettings,
       if (proxyChains != null) 'proxy_chains': proxyChains,
+      if (frontProxyId != null) 'front_proxy_id': frontProxyId,
+      if (compatibilityMode != null) 'compatibility_mode': compatibilityMode,
+      if (disableStun != null) 'disable_stun': disableStun,
       if (order != null) 'order': order,
     });
   }
@@ -1143,6 +1287,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
     Value<List<String>>? mitmHostnames,
     Value<GeneralSettings>? generalSettings,
     Value<Map<String, String>>? proxyChains,
+    Value<String?>? frontProxyId,
+    Value<bool>? compatibilityMode,
+    Value<bool>? disableStun,
     Value<int?>? order,
   }) {
     return ProfilesCompanion(
@@ -1169,6 +1316,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
       mitmHostnames: mitmHostnames ?? this.mitmHostnames,
       generalSettings: generalSettings ?? this.generalSettings,
       proxyChains: proxyChains ?? this.proxyChains,
+      frontProxyId: frontProxyId ?? this.frontProxyId,
+      compatibilityMode: compatibilityMode ?? this.compatibilityMode,
+      disableStun: disableStun ?? this.disableStun,
       order: order ?? this.order,
     );
   }
@@ -1268,6 +1418,15 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
         $ProfilesTable.$converterproxyChains.toSql(proxyChains.value),
       );
     }
+    if (frontProxyId.present) {
+      map['front_proxy_id'] = Variable<String>(frontProxyId.value);
+    }
+    if (compatibilityMode.present) {
+      map['compatibility_mode'] = Variable<bool>(compatibilityMode.value);
+    }
+    if (disableStun.present) {
+      map['disable_stun'] = Variable<bool>(disableStun.value);
+    }
     if (order.present) {
       map['order'] = Variable<int>(order.value);
     }
@@ -1299,6 +1458,9 @@ class ProfilesCompanion extends UpdateCompanion<RawProfile> {
           ..write('mitmHostnames: $mitmHostnames, ')
           ..write('generalSettings: $generalSettings, ')
           ..write('proxyChains: $proxyChains, ')
+          ..write('frontProxyId: $frontProxyId, ')
+          ..write('compatibilityMode: $compatibilityMode, ')
+          ..write('disableStun: $disableStun, ')
           ..write('order: $order')
           ..write(')'))
         .toString();
@@ -4518,6 +4680,9 @@ typedef $$ProfilesTableCreateCompanionBuilder =
       Value<List<String>> mitmHostnames,
       Value<GeneralSettings> generalSettings,
       Value<Map<String, String>> proxyChains,
+      Value<String?> frontProxyId,
+      Value<bool> compatibilityMode,
+      Value<bool> disableStun,
       Value<int?> order,
     });
 typedef $$ProfilesTableUpdateCompanionBuilder =
@@ -4544,6 +4709,9 @@ typedef $$ProfilesTableUpdateCompanionBuilder =
       Value<List<String>> mitmHostnames,
       Value<GeneralSettings> generalSettings,
       Value<Map<String, String>> proxyChains,
+      Value<String?> frontProxyId,
+      Value<bool> compatibilityMode,
+      Value<bool> disableStun,
       Value<int?> order,
     });
 
@@ -4733,6 +4901,21 @@ class $$ProfilesTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
+  ColumnFilters<String> get frontProxyId => $composableBuilder(
+    column: $table.frontProxyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get compatibilityMode => $composableBuilder(
+    column: $table.compatibilityMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get disableStun => $composableBuilder(
+    column: $table.disableStun,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnFilters(column),
@@ -4908,6 +5091,21 @@ class $$ProfilesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get frontProxyId => $composableBuilder(
+    column: $table.frontProxyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get compatibilityMode => $composableBuilder(
+    column: $table.compatibilityMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get disableStun => $composableBuilder(
+    column: $table.disableStun,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get order => $composableBuilder(
     column: $table.order,
     builder: (column) => ColumnOrderings(column),
@@ -5028,6 +5226,21 @@ class $$ProfilesTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get frontProxyId => $composableBuilder(
+    column: $table.frontProxyId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get compatibilityMode => $composableBuilder(
+    column: $table.compatibilityMode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get disableStun => $composableBuilder(
+    column: $table.disableStun,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get order =>
       $composableBuilder(column: $table.order, builder: (column) => column);
 
@@ -5136,6 +5349,9 @@ class $$ProfilesTableTableManager
                 Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<GeneralSettings> generalSettings = const Value.absent(),
                 Value<Map<String, String>> proxyChains = const Value.absent(),
+                Value<String?> frontProxyId = const Value.absent(),
+                Value<bool> compatibilityMode = const Value.absent(),
+                Value<bool> disableStun = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion(
                 id: id,
@@ -5160,6 +5376,9 @@ class $$ProfilesTableTableManager
                 mitmHostnames: mitmHostnames,
                 generalSettings: generalSettings,
                 proxyChains: proxyChains,
+                frontProxyId: frontProxyId,
+                compatibilityMode: compatibilityMode,
+                disableStun: disableStun,
                 order: order,
               ),
           createCompanionCallback:
@@ -5187,6 +5406,9 @@ class $$ProfilesTableTableManager
                 Value<List<String>> mitmHostnames = const Value.absent(),
                 Value<GeneralSettings> generalSettings = const Value.absent(),
                 Value<Map<String, String>> proxyChains = const Value.absent(),
+                Value<String?> frontProxyId = const Value.absent(),
+                Value<bool> compatibilityMode = const Value.absent(),
+                Value<bool> disableStun = const Value.absent(),
                 Value<int?> order = const Value.absent(),
               }) => ProfilesCompanion.insert(
                 id: id,
@@ -5211,6 +5433,9 @@ class $$ProfilesTableTableManager
                 mitmHostnames: mitmHostnames,
                 generalSettings: generalSettings,
                 proxyChains: proxyChains,
+                frontProxyId: frontProxyId,
+                compatibilityMode: compatibilityMode,
+                disableStun: disableStun,
                 order: order,
               ),
           withReferenceMapper: (p0) => p0

@@ -87,6 +87,9 @@ abstract class Profile with _$Profile {
     int? scriptId,
     String? matchTarget,
     int? order,
+    String? frontProxyId,
+    @Default(false) bool compatibilityMode,
+    @Default(false) bool disableStun,
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, Object?> json) =>

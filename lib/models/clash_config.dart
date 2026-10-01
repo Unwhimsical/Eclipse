@@ -140,6 +140,16 @@ abstract class ProxyGroup with _$ProxyGroup {
       _$ProxyGroupFromJson(json);
 }
 
+extension ProxyGroupConfigMap on ProxyGroup {
+  Map<String, dynamic> toConfigMap() {
+    final json = toJson();
+    json.remove('id');
+    json.remove('profileId');
+    json.removeWhere((key, value) => value == null);
+    return json;
+  }
+}
+
 @freezed
 abstract class Proxy with _$Proxy {
   const factory Proxy({
@@ -253,6 +263,7 @@ abstract class Tun with _$Tun {
     @Default(TunStack.mixed) TunStack stack,
     @JsonKey(name: 'dns-hijack') @Default(['any:53']) List<String> dnsHijack,
     @JsonKey(name: 'route-address') @Default([]) List<String> routeAddress,
+    @Default(true) bool udp,
   }) = _Tun;
 
   factory Tun.fromJson(Map<String, Object?> json) => _$TunFromJson(json);

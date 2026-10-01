@@ -343,12 +343,15 @@ enum PageLabel {
   rules,
   modules,
   tools,
+  data,
   settings,
   logs,
   requests,
   resources,
   connections,
 }
+
+enum DelayTestMethod { tcp, icmp, connect }
 
 enum RuleAction {
   DOMAIN('DOMAIN'),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 
 import 'desktop/model.dart';
@@ -40,7 +41,11 @@ mixin CoreInterface {
 
   Future<Map<String, dynamic>> getConfig(String path);
 
-  Future<Delay?> asyncTestDelay(String url, String proxyName);
+  Future<Delay?> asyncTestDelay(
+    String url,
+    String proxyName, [
+    DelayTestMethod method = DelayTestMethod.tcp,
+  ]);
 
   Future<String> updateConfig(UpdateParams updateParams);
 
@@ -400,11 +405,16 @@ abstract class CoreHandlerInterface with CoreInterface {
   }
 
   @override
-  Future<Delay?> asyncTestDelay(String url, String proxyName) async {
+  Future<Delay?> asyncTestDelay(
+    String url,
+    String proxyName, [
+    DelayTestMethod method = DelayTestMethod.tcp,
+  ]) async {
     final delayParams = {
       'proxy-name': proxyName,
       'timeout': delayTestTimeoutDuration.inMilliseconds,
       'test-url': url,
+      'method': method.name,
     };
     final data = await _invokeMethod<Map<String, dynamic>>(
       method: CoreMethod.asyncTestDelay,

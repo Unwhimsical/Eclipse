@@ -9291,7 +9291,7 @@ $ProxiesDataCopyWith<$Res> get proxiesData {
 /// @nodoc
 mixin _$MakeRealProfileState {
 
- String get profilesPath; int get profileId; Map<String, dynamic> get rawConfig; PatchClashConfig get realPatchConfig; bool get overrideDns; bool get appendSystemDns; List<ProxyGroup> get proxyGroups; List<Rule> get rules; List<Rule> get addedRules; String get defaultUA; List<String> get authentication; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; List<String> get mapLocal; List<String> get bodyRewrites; List<String> get mitmHostnames; GeneralSettings get generalSettings; Map<String, String> get proxyChains; String? get matchTarget;
+ String get profilesPath; int get profileId; Map<String, dynamic> get rawConfig; PatchClashConfig get realPatchConfig; bool get overrideDns; bool get appendSystemDns; List<ProxyGroup> get proxyGroups; List<Rule> get rules; List<Rule> get addedRules; String get defaultUA; List<String> get authentication; Map<String, String> get hosts; List<String> get urlRewrites; List<String> get headerRewrites; List<String> get mapLocal; List<String> get bodyRewrites; List<String> get mitmHostnames; GeneralSettings get generalSettings; Map<String, String> get proxyChains; String? get matchTarget; String? get frontProxyId; bool get compatibilityMode; bool get disableStun;
 /// Create a copy of MakeRealProfileState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -9303,20 +9303,20 @@ $MakeRealProfileStateCopyWith<MakeRealProfileState> get copyWith => _$MakeRealPr
 @override
 bool operator ==(Object other) {
   final _this = this as MakeRealProfileState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MakeRealProfileState&&(identical(other.profilesPath, _this.profilesPath) || other.profilesPath == _this.profilesPath)&&(identical(other.profileId, _this.profileId) || other.profileId == _this.profileId)&&const DeepCollectionEquality().equals(other.rawConfig, _this.rawConfig)&&(identical(other.realPatchConfig, _this.realPatchConfig) || other.realPatchConfig == _this.realPatchConfig)&&(identical(other.overrideDns, _this.overrideDns) || other.overrideDns == _this.overrideDns)&&(identical(other.appendSystemDns, _this.appendSystemDns) || other.appendSystemDns == _this.appendSystemDns)&&const DeepCollectionEquality().equals(other.proxyGroups, _this.proxyGroups)&&const DeepCollectionEquality().equals(other.rules, _this.rules)&&const DeepCollectionEquality().equals(other.addedRules, _this.addedRules)&&(identical(other.defaultUA, _this.defaultUA) || other.defaultUA == _this.defaultUA)&&const DeepCollectionEquality().equals(other.authentication, _this.authentication)&&const DeepCollectionEquality().equals(other.hosts, _this.hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _this.urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _this.headerRewrites)&&const DeepCollectionEquality().equals(other.mapLocal, _this.mapLocal)&&const DeepCollectionEquality().equals(other.bodyRewrites, _this.bodyRewrites)&&const DeepCollectionEquality().equals(other.mitmHostnames, _this.mitmHostnames)&&(identical(other.generalSettings, _this.generalSettings) || other.generalSettings == _this.generalSettings)&&const DeepCollectionEquality().equals(other.proxyChains, _this.proxyChains)&&(identical(other.matchTarget, _this.matchTarget) || other.matchTarget == _this.matchTarget));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MakeRealProfileState&&(identical(other.profilesPath, _this.profilesPath) || other.profilesPath == _this.profilesPath)&&(identical(other.profileId, _this.profileId) || other.profileId == _this.profileId)&&const DeepCollectionEquality().equals(other.rawConfig, _this.rawConfig)&&(identical(other.realPatchConfig, _this.realPatchConfig) || other.realPatchConfig == _this.realPatchConfig)&&(identical(other.overrideDns, _this.overrideDns) || other.overrideDns == _this.overrideDns)&&(identical(other.appendSystemDns, _this.appendSystemDns) || other.appendSystemDns == _this.appendSystemDns)&&const DeepCollectionEquality().equals(other.proxyGroups, _this.proxyGroups)&&const DeepCollectionEquality().equals(other.rules, _this.rules)&&const DeepCollectionEquality().equals(other.addedRules, _this.addedRules)&&(identical(other.defaultUA, _this.defaultUA) || other.defaultUA == _this.defaultUA)&&const DeepCollectionEquality().equals(other.authentication, _this.authentication)&&const DeepCollectionEquality().equals(other.hosts, _this.hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _this.urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _this.headerRewrites)&&const DeepCollectionEquality().equals(other.mapLocal, _this.mapLocal)&&const DeepCollectionEquality().equals(other.bodyRewrites, _this.bodyRewrites)&&const DeepCollectionEquality().equals(other.mitmHostnames, _this.mitmHostnames)&&(identical(other.generalSettings, _this.generalSettings) || other.generalSettings == _this.generalSettings)&&const DeepCollectionEquality().equals(other.proxyChains, _this.proxyChains)&&(identical(other.matchTarget, _this.matchTarget) || other.matchTarget == _this.matchTarget)&&(identical(other.frontProxyId, _this.frontProxyId) || other.frontProxyId == _this.frontProxyId)&&(identical(other.compatibilityMode, _this.compatibilityMode) || other.compatibilityMode == _this.compatibilityMode)&&(identical(other.disableStun, _this.disableStun) || other.disableStun == _this.disableStun));
 }
 
 
 @override
 int get hashCode {
   final _this = this as MakeRealProfileState;
-  return Object.hashAll([runtimeType,_this.profilesPath,_this.profileId,const DeepCollectionEquality().hash(_this.rawConfig),_this.realPatchConfig,_this.overrideDns,_this.appendSystemDns,const DeepCollectionEquality().hash(_this.proxyGroups),const DeepCollectionEquality().hash(_this.rules),const DeepCollectionEquality().hash(_this.addedRules),_this.defaultUA,const DeepCollectionEquality().hash(_this.authentication),const DeepCollectionEquality().hash(_this.hosts),const DeepCollectionEquality().hash(_this.urlRewrites),const DeepCollectionEquality().hash(_this.headerRewrites),const DeepCollectionEquality().hash(_this.mapLocal),const DeepCollectionEquality().hash(_this.bodyRewrites),const DeepCollectionEquality().hash(_this.mitmHostnames),_this.generalSettings,const DeepCollectionEquality().hash(_this.proxyChains),_this.matchTarget]);
+  return Object.hashAll([runtimeType,_this.profilesPath,_this.profileId,const DeepCollectionEquality().hash(_this.rawConfig),_this.realPatchConfig,_this.overrideDns,_this.appendSystemDns,const DeepCollectionEquality().hash(_this.proxyGroups),const DeepCollectionEquality().hash(_this.rules),const DeepCollectionEquality().hash(_this.addedRules),_this.defaultUA,const DeepCollectionEquality().hash(_this.authentication),const DeepCollectionEquality().hash(_this.hosts),const DeepCollectionEquality().hash(_this.urlRewrites),const DeepCollectionEquality().hash(_this.headerRewrites),const DeepCollectionEquality().hash(_this.mapLocal),const DeepCollectionEquality().hash(_this.bodyRewrites),const DeepCollectionEquality().hash(_this.mitmHostnames),_this.generalSettings,const DeepCollectionEquality().hash(_this.proxyChains),_this.matchTarget,_this.frontProxyId,_this.compatibilityMode,_this.disableStun]);
 }
 
 @override
 String toString() {
   final _this = this as MakeRealProfileState;
-  return 'MakeRealProfileState(profilesPath: ${_this.profilesPath}, profileId: ${_this.profileId}, rawConfig: ${_this.rawConfig}, realPatchConfig: ${_this.realPatchConfig}, overrideDns: ${_this.overrideDns}, appendSystemDns: ${_this.appendSystemDns}, proxyGroups: ${_this.proxyGroups}, rules: ${_this.rules}, addedRules: ${_this.addedRules}, defaultUA: ${_this.defaultUA}, authentication: ${_this.authentication}, hosts: ${_this.hosts}, urlRewrites: ${_this.urlRewrites}, headerRewrites: ${_this.headerRewrites}, mapLocal: ${_this.mapLocal}, bodyRewrites: ${_this.bodyRewrites}, mitmHostnames: ${_this.mitmHostnames}, generalSettings: ${_this.generalSettings}, proxyChains: ${_this.proxyChains}, matchTarget: ${_this.matchTarget})';
+  return 'MakeRealProfileState(profilesPath: ${_this.profilesPath}, profileId: ${_this.profileId}, rawConfig: ${_this.rawConfig}, realPatchConfig: ${_this.realPatchConfig}, overrideDns: ${_this.overrideDns}, appendSystemDns: ${_this.appendSystemDns}, proxyGroups: ${_this.proxyGroups}, rules: ${_this.rules}, addedRules: ${_this.addedRules}, defaultUA: ${_this.defaultUA}, authentication: ${_this.authentication}, hosts: ${_this.hosts}, urlRewrites: ${_this.urlRewrites}, headerRewrites: ${_this.headerRewrites}, mapLocal: ${_this.mapLocal}, bodyRewrites: ${_this.bodyRewrites}, mitmHostnames: ${_this.mitmHostnames}, generalSettings: ${_this.generalSettings}, proxyChains: ${_this.proxyChains}, matchTarget: ${_this.matchTarget}, frontProxyId: ${_this.frontProxyId}, compatibilityMode: ${_this.compatibilityMode}, disableStun: ${_this.disableStun})';
 }
 
 
@@ -9327,7 +9327,7 @@ abstract mixin class $MakeRealProfileStateCopyWith<$Res>  {
   factory $MakeRealProfileStateCopyWith(MakeRealProfileState value, $Res Function(MakeRealProfileState) _then) = _$MakeRealProfileStateCopyWithImpl;
 @useResult
 $Res call({
- String profilesPath, int profileId, Map<String, dynamic> rawConfig, PatchClashConfig realPatchConfig, bool overrideDns, bool appendSystemDns, List<ProxyGroup> proxyGroups, List<Rule> rules, List<Rule> addedRules, String defaultUA, List<String> authentication, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, List<String> mapLocal, List<String> bodyRewrites, List<String> mitmHostnames, GeneralSettings generalSettings, Map<String, String> proxyChains, String? matchTarget
+ String profilesPath, int profileId, Map<String, dynamic> rawConfig, PatchClashConfig realPatchConfig, bool overrideDns, bool appendSystemDns, List<ProxyGroup> proxyGroups, List<Rule> rules, List<Rule> addedRules, String defaultUA, List<String> authentication, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, List<String> mapLocal, List<String> bodyRewrites, List<String> mitmHostnames, GeneralSettings generalSettings, Map<String, String> proxyChains, String? matchTarget, String? frontProxyId, bool compatibilityMode, bool disableStun
 });
 
 
@@ -9344,7 +9344,7 @@ class _$MakeRealProfileStateCopyWithImpl<$Res>
 
 /// Create a copy of MakeRealProfileState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? profilesPath = null,Object? profileId = null,Object? rawConfig = null,Object? realPatchConfig = null,Object? overrideDns = null,Object? appendSystemDns = null,Object? proxyGroups = null,Object? rules = null,Object? addedRules = null,Object? defaultUA = null,Object? authentication = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mapLocal = null,Object? bodyRewrites = null,Object? mitmHostnames = null,Object? generalSettings = null,Object? proxyChains = null,Object? matchTarget = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? profilesPath = null,Object? profileId = null,Object? rawConfig = null,Object? realPatchConfig = null,Object? overrideDns = null,Object? appendSystemDns = null,Object? proxyGroups = null,Object? rules = null,Object? addedRules = null,Object? defaultUA = null,Object? authentication = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mapLocal = null,Object? bodyRewrites = null,Object? mitmHostnames = null,Object? generalSettings = null,Object? proxyChains = null,Object? matchTarget = freezed,Object? frontProxyId = freezed,Object? compatibilityMode = null,Object? disableStun = null,}) {
   return _then(MakeRealProfileState(
 profilesPath: null == profilesPath ? _self.profilesPath : profilesPath // ignore: cast_nullable_to_non_nullable
 as String,profileId: null == profileId ? _self.profileId : profileId // ignore: cast_nullable_to_non_nullable
@@ -9366,7 +9366,10 @@ as List<String>,mitmHostnames: null == mitmHostnames ? _self.mitmHostnames : mit
 as List<String>,generalSettings: null == generalSettings ? _self.generalSettings : generalSettings // ignore: cast_nullable_to_non_nullable
 as GeneralSettings,proxyChains: null == proxyChains ? _self.proxyChains : proxyChains // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,matchTarget: freezed == matchTarget ? _self.matchTarget : matchTarget // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,frontProxyId: freezed == frontProxyId ? _self.frontProxyId : frontProxyId // ignore: cast_nullable_to_non_nullable
+as String?,compatibilityMode: null == compatibilityMode ? _self.compatibilityMode : compatibilityMode // ignore: cast_nullable_to_non_nullable
+as bool,disableStun: null == disableStun ? _self.disableStun : disableStun // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 /// Create a copy of MakeRealProfileState
@@ -9469,10 +9472,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget,  String? frontProxyId,  bool compatibilityMode,  bool disableStun)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MakeRealProfileState() when $default != null:
-return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget);case _:
+return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget,_that.frontProxyId,_that.compatibilityMode,_that.disableStun);case _:
   return orElse();
 
 }
@@ -9490,10 +9493,10 @@ return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPat
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget,  String? frontProxyId,  bool compatibilityMode,  bool disableStun)  $default,) {final _that = this;
 switch (_that) {
 case _MakeRealProfileState():
-return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget);case _:
+return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget,_that.frontProxyId,_that.compatibilityMode,_that.disableStun);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -9510,10 +9513,10 @@ return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPat
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String profilesPath,  int profileId,  Map<String, dynamic> rawConfig,  PatchClashConfig realPatchConfig,  bool overrideDns,  bool appendSystemDns,  List<ProxyGroup> proxyGroups,  List<Rule> rules,  List<Rule> addedRules,  String defaultUA,  List<String> authentication,  Map<String, String> hosts,  List<String> urlRewrites,  List<String> headerRewrites,  List<String> mapLocal,  List<String> bodyRewrites,  List<String> mitmHostnames,  GeneralSettings generalSettings,  Map<String, String> proxyChains,  String? matchTarget,  String? frontProxyId,  bool compatibilityMode,  bool disableStun)?  $default,) {final _that = this;
 switch (_that) {
 case _MakeRealProfileState() when $default != null:
-return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget);case _:
+return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPatchConfig,_that.overrideDns,_that.appendSystemDns,_that.proxyGroups,_that.rules,_that.addedRules,_that.defaultUA,_that.authentication,_that.hosts,_that.urlRewrites,_that.headerRewrites,_that.mapLocal,_that.bodyRewrites,_that.mitmHostnames,_that.generalSettings,_that.proxyChains,_that.matchTarget,_that.frontProxyId,_that.compatibilityMode,_that.disableStun);case _:
   return null;
 
 }
@@ -9525,7 +9528,7 @@ return $default(_that.profilesPath,_that.profileId,_that.rawConfig,_that.realPat
 
 
 class _MakeRealProfileState implements MakeRealProfileState {
-  const _MakeRealProfileState({required this.profilesPath, required this.profileId, required  Map<String, dynamic> rawConfig, required this.realPatchConfig, required this.overrideDns, required this.appendSystemDns, required  List<ProxyGroup> proxyGroups, required  List<Rule> rules, required  List<Rule> addedRules, required this.defaultUA,  List<String> authentication = const [],  Map<String, String> hosts = const {},  List<String> urlRewrites = const [],  List<String> headerRewrites = const [],  List<String> mapLocal = const [],  List<String> bodyRewrites = const [],  List<String> mitmHostnames = const [], this.generalSettings = const GeneralSettings(),  Map<String, String> proxyChains = const {}, this.matchTarget}): _rawConfig = rawConfig,_proxyGroups = proxyGroups,_rules = rules,_addedRules = addedRules,_authentication = authentication,_hosts = hosts,_urlRewrites = urlRewrites,_headerRewrites = headerRewrites,_mapLocal = mapLocal,_bodyRewrites = bodyRewrites,_mitmHostnames = mitmHostnames,_proxyChains = proxyChains;
+  const _MakeRealProfileState({required this.profilesPath, required this.profileId, required  Map<String, dynamic> rawConfig, required this.realPatchConfig, required this.overrideDns, required this.appendSystemDns, required  List<ProxyGroup> proxyGroups, required  List<Rule> rules, required  List<Rule> addedRules, required this.defaultUA,  List<String> authentication = const [],  Map<String, String> hosts = const {},  List<String> urlRewrites = const [],  List<String> headerRewrites = const [],  List<String> mapLocal = const [],  List<String> bodyRewrites = const [],  List<String> mitmHostnames = const [], this.generalSettings = const GeneralSettings(),  Map<String, String> proxyChains = const {}, this.matchTarget, this.frontProxyId, this.compatibilityMode = false, this.disableStun = false}): _rawConfig = rawConfig,_proxyGroups = proxyGroups,_rules = rules,_addedRules = addedRules,_authentication = authentication,_hosts = hosts,_urlRewrites = urlRewrites,_headerRewrites = headerRewrites,_mapLocal = mapLocal,_bodyRewrites = bodyRewrites,_mitmHostnames = mitmHostnames,_proxyChains = proxyChains;
   
 
 @override final  String profilesPath;
@@ -9620,6 +9623,9 @@ class _MakeRealProfileState implements MakeRealProfileState {
 }
 
 @override final  String? matchTarget;
+@override final  String? frontProxyId;
+@override@JsonKey() final  bool compatibilityMode;
+@override@JsonKey() final  bool disableStun;
 
 /// Create a copy of MakeRealProfileState
 /// with the given fields replaced by the non-null parameter values.
@@ -9631,18 +9637,18 @@ _$MakeRealProfileStateCopyWith<_MakeRealProfileState> get copyWith => __$MakeRea
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MakeRealProfileState&&(identical(other.profilesPath, profilesPath) || other.profilesPath == profilesPath)&&(identical(other.profileId, profileId) || other.profileId == profileId)&&const DeepCollectionEquality().equals(other.rawConfig, _rawConfig)&&(identical(other.realPatchConfig, realPatchConfig) || other.realPatchConfig == realPatchConfig)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.appendSystemDns, appendSystemDns) || other.appendSystemDns == appendSystemDns)&&const DeepCollectionEquality().equals(other.proxyGroups, _proxyGroups)&&const DeepCollectionEquality().equals(other.rules, _rules)&&const DeepCollectionEquality().equals(other.addedRules, _addedRules)&&(identical(other.defaultUA, defaultUA) || other.defaultUA == defaultUA)&&const DeepCollectionEquality().equals(other.authentication, _authentication)&&const DeepCollectionEquality().equals(other.hosts, _hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _headerRewrites)&&const DeepCollectionEquality().equals(other.mapLocal, _mapLocal)&&const DeepCollectionEquality().equals(other.bodyRewrites, _bodyRewrites)&&const DeepCollectionEquality().equals(other.mitmHostnames, _mitmHostnames)&&(identical(other.generalSettings, generalSettings) || other.generalSettings == generalSettings)&&const DeepCollectionEquality().equals(other.proxyChains, _proxyChains)&&(identical(other.matchTarget, matchTarget) || other.matchTarget == matchTarget));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _MakeRealProfileState&&(identical(other.profilesPath, profilesPath) || other.profilesPath == profilesPath)&&(identical(other.profileId, profileId) || other.profileId == profileId)&&const DeepCollectionEquality().equals(other.rawConfig, _rawConfig)&&(identical(other.realPatchConfig, realPatchConfig) || other.realPatchConfig == realPatchConfig)&&(identical(other.overrideDns, overrideDns) || other.overrideDns == overrideDns)&&(identical(other.appendSystemDns, appendSystemDns) || other.appendSystemDns == appendSystemDns)&&const DeepCollectionEquality().equals(other.proxyGroups, _proxyGroups)&&const DeepCollectionEquality().equals(other.rules, _rules)&&const DeepCollectionEquality().equals(other.addedRules, _addedRules)&&(identical(other.defaultUA, defaultUA) || other.defaultUA == defaultUA)&&const DeepCollectionEquality().equals(other.authentication, _authentication)&&const DeepCollectionEquality().equals(other.hosts, _hosts)&&const DeepCollectionEquality().equals(other.urlRewrites, _urlRewrites)&&const DeepCollectionEquality().equals(other.headerRewrites, _headerRewrites)&&const DeepCollectionEquality().equals(other.mapLocal, _mapLocal)&&const DeepCollectionEquality().equals(other.bodyRewrites, _bodyRewrites)&&const DeepCollectionEquality().equals(other.mitmHostnames, _mitmHostnames)&&(identical(other.generalSettings, generalSettings) || other.generalSettings == generalSettings)&&const DeepCollectionEquality().equals(other.proxyChains, _proxyChains)&&(identical(other.matchTarget, matchTarget) || other.matchTarget == matchTarget)&&(identical(other.frontProxyId, frontProxyId) || other.frontProxyId == frontProxyId)&&(identical(other.compatibilityMode, compatibilityMode) || other.compatibilityMode == compatibilityMode)&&(identical(other.disableStun, disableStun) || other.disableStun == disableStun));
 }
 
 
 @override
 int get hashCode {
-    return Object.hashAll([runtimeType,profilesPath,profileId,const DeepCollectionEquality().hash(_rawConfig),realPatchConfig,overrideDns,appendSystemDns,const DeepCollectionEquality().hash(_proxyGroups),const DeepCollectionEquality().hash(_rules),const DeepCollectionEquality().hash(_addedRules),defaultUA,const DeepCollectionEquality().hash(_authentication),const DeepCollectionEquality().hash(_hosts),const DeepCollectionEquality().hash(_urlRewrites),const DeepCollectionEquality().hash(_headerRewrites),const DeepCollectionEquality().hash(_mapLocal),const DeepCollectionEquality().hash(_bodyRewrites),const DeepCollectionEquality().hash(_mitmHostnames),generalSettings,const DeepCollectionEquality().hash(_proxyChains),matchTarget]);
+    return Object.hashAll([runtimeType,profilesPath,profileId,const DeepCollectionEquality().hash(_rawConfig),realPatchConfig,overrideDns,appendSystemDns,const DeepCollectionEquality().hash(_proxyGroups),const DeepCollectionEquality().hash(_rules),const DeepCollectionEquality().hash(_addedRules),defaultUA,const DeepCollectionEquality().hash(_authentication),const DeepCollectionEquality().hash(_hosts),const DeepCollectionEquality().hash(_urlRewrites),const DeepCollectionEquality().hash(_headerRewrites),const DeepCollectionEquality().hash(_mapLocal),const DeepCollectionEquality().hash(_bodyRewrites),const DeepCollectionEquality().hash(_mitmHostnames),generalSettings,const DeepCollectionEquality().hash(_proxyChains),matchTarget,frontProxyId,compatibilityMode,disableStun]);
 }
 
 @override
 String toString() {
-    return 'MakeRealProfileState(profilesPath: $profilesPath, profileId: $profileId, rawConfig: $rawConfig, realPatchConfig: $realPatchConfig, overrideDns: $overrideDns, appendSystemDns: $appendSystemDns, proxyGroups: $proxyGroups, rules: $rules, addedRules: $addedRules, defaultUA: $defaultUA, authentication: $authentication, hosts: $hosts, urlRewrites: $urlRewrites, headerRewrites: $headerRewrites, mapLocal: $mapLocal, bodyRewrites: $bodyRewrites, mitmHostnames: $mitmHostnames, generalSettings: $generalSettings, proxyChains: $proxyChains, matchTarget: $matchTarget)';
+    return 'MakeRealProfileState(profilesPath: $profilesPath, profileId: $profileId, rawConfig: $rawConfig, realPatchConfig: $realPatchConfig, overrideDns: $overrideDns, appendSystemDns: $appendSystemDns, proxyGroups: $proxyGroups, rules: $rules, addedRules: $addedRules, defaultUA: $defaultUA, authentication: $authentication, hosts: $hosts, urlRewrites: $urlRewrites, headerRewrites: $headerRewrites, mapLocal: $mapLocal, bodyRewrites: $bodyRewrites, mitmHostnames: $mitmHostnames, generalSettings: $generalSettings, proxyChains: $proxyChains, matchTarget: $matchTarget, frontProxyId: $frontProxyId, compatibilityMode: $compatibilityMode, disableStun: $disableStun)';
 }
 
 
@@ -9653,7 +9659,7 @@ abstract mixin class _$MakeRealProfileStateCopyWith<$Res> implements $MakeRealPr
   factory _$MakeRealProfileStateCopyWith(_MakeRealProfileState value, $Res Function(_MakeRealProfileState) _then) = __$MakeRealProfileStateCopyWithImpl;
 @override @useResult
 $Res call({
- String profilesPath, int profileId, Map<String, dynamic> rawConfig, PatchClashConfig realPatchConfig, bool overrideDns, bool appendSystemDns, List<ProxyGroup> proxyGroups, List<Rule> rules, List<Rule> addedRules, String defaultUA, List<String> authentication, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, List<String> mapLocal, List<String> bodyRewrites, List<String> mitmHostnames, GeneralSettings generalSettings, Map<String, String> proxyChains, String? matchTarget
+ String profilesPath, int profileId, Map<String, dynamic> rawConfig, PatchClashConfig realPatchConfig, bool overrideDns, bool appendSystemDns, List<ProxyGroup> proxyGroups, List<Rule> rules, List<Rule> addedRules, String defaultUA, List<String> authentication, Map<String, String> hosts, List<String> urlRewrites, List<String> headerRewrites, List<String> mapLocal, List<String> bodyRewrites, List<String> mitmHostnames, GeneralSettings generalSettings, Map<String, String> proxyChains, String? matchTarget, String? frontProxyId, bool compatibilityMode, bool disableStun
 });
 
 
@@ -9670,7 +9676,7 @@ class __$MakeRealProfileStateCopyWithImpl<$Res>
 
 /// Create a copy of MakeRealProfileState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? profilesPath = null,Object? profileId = null,Object? rawConfig = null,Object? realPatchConfig = null,Object? overrideDns = null,Object? appendSystemDns = null,Object? proxyGroups = null,Object? rules = null,Object? addedRules = null,Object? defaultUA = null,Object? authentication = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mapLocal = null,Object? bodyRewrites = null,Object? mitmHostnames = null,Object? generalSettings = null,Object? proxyChains = null,Object? matchTarget = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? profilesPath = null,Object? profileId = null,Object? rawConfig = null,Object? realPatchConfig = null,Object? overrideDns = null,Object? appendSystemDns = null,Object? proxyGroups = null,Object? rules = null,Object? addedRules = null,Object? defaultUA = null,Object? authentication = null,Object? hosts = null,Object? urlRewrites = null,Object? headerRewrites = null,Object? mapLocal = null,Object? bodyRewrites = null,Object? mitmHostnames = null,Object? generalSettings = null,Object? proxyChains = null,Object? matchTarget = freezed,Object? frontProxyId = freezed,Object? compatibilityMode = null,Object? disableStun = null,}) {
   return _then(_MakeRealProfileState(
 profilesPath: null == profilesPath ? _self.profilesPath : profilesPath // ignore: cast_nullable_to_non_nullable
 as String,profileId: null == profileId ? _self.profileId : profileId // ignore: cast_nullable_to_non_nullable
@@ -9692,7 +9698,10 @@ as List<String>,mitmHostnames: null == mitmHostnames ? _self._mitmHostnames : mi
 as List<String>,generalSettings: null == generalSettings ? _self.generalSettings : generalSettings // ignore: cast_nullable_to_non_nullable
 as GeneralSettings,proxyChains: null == proxyChains ? _self._proxyChains : proxyChains // ignore: cast_nullable_to_non_nullable
 as Map<String, String>,matchTarget: freezed == matchTarget ? _self.matchTarget : matchTarget // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,frontProxyId: freezed == frontProxyId ? _self.frontProxyId : frontProxyId // ignore: cast_nullable_to_non_nullable
+as String?,compatibilityMode: null == compatibilityMode ? _self.compatibilityMode : compatibilityMode // ignore: cast_nullable_to_non_nullable
+as bool,disableStun: null == disableStun ? _self.disableStun : disableStun // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
