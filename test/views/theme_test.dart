@@ -4,6 +4,7 @@ import 'package:fl_clash/providers/config.dart';
 import 'package:fl_clash/providers/database.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/theme.dart';
+import 'package:fl_clash/views/theme/eclipse_theme.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -128,6 +129,27 @@ void main() {
       await pumpThemeView(tester);
 
       expect(find.text('120%'), findsOneWidget);
+    });
+  });
+
+  group('eclipse theme extension', () {
+    test('applies eclipse colors to dark theme', () {
+      final theme = ThemeData.dark().eclipse;
+      expect(theme.scaffoldBackgroundColor, EclipsePalette.darkBackground);
+      expect(theme.colorScheme.surface, EclipsePalette.darkBackground);
+    });
+
+    test('applies eclipse colors to light theme', () {
+      final theme = ThemeData.light().eclipse;
+      expect(theme.scaffoldBackgroundColor, EclipsePalette.lightBackground);
+      expect(theme.colorScheme.surface, EclipsePalette.lightBackground);
+    });
+
+    test('eclipse scheme preserves brightness', () {
+      final dark = ThemeData.dark().colorScheme.eclipse;
+      expect(dark.brightness, Brightness.dark);
+      final light = ThemeData.light().colorScheme.eclipse;
+      expect(light.brightness, Brightness.light);
     });
   });
 }
