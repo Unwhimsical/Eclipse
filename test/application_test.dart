@@ -141,4 +141,9 @@ void main() {
       );
     }
   });
+
+  test('Application creates an ApplicationState', () {
+    const app = Application();
+    expect(app.createState(), isA<ApplicationState>());
+  });
 }
