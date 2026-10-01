@@ -3,9 +3,22 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:fl_clash/common/ca_store.dart';
 import 'package:fl_clash/common/module_store.dart';
+import 'package:fl_clash/common/script_cache.dart';
 import 'package:fl_clash/common/shadowrocket.dart';
 import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/models/module.dart';
 import 'package:flutter/foundation.dart';
+
+/// Parse cache keyed by (module id, file mtime, args hash).
+final _moduleParseCache = <String, _CachedModuleParse>{};
+
+class _CachedModuleParse {
+  _CachedModuleParse(this.mtimeMs, this.argsHash, this.module);
+
+  final int mtimeMs;
+  final int argsHash;
+  final Sgmodule module;
+}
 
 final _whitespacePattern = RegExp(r'\s+');
 
@@ -33,6 +46,7 @@ class MitmManager {
     List<String> profileMitmHostnames = const [],
     List<String> profileMapLocal = const [],
     List<String> profileBodyRewrites = const [],
+    bool refreshScripts = false,
   }) async {
     final modules = await _moduleStore.list();
     final enabled = modules.where((m) => m.enabled).toList();
@@ -87,14 +101,7 @@ class MitmManager {
 
     for (final module in enabled) {
       try {
-        final path = await _moduleStore.moduleFilePath(module.id);
-        final file = File(path);
-        if (!await file.exists()) continue;
-        final content = await file.readAsString();
-        final Sgmodule sg = parseSgmoduleWithArguments(
-          content,
-          module.argumentValues,
-        );
+        final Sgmodule sg = await _parseModuleCached(module);
 
         // MITM hostnames.
         addHosts(sg.mitmHostnames);
@@ -143,7 +150,10 @@ class MitmManager {
         final scriptContents = <String, String>{};
         await Future.wait(
           scriptPaths.map(
-            (path) async => scriptContents[path] = await _downloadScript(path),
+            (path) async => scriptContents[path] = await _downloadScript(
+              path,
+              forceRefresh: refreshScripts,
+            ),
           ),
         );
         for (final parsed in parsedScripts) {
@@ -284,16 +294,54 @@ class MitmManager {
     };
   }
 
-  /// Download a remote script. Returns empty string on failure.
-  Future<String> _downloadScript(String url) async {
+  /// Cached parse; throws when the file is missing.
+  Future<Sgmodule> _parseModuleCached(ModuleInfo module) async {
+    final path = await _moduleStore.moduleFilePath(module.id);
+    final file = File(path);
+    final stat = await file.stat();
+    final mtimeMs = stat.modified.millisecondsSinceEpoch;
+    final argsHash = Object.hashAllUnordered(
+      module.argumentValues.entries.map((e) => '${e.key}=${e.value}'),
+    );
+    final cached = _moduleParseCache[module.id];
+    if (cached != null &&
+        cached.mtimeMs == mtimeMs &&
+        cached.argsHash == argsHash) {
+      return cached.module;
+    }
+    final sg = parseSgmoduleWithArguments(
+      await file.readAsString(),
+      module.argumentValues,
+    );
+    if (_moduleParseCache.length >= 8) _moduleParseCache.clear();
+    _moduleParseCache[module.id] = _CachedModuleParse(mtimeMs, argsHash, sg);
+    return sg;
+  }
+
+  /// 15s timeout; failures fall back to the cached copy, even a stale one.
+  Future<String> _downloadScript(
+    String url, {
+    bool forceRefresh = false,
+  }) async {
+    final cache = ScriptCache();
+    if (!forceRefresh) {
+      final cached = await cache.get(url);
+      if (cached != null) return cached;
+    }
     try {
       final resp = await _dio.get<String>(
         url,
-        options: Options(responseType: ResponseType.plain),
+        options: Options(
+          responseType: ResponseType.plain,
+          sendTimeout: const Duration(seconds: 15),
+          receiveTimeout: const Duration(seconds: 15),
+        ),
       );
-      return resp.data ?? '';
+      final content = resp.data ?? '';
+      await cache.put(url, content);
+      return content;
     } catch (_) {
-      return '';
+      return await cache.getStale(url) ?? '';
     }
   }
 }

@@ -130,14 +130,19 @@ class ShadowrocketImport {
     required String raw,
     String? fileName,
   }) async {
-    final name = parseSgmodule(raw).name;
+    final parsed = await parseSgmoduleWithArgumentsBackground(raw, const {});
+    final name = parsed.name;
     if (name.isNotEmpty) {
       final existing = await moduleStore.findByName(name);
       if (existing != null) {
         return updateModule(ref, existing.id, raw);
       }
     }
-    final info = await moduleStore.import(raw, fileName: fileName);
+    final info = await moduleStore.importParsed(
+      parsed,
+      raw,
+      fileName: fileName,
+    );
     if (info.ruleSetRules.isNotEmpty) {
       await _addGlobalRules(ref, info.ruleSetRules);
       final inline = await moduleStore.readInlineRules(info.id);
@@ -145,7 +150,7 @@ class ShadowrocketImport {
         await _addGlobalRules(ref, inline);
       }
     } else {
-      final rules = parseSgmoduleWithArguments(raw, const {}).rules;
+      final rules = parsed.rules;
       if (rules.isNotEmpty) {
         await _addGlobalRules(ref, rules);
       }
@@ -169,10 +174,11 @@ class ShadowrocketImport {
         await _removeGlobalRules(ref, oldInline);
       }
     } else if (oldRaw != null) {
-      await _removeGlobalRules(
-        ref,
-        parseSgmoduleWithArguments(oldRaw, info.argumentValues).rules,
+      final oldParsed = await parseSgmoduleWithArgumentsBackground(
+        oldRaw,
+        info.argumentValues,
       );
+      await _removeGlobalRules(ref, oldParsed.rules);
     }
     final updated = await moduleStore.updateContent(id, newRaw);
     if (updated == null) return null;
@@ -183,12 +189,12 @@ class ShadowrocketImport {
         await _addGlobalRules(ref, inline);
       }
     } else {
-      final rules = parseSgmoduleWithArguments(
+      final newParsed = await parseSgmoduleWithArgumentsBackground(
         newRaw,
         updated.argumentValues,
-      ).rules;
-      if (rules.isNotEmpty) {
-        await _addGlobalRules(ref, rules);
+      );
+      if (newParsed.rules.isNotEmpty) {
+        await _addGlobalRules(ref, newParsed.rules);
       }
     }
     await _syncMitm(ref);
@@ -211,10 +217,13 @@ class ShadowrocketImport {
         await _removeGlobalRules(ref, oldInline);
       }
       await moduleStore.setArgumentValues(current.id, values);
-      final substituted = parseSgmoduleWithArguments(raw, values).rules;
+      final substituted = await parseSgmoduleWithArgumentsBackground(
+        raw,
+        values,
+      );
       final ruleSetRules = await moduleStore.rewriteRuleProviders(
         current.id,
-        substituted,
+        substituted.rules,
       );
       await _addGlobalRules(ref, ruleSetRules);
       final inline = await moduleStore.readInlineRules(current.id);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'yaml.dart';
 
@@ -1162,10 +1163,37 @@ Sgmodule parseSgmoduleWithArguments(
   String raw,
   Map<String, String> userValues,
 ) {
-  final declared = parseSgmodule(raw);
-  final effective = effectiveModuleArguments(declared, userValues);
-  if (effective.isEmpty) return declared;
+  final declaredArgs = scanModuleArguments(raw);
+  if (declaredArgs.isEmpty) return parseSgmodule(raw);
+  final effective = <String, String>{
+    for (final arg in declaredArgs)
+      arg.key: userValues[arg.key] ?? arg.defaultValue,
+  };
   return parseSgmodule(substituteModuleArguments(raw, effective));
+}
+
+List<ModuleArgument> scanModuleArguments(String content) {
+  var found = const <ModuleArgument>[];
+  var any = false;
+  for (final rawLine in const LineSplitter().convert(content)) {
+    final line = rawLine.trim();
+    if (!line.startsWith('#!')) continue;
+    final meta = line.substring(2);
+    final eq = meta.indexOf('=');
+    if (eq > 0 && meta.substring(0, eq).trim().toLowerCase() == 'arguments') {
+      found = parseModuleArguments(meta.substring(eq + 1).trim());
+      any = true;
+    }
+  }
+  return any ? found : const <ModuleArgument>[];
+}
+
+/// [userValues] must be a plain string map (isolate-safe).
+Future<Sgmodule> parseSgmoduleWithArgumentsBackground(
+  String raw,
+  Map<String, String> userValues,
+) {
+  return Isolate.run(() => parseSgmoduleWithArguments(raw, userValues));
 }
 
 /// Parse a `[Header Rewrite]` line into (pattern, action, args).

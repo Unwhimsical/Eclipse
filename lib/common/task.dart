@@ -323,7 +323,8 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   if (data.proxyGroups.isNotEmpty) {
     rawConfig['proxy-groups'] = data.proxyGroups;
   }
-  await _orderRulesByModules(rules);
+  final parsedModules = await _parseEnabledModules();
+  await _orderRulesByModules(rules, parsedModules);
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
   await _injectMitmProxy(
     rawConfig,
@@ -332,38 +333,54 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     data.mitmHostnames,
     data.mapLocal,
     data.bodyRewrites,
+    parsedModules,
   );
   applyProxyChains(rawConfig, data.proxyChains);
-  await _injectModuleHosts(rawConfig);
+  await _injectModuleHosts(rawConfig, parsedModules);
   rawConfig['rules'] = rules;
   final yaml = await _encodeYaml(Map<String, dynamic>.from(rawConfig));
   return (yaml: yaml, md5: yaml.toMd5());
 }
 
-/// Shadowrocket rule order: enabled modules first (UI order), then config
-/// rules. A module without `%APPEND%` replaces config and earlier modules.
-Future<void> _orderRulesByModules(List<String> rules) async {
+/// Parse each enabled module once; missing files yield an empty [Sgmodule].
+Future<List<({ModuleInfo info, Sgmodule sg})>> _parseEnabledModules() async {
+  final parsed = <({ModuleInfo info, Sgmodule sg})>[];
   try {
     final moduleStore = ModuleStore();
     final modules = await moduleStore.list();
-    final enabled = modules.where((m) => m.enabled).toList();
-    if (enabled.isEmpty || rules.isEmpty) return;
+    for (final module in modules.where((m) => m.enabled)) {
+      Sgmodule sg = const Sgmodule();
+      try {
+        final raw = await moduleStore.readRaw(module.id);
+        if (raw != null) {
+          sg = parseSgmoduleWithArguments(raw, module.argumentValues);
+        }
+      } catch (_) {}
+      parsed.add((info: module, sg: sg));
+    }
+  } catch (_) {}
+  return parsed;
+}
+
+/// Shadowrocket rule order: enabled modules first (UI order), then config
+/// rules. A module without `%APPEND%` replaces config and earlier modules.
+Future<void> _orderRulesByModules(
+  List<String> rules,
+  List<({ModuleInfo info, Sgmodule sg})> parsedModules,
+) async {
+  try {
+    final moduleStore = ModuleStore();
+    if (parsedModules.isEmpty || rules.isEmpty) return;
 
     final moduleRules = <({Set<String> ruleSet, bool rulesAppend})>[];
-    for (final module in enabled) {
+    for (final entry in parsedModules) {
+      final module = entry.info;
       final ruleSet = <String>{};
       ruleSet.addAll(module.ruleSetRules);
       final inline = await moduleStore.readInlineRules(module.id);
       ruleSet.addAll(inline);
       if (ruleSet.isEmpty) {
-        final raw = await moduleStore.readRaw(module.id);
-        if (raw != null) {
-          try {
-            ruleSet.addAll(
-              parseSgmoduleWithArguments(raw, module.argumentValues).rules,
-            );
-          } catch (_) {}
-        }
+        ruleSet.addAll(entry.sg.rules);
       }
       moduleRules.add((ruleSet: ruleSet, rulesAppend: module.rulesAppend));
     }
@@ -408,26 +425,20 @@ List<String> orderRulesByModules(
 }
 
 /// Inject `[Host]` entries from enabled modules into the Clash `hosts` map.
-Future<void> _injectModuleHosts(Map rawConfig) async {
+Future<void> _injectModuleHosts(
+  Map rawConfig,
+  List<({ModuleInfo info, Sgmodule sg})> parsedModules,
+) async {
   try {
-    final moduleStore = ModuleStore();
-    final modules = await moduleStore.list();
     if (rawConfig['hosts'] == null) {
       rawConfig['hosts'] = <String, dynamic>{};
     }
     final hosts = Map<String, dynamic>.from(rawConfig['hosts'] as Map);
-    for (final module in modules.where((m) => m.enabled)) {
+    for (final entry in parsedModules) {
       try {
-        final path = await moduleStore.moduleFilePath(module.id);
-        final file = File(path);
-        if (!await file.exists()) continue;
-        final Sgmodule sg = parseSgmoduleWithArguments(
-          await file.readAsString(),
-          module.argumentValues,
-        );
-        for (final entry in sg.hosts.entries) {
+        for (final host in entry.sg.hosts.entries) {
           // Shadowrocket: `domain = ip` or `domain = server:port`.
-          hosts[entry.key] = entry.value;
+          hosts[host.key] = host.value;
         }
       } catch (_) {}
     }
@@ -442,27 +453,11 @@ Future<void> _injectMitmProxy(
   List<String> profileMitmHostnames,
   List<String> profileMapLocal,
   List<String> profileBodyRewrites,
+  List<({ModuleInfo info, Sgmodule sg})> parsedModules,
 ) async {
-  final parsedModules = <Sgmodule>[];
-  try {
-    final moduleStore = ModuleStore();
-    final modules = await moduleStore.list();
-    for (final module in modules.where((m) => m.enabled)) {
-      try {
-        final path = await moduleStore.moduleFilePath(module.id);
-        final file = File(path);
-        if (!await file.exists()) continue;
-        parsedModules.add(
-          parseSgmoduleWithArguments(
-            await file.readAsString(),
-            module.argumentValues,
-          ),
-        );
-      } catch (_) {}
-    }
-  } catch (_) {}
+  final modules = <Sgmodule>[for (final entry in parsedModules) entry.sg];
   final hosts = collectMitmHostnames(
-    modules: parsedModules,
+    modules: modules,
     profileMitmHostnames: profileMitmHostnames,
     profileUrlRewrites: profileUrlRewrites,
     profileMapLocal: profileMapLocal,
@@ -472,7 +467,7 @@ Future<void> _injectMitmProxy(
   // module list order: route their hosts through the MITM proxy so the Go
   // layer can render the graceful empty response. First occurrence wins.
   final seenRejectHosts = <String>{};
-  for (final sg in parsedModules) {
+  for (final sg in modules) {
     for (final granular in sg.granularRejects) {
       if (seenRejectHosts.add(granular.hostPattern)) {
         hosts.add(granular.hostPattern);

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/module.dart';
 import 'path.dart';
+import 'script_cache.dart';
 import 'shadowrocket.dart';
 import 'yaml.dart';
 
@@ -136,8 +137,17 @@ class ModuleStore {
   /// Modules with more than [ruleProviderThreshold] rules use file-based
   /// `rule-providers`; [ModuleInfo.ruleSetRules] holds the `RULE-SET` rules
   /// the caller should add to global rules instead of every rule.
+  /// Parses in a background isolate to keep large imports off the UI thread.
   Future<ModuleInfo> import(String raw, {String? fileName}) async {
-    final Sgmodule parsed = parseSgmoduleWithArguments(raw, const {});
+    final parsed = await parseSgmoduleWithArgumentsBackground(raw, const {});
+    return importParsed(parsed, raw, fileName: fileName);
+  }
+
+  Future<ModuleInfo> importParsed(
+    Sgmodule parsed,
+    String raw, {
+    String? fileName,
+  }) async {
     final id = DateTime.now().microsecondsSinceEpoch.toString();
     final name = parsed.name.isEmpty
         ? (fileName?.replaceAll('.sgmodule', '') ?? 'Module $id')
@@ -199,23 +209,23 @@ class ModuleStore {
     final index = modules.indexWhere((e) => e.id == id);
     if (index < 0) return null;
     final old = modules[index];
-    final declared = parseSgmodule(newRaw);
     final merged = <String, String>{};
-    for (final arg in declared.arguments) {
+    for (final arg in scanModuleArguments(newRaw)) {
       final value = old.argumentValues[arg.key];
       if (value != null) merged[arg.key] = value;
     }
     await File(await moduleFilePath(id)).writeAsString(newRaw);
     await _clearRuleProviders(id);
-    final parsed = parseSgmoduleWithArguments(newRaw, merged);
+    await ScriptCache().clear();
+    final parsed = await parseSgmoduleWithArgumentsBackground(newRaw, merged);
     List<String> ruleSetRules = const [];
     if (parsed.rules.length > ruleProviderThreshold) {
       ruleSetRules = await _writeRuleProviders(id, parsed.rules);
     }
     final info = old.copyWith(
-      name: declared.name.isEmpty ? old.name : declared.name,
-      desc: declared.desc,
-      author: declared.author,
+      name: parsed.name.isEmpty ? old.name : parsed.name,
+      desc: parsed.desc,
+      author: parsed.author,
       ruleCount: parsed.rules.length,
       hostCount: parsed.hosts.length,
       rewriteCount: parsed.urlRewrites.length,
@@ -264,6 +274,7 @@ class ModuleStore {
   Future<void> delete(String id) async {
     final modules = (await list()).where((e) => e.id != id).toList();
     await _saveIndex(modules);
+    await ScriptCache().clear();
     final dir = await _modulesDir();
     final moduleFile = File(join(dir, '$id.sgmodule'));
     if (await moduleFile.exists()) {
