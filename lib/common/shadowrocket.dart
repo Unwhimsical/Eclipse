@@ -1377,19 +1377,28 @@ String buildClashConfigFromProxies({
       .where((e) => e.isNotEmpty)
       .toList();
   final mainGroup = groupName ?? 'PROXY';
+  // A proxy-less config is a pure rule set: skip the default select group so
+  // no empty group is emitted, and fall back to DIRECT for the final match.
   final groups =
       proxyGroups ??
-      [
-        {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
-      ];
+      (proxyNames.isEmpty
+          ? const <Map<String, dynamic>>[]
+          : [
+              {'name': mainGroup, 'type': 'select', 'proxies': proxyNames},
+            ]);
   // skip-proxy stays on the TUN path: no DIRECT rules are forced.
+  // `#` lines are parser placeholders (e.g. unsupported USER-AGENT rules),
+  // never valid Clash rules: drop them so validation does not fail.
   final configRules = <String>[];
-  configRules.addAll(rules ?? ['MATCH,$mainGroup']);
-  final config = <String, dynamic>{
-    'proxies': proxies,
-    'proxy-groups': groups,
-    'rules': configRules,
-  };
+  if (rules == null) {
+    configRules.add(proxyNames.isEmpty ? 'MATCH,DIRECT' : 'MATCH,$mainGroup');
+  } else {
+    configRules.addAll(rules.where((rule) => !rule.trimLeft().startsWith('#')));
+  }
+  final config = <String, dynamic>{'proxies': proxies, 'rules': configRules};
+  if (groups.isNotEmpty) {
+    config['proxy-groups'] = groups;
+  }
   // DNS configuration from [General]
   if (dnsServers != null && dnsServers.isNotEmpty) {
     final dns = <String, dynamic>{'enable': true, 'nameserver': dnsServers};

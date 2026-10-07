@@ -47,9 +47,8 @@ class ShadowrocketImport {
         .toList();
   }
 
-  /// Import a `.conf` file. Nodes become a new profile; rules and proxy
-  /// groups are merged into global rules / the new profile. `[General]`
-  /// DNS servers are applied to the generated profile.
+  /// Import a `.conf` as one complete configuration set. The conf's own
+  /// rules stay inside the new profile and never merge into global rules.
   static Future<String?> importConf(
     WidgetRef ref, {
     required String content,
@@ -62,48 +61,44 @@ class ShadowrocketImport {
     final generalSettings = generalSettingsFromConf(
       conf,
     ).copyWith(include: includeUrl);
-    String? profileLabel;
-    if (conf.proxies.isNotEmpty) {
-      final yamlText = buildClashConfigFromProxies(
-        proxies: conf.proxies,
-        proxyGroups: conf.proxyGroups.isEmpty ? null : conf.proxyGroups,
-        rules: conf.rules.isEmpty ? null : conf.rules,
-        dnsServers: conf.dnsServers.isEmpty ? null : conf.dnsServers,
-        directDnsServers: conf.directDnsServers.isEmpty
-            ? null
-            : conf.directDnsServers,
-        tunExcludedRoutes: conf.tunExcludedRoutes.isEmpty
-            ? null
-            : conf.tunExcludedRoutes,
-        tunIncludedRoutes: conf.tunIncludedRoutes.isEmpty
-            ? null
-            : conf.tunIncludedRoutes,
-        ipv6Enabled: conf.general.containsKey('ipv6') ? conf.ipv6Enabled : null,
-        preferIpv6: conf.general.containsKey('prefer-ipv6')
-            ? conf.preferIpv6
-            : null,
-        alwaysRealIp: conf.general.containsKey('always-real-ip')
-            ? conf.alwaysRealIp
-            : null,
-      );
-      profileLabel = await _createProfileFromYaml(
-        ref,
-        yamlText,
-        fileName?.replaceAll('.conf', '') ?? '导入配置 (${conf.proxies.length})',
-        hosts: conf.hosts,
-        urlRewrites: conf.urlRewrites,
-        headerRewrites: conf.headerRewrites,
-        mapLocal: conf.mapLocal,
-        bodyRewrites: conf.bodyRewrites,
-        mitmEnabled: parseMitmEnabled(conf.mitm),
-        mitmHostnames: parseMitmHostnames(conf.mitm),
-        generalSettings: generalSettings,
-      );
-    }
-    if (conf.rules.isNotEmpty) {
-      await _addGlobalRules(ref, conf.rules);
-    }
-    return profileLabel ?? '规则已导入 (${conf.rules.length})';
+    final yamlText = buildClashConfigFromProxies(
+      proxies: conf.proxies,
+      proxyGroups: conf.proxyGroups.isEmpty ? null : conf.proxyGroups,
+      rules: conf.rules.isEmpty ? null : conf.rules,
+      dnsServers: conf.dnsServers.isEmpty ? null : conf.dnsServers,
+      directDnsServers: conf.directDnsServers.isEmpty
+          ? null
+          : conf.directDnsServers,
+      tunExcludedRoutes: conf.tunExcludedRoutes.isEmpty
+          ? null
+          : conf.tunExcludedRoutes,
+      tunIncludedRoutes: conf.tunIncludedRoutes.isEmpty
+          ? null
+          : conf.tunIncludedRoutes,
+      ipv6Enabled: conf.general.containsKey('ipv6') ? conf.ipv6Enabled : null,
+      preferIpv6: conf.general.containsKey('prefer-ipv6')
+          ? conf.preferIpv6
+          : null,
+      alwaysRealIp: conf.general.containsKey('always-real-ip')
+          ? conf.alwaysRealIp
+          : null,
+    );
+    final defaultLabel = conf.proxies.isNotEmpty
+        ? '导入配置 (${conf.proxies.length})'
+        : '导入配置';
+    return _createProfileFromYaml(
+      ref,
+      yamlText,
+      fileName?.replaceAll('.conf', '') ?? defaultLabel,
+      hosts: conf.hosts,
+      urlRewrites: conf.urlRewrites,
+      headerRewrites: conf.headerRewrites,
+      mapLocal: conf.mapLocal,
+      bodyRewrites: conf.bodyRewrites,
+      mitmEnabled: parseMitmEnabled(conf.mitm),
+      mitmHostnames: parseMitmHostnames(conf.mitm),
+      generalSettings: generalSettings,
+    );
   }
 
   /// Download a `.conf` from a remote URL and import it.

@@ -547,6 +547,43 @@ hostname = %APPEND%,example.com,*.example.org
       expect(doc.containsKey('tun'), isFalse);
       expect(doc.containsKey('ipv6'), isFalse);
     });
+
+    test('proxy-less conf yields a safe rule-only config', () {
+      final text = buildClashConfigFromProxies(proxies: const []);
+      final doc = yaml.loadYaml(text) as Map;
+      expect(doc['proxies'], isEmpty);
+      expect(doc.containsKey('proxy-groups'), isFalse);
+      expect(doc['rules'], ['MATCH,DIRECT']);
+    });
+
+    test('proxy-less conf keeps its own rules without a group', () {
+      final text = buildClashConfigFromProxies(
+        proxies: const [],
+        rules: ['DOMAIN-SUFFIX,example.com,REJECT', 'MATCH,DIRECT'],
+        dnsServers: ['8.8.8.8'],
+      );
+      final doc = yaml.loadYaml(text) as Map;
+      expect(doc.containsKey('proxy-groups'), isFalse);
+      expect(doc['rules'], [
+        'DOMAIN-SUFFIX,example.com,REJECT',
+        'MATCH,DIRECT',
+      ]);
+      expect((doc['dns'] as Map)['nameserver'], ['8.8.8.8']);
+    });
+
+    test('drops parser placeholder comment lines from rules', () {
+      final text = buildClashConfigFromProxies(
+        proxies: [
+          {'name': 'node1', 'type': 'ss'},
+        ],
+        rules: [
+          '# USER-AGENT not supported by Clash: USER-AGENT,foo,REJECT',
+          'DOMAIN-SUFFIX,example.com,REJECT',
+        ],
+      );
+      final doc = yaml.loadYaml(text) as Map;
+      expect(doc['rules'], ['DOMAIN-SUFFIX,example.com,REJECT']);
+    });
   });
 
   group('ConfData general getters', () {
