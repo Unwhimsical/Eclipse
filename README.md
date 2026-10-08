@@ -1,128 +1,41 @@
-<div>
+# Eclipse
 
-[**简体中文**](README_zh_CN.md)
+Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 macOS。
 
-</div>
+## 功能特性
 
-## Eclipse
+- **节点与订阅导入**：分享链接逐行导入、Base64 订阅导入
+- **规则与模块**：`.conf` 配置导入、`.sgmodule` 模块导入（规则 / Host / URL Rewrite / Script / MITM，支持 `%APPEND%` 追加语义与模块参数）
+- **应用内 CA 中心**：一键生成 MITM 根证书，附带安装与信任引导（Android / iOS）
+- **MITM**：TLS 解密、Header 改写、Body 改写（jq）、Map Local
+- **JS 脚本引擎**
+- **场景模式**：按 Wi-Fi 名称 / 蜂窝网络自动切换配置
+- **代理链**：节点 A 经节点 B 出站
+- **其他**：延迟测试、代理共享、按需连接、统计分类、剪贴板导入、DNS / TUN / 代理设置
+- **自动构建**：GitHub Actions 自动产出 Android APK、未签名 iOS IPA、Windows / macOS 桌面包
 
-A multi-platform proxy client based on ClashMeta, simple and easy to use, open-source and ad-free.
-
-> Forked from [chen08209/FlClash](https://github.com/chen08209/FlClash) (GPL-3.0).
-
-<p align="center">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="snapshots/preview-dark.png">
-        <img alt="FlClash on desktop and mobile" src="snapshots/preview.png" width="90%">
-    </picture>
-</p>
-
-## Features
-
-✈️ Multi-platform: Android, Windows, macOS and Linux
-
-💻 Adaptive multiple screen sizes, Multiple color themes available
-
-💡 Based on Material You Design, [Surfboard](https://github.com/getsurfboard/surfboard)-like UI
-
-☁️ Supports data sync via WebDAV
-
-✨ Support subscription link, Dark mode
-
-## Use
-
-### Linux
-
-⚠️ Make sure to install the following dependencies before using them
-
-   ```bash
-    sudo apt-get install libayatana-appindicator3-dev
-   ```
-
-### Android
-
-Support the following actions
-
-   ```bash
-    com.follow.clash.action.START
-    
-    com.follow.clash.action.STOP
-    
-    com.follow.clash.action.TOGGLE
-   ```
-
-## Download
-
-<a href="https://chen08209.github.io/FlClash-fdroid-repo/repo?fingerprint=789D6D32668712EF7672F9E58DEEB15FBD6DCEEC5AE7A4371EA72F2AAE8A12FD"><img alt="Get it on F-Droid" src="snapshots/get-it-on-fdroid.svg" width="200px"/></a> <a href="https://github.com/chen08209/FlClash/releases"><img alt="Get it on GitHub" src="snapshots/get-it-on-github.svg" width="200px"/></a>
-
-### Homebrew
+## 构建
 
 ```bash
-brew tap chen08209/tap
-brew install --cask flclash
+# Android APK
+dart setup.dart android -v
+# iOS（未签名）
+dart setup.dart ios -v
+# Windows / macOS 桌面包
+dart setup.dart windows -v
+dart setup.dart macos -v
 ```
 
-## Build
+需要 Flutter 3.47.1，详见 `.github/workflows/`。
 
-1. Install `Flutter` and `Golang` environment
+## 致谢
 
-2. Build Application
+- 基于 [FlClash](https://github.com/chen08209/FlClash)（chen08209）二次开发
+- iOS 移植参考 [flclash-patched](https://github.com/chenx-dust/flclash-patched)（chenx-dust）
+- 代理核心 [mihomo](https://github.com/MetaCubeX/mihomo)（MetaCubeX）
 
-    - android
+详细第三方署名见 [ATTRIBUTION.md](ATTRIBUTION.md)。
 
-        1. Install `Android SDK`, `Android NDK`
+## 开源协议
 
-        2. Set `ANDROID_NDK` environment variable
-
-        3. Run build script
-
-           ```bash
-           dart setup.dart android
-           ```
-
-    - windows
-
-        1. Requires a Windows client
-
-        2. Install `GCC`, `Inno Setup`
-
-        3. Run build script
-
-           ```bash
-           dart setup.dart windows
-           ```
-
-    - linux
-
-        1. Requires a Linux client
-
-        2. Dependencies are auto-installed by setup script, or manually:
-           ```bash
-           sudo apt-get install -y libayatana-appindicator3-dev
-           ```
-
-        3. Run build script
-
-           ```bash
-           dart setup.dart linux
-           ```
-
-    - macOS
-
-        1. Requires a macOS client
-
-        2. Run build script
-
-           ```bash
-           dart setup.dart macos
-           ```
-
-## Star
-
-The easiest way to support developers is to click on the star (⭐) at the top of the page.
-
-<p style="text-align: center;">
-    <a href="https://api.star-history.com/svg?repos=chen08209/FlClash&Date">
-        <img alt="start" width=50% src="https://api.star-history.com/svg?repos=chen08209/FlClash&Date"/>
-    </a>
-</p>
+本项目遵循 GPL-3.0 开源协议，详见 [LICENSE](LICENSE)。
