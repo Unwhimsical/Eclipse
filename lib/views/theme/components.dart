@@ -1,4 +1,5 @@
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
@@ -25,6 +26,12 @@ class EclipseSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
+    // The desktop theme carries its own group-title token (§1: purple 15px
+    // w700); without it the section keeps its current style, so mobile is
+    // pixel-identical.
+    final titleStyle =
+        Theme.of(context).extension<DesktopThemeTokens>()?.groupTitleStyle ??
+        textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600);
     final separated = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       if (i > 0 && divided) {
@@ -55,13 +62,7 @@ class EclipseSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (title != null)
-                          Text(
-                            title!,
-                            style: textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                        if (title != null) Text(title!, style: titleStyle),
                         if (subtitle != null)
                           Padding(
                             padding: const EdgeInsets.only(top: 2),

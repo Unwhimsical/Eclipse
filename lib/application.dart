@@ -14,6 +14,7 @@ import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/clipboard_watcher/clipboard_watcher.dart';
+import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:fl_clash/views/theme/eclipse_theme.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -77,6 +78,31 @@ class ApplicationState extends ConsumerState<Application>
   ColorScheme _getAppColorScheme({required Brightness brightness}) {
     final scheme = ref.read(genColorSchemeProvider(brightness)).eclipse;
     return _isEclipseDefault(brightness) ? scheme.eclipsePrimary : scheme;
+  }
+
+  ColorScheme _getDesktopColorScheme({required Brightness brightness}) {
+    final scheme = ref.read(genColorSchemeProvider(brightness)).eclipseDesktop;
+    return _isEclipseDefault(brightness)
+        ? scheme.eclipseDesktopPrimary
+        : scheme;
+  }
+
+  ThemeData _buildTheme({
+    required Brightness brightness,
+    required bool isDesktopView,
+    bool pureBlack = false,
+  }) {
+    final colorScheme =
+        (isDesktopView
+                ? _getDesktopColorScheme(brightness: brightness)
+                : _getAppColorScheme(brightness: brightness))
+            .toPureBlack(pureBlack);
+    final base = ThemeData(
+      useMaterial3: true,
+      pageTransitionsTheme: _pageTransitionsTheme,
+      colorScheme: colorScheme,
+    ).withAppShapes;
+    return isDesktopView ? base.withDesktopTheme(brightness) : base.eclipse;
   }
 
   bool _isEclipseDefault(Brightness brightness) {
@@ -215,6 +241,7 @@ class ApplicationState extends ConsumerState<Application>
           appSettingProvider.select((state) => state.locale),
         );
         final themeProps = ref.watch(themeSettingProvider);
+        final isDesktopView = ref.watch(viewModeProvider) == ViewMode.desktop;
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           navigatorKey: globalState.navigatorKey,
@@ -243,18 +270,15 @@ class ApplicationState extends ConsumerState<Application>
           locale: getLocaleForString(locale),
           supportedLocales: AppLocalizations.delegate.supportedLocales,
           themeMode: themeProps.themeMode,
-          theme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(brightness: Brightness.light),
-          ).withAppShapes.eclipse,
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            pageTransitionsTheme: _pageTransitionsTheme,
-            colorScheme: _getAppColorScheme(
-              brightness: Brightness.dark,
-            ).toPureBlack(themeProps.pureBlack),
-          ).withAppShapes.eclipse,
+          theme: _buildTheme(
+            brightness: Brightness.light,
+            isDesktopView: isDesktopView,
+          ),
+          darkTheme: _buildTheme(
+            brightness: Brightness.dark,
+            isDesktopView: isDesktopView,
+            pureBlack: themeProps.pureBlack,
+          ),
           home: ClipboardLinkWatcher(
             onLinkDetected: (link) async {
               await ShadowrocketImport.importShareLinks(ref, text: link);
