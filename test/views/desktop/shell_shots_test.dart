@@ -27,8 +27,13 @@ ThemeData _desktopTheme(Brightness brightness) {
 }
 
 Future<void> _loadFonts() async {
+  // Screenshots only run with ECLIPSE_SHOTS_DIR set; skip font loading
+  // otherwise so CI (which lacks these paths) stays green.
+  if (Platform.environment['ECLIPSE_SHOTS_DIR']?.isNotEmpty != true) return;
   Future<void> load(String family, String path) async {
-    final bytes = await File(path).readAsBytes();
+    final file = File(path);
+    if (!await file.exists()) return;
+    final bytes = await file.readAsBytes();
     final loader = FontLoader(family)
       ..addFont(Future.value(ByteData.view(bytes.buffer)));
     await loader.load();
