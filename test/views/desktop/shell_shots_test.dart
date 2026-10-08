@@ -39,6 +39,10 @@ Future<void> _loadFonts() async {
     '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',
   );
   await load(
+    'NotoSansCJK',
+    '/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc',
+  );
+  await load(
     'MaterialIcons',
     '/home/hatch/workspace/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
   );
@@ -249,31 +253,35 @@ Future<void> _capture(
         ...GlobalMaterialLocalizations.delegates,
       ],
       supportedLocales: AppLocalizations.delegate.supportedLocales,
+      // Paint the scaffold background inside the capture boundary.
       home: Scaffold(
         body: RepaintBoundary(
           key: const ValueKey('shot-boundary'),
-          child: SizedBox(
-            width: 1280,
-            height: 800,
-            child: Row(
-              children: [
-                DesktopSideNav(
-                  items: _navItems(),
-                  currentIndex: currentIndex,
-                  onSelected: (_) {},
-                  version: '0.8.98',
-                  isRunning: true,
-                  isMacOS: false,
-                ),
-                Expanded(
-                  child: Column(
-                    children: [
-                      DesktopPageHeader(title: title, actions: actions),
-                      Expanded(child: body),
-                    ],
+          child: ColoredBox(
+            color: _desktopTheme(brightness).scaffoldBackgroundColor,
+            child: SizedBox(
+              width: 1280,
+              height: 800,
+              child: Row(
+                children: [
+                  DesktopSideNav(
+                    items: _navItems(),
+                    currentIndex: currentIndex,
+                    onSelected: (_) {},
+                    version: '0.8.98',
+                    isRunning: true,
+                    isMacOS: false,
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Column(
+                      children: [
+                        DesktopPageHeader(title: title, actions: actions),
+                        Expanded(child: body),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
