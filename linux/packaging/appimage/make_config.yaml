@@ -1,4 +1,4 @@
-display_name: FlClash
+display_name: Eclipse
 
 icon: ./assets/images/icon.png
 
@@ -6,14 +6,15 @@ supported_mime_type:
   - x-scheme-handler/clash
   - x-scheme-handler/clashmeta
   - x-scheme-handler/flclash
+  - x-scheme-handler/eclipse
 
 keywords:
-  - FlClash
+  - Eclipse
   - Clash
   - ClashMeta
   - Proxy
 
-generic_name: FlClash
+generic_name: Eclipse
 
 categories:
   - Network
