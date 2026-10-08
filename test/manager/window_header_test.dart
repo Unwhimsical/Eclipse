@@ -32,8 +32,6 @@ Finder _glyph(CaptionGlyph glyph) => find.byWidgetPredicate(
 Finder _captionButton(Finder icon) =>
     find.ancestor(of: icon, matching: find.byType(IconButton));
 
-Finder get _pinIcon => find.byIcon(Icons.push_pin_outlined);
-
 List<Finder> get _captionIcons => [
   _glyph(CaptionGlyph.minimize),
   _glyph(CaptionGlyph.maximize),
@@ -177,7 +175,6 @@ void main() {
                 onDoubleTap: () => events.add('maximize'),
                 actions: WindowHeaderActions(
                   state: caption,
-                  onPin: () => events.add('pin'),
                   onMinimize: () => events.add('minimize'),
                   onMaximize: () => events.add('maximize'),
                   onClose: () => events.add('close'),
@@ -236,7 +233,7 @@ void main() {
       await pumpBar(tester, width: 900);
 
       final bar = barRect(tester);
-      for (final icon in [_pinIcon, ..._captionIcons]) {
+      for (final icon in _captionIcons) {
         final rect = tester.getRect(_captionButton(icon));
         expect(
           rect.top >= bar.top &&
@@ -274,28 +271,16 @@ void main() {
       );
     });
 
-    testWidgets('the pin keeps the round Material button in a square slot', (
+    testWidgets('the Windows bar carries exactly three caption buttons', (
       tester,
     ) async {
       await pumpBar(tester, width: 900);
 
-      final pin = _captionButton(_pinIcon);
-      expect(
-        tester.getSize(pin),
-        Size.square(_windowsHeaderHeight),
-        reason: 'the pin must not stretch into a Windows caption slot',
-      );
-      expect(tester.getSize(_pinIcon), const Size.square(pinIconSize));
-      expect(tester.getCenter(_pinIcon), tester.getCenter(pin));
-      expect(
-        tester.widget<IconButton>(pin).style?.shape?.resolve({}),
-        const CircleBorder(),
-        reason: 'the pin keeps the round ripple of a regular icon button',
-      );
-      expect(
-        tester.getRect(pin).right,
-        tester.getRect(_captionButton(_glyph(CaptionGlyph.minimize))).left,
-      );
+      expect(find.byIcon(Icons.push_pin), findsNothing);
+      expect(find.byIcon(Icons.push_pin_outlined), findsNothing);
+      expect(_captionButton(_glyph(CaptionGlyph.minimize)), findsOneWidget);
+      expect(_captionButton(_glyph(CaptionGlyph.maximize)), findsOneWidget);
+      expect(_captionButton(_glyph(CaptionGlyph.close)), findsOneWidget);
     });
 
     testWidgets('the window glyphs are 10x10 and centered in their slot', (
@@ -386,7 +371,6 @@ void main() {
       );
 
       for (final icon in [
-        _pinIcon,
         _glyph(CaptionGlyph.minimize),
         _glyph(CaptionGlyph.maximize),
       ]) {
@@ -474,13 +458,12 @@ void main() {
     testWidgets('each caption button reports its own press', (tester) async {
       await pumpBar(tester, width: 900);
 
-      await tester.tap(_pinIcon);
       await tester.tap(_glyph(CaptionGlyph.minimize));
       await tester.tap(_glyph(CaptionGlyph.maximize));
       await tester.tap(_glyph(CaptionGlyph.close));
       await tester.pump();
 
-      expect(events, ['pin', 'minimize', 'maximize', 'close']);
+      expect(events, ['minimize', 'maximize', 'close']);
     });
 
     testWidgets('the drag surface never swallows a caption button press', (
@@ -520,7 +503,6 @@ void main() {
               onDoubleTap: () {},
               actions: WindowHeaderActions(
                 state: caption,
-                onPin: () {},
                 onMinimize: () {},
                 onMaximize: () {},
                 onClose: () {},

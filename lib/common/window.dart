@@ -50,7 +50,7 @@ class Window implements WindowPort {
     }
     final WindowOptions windowOptions = WindowOptions(
       size: props.size,
-      minimumSize: const Size(380, 400),
+      minimumSize: kMinDesktopWindowSize,
     );
     if (!system.isMacOS || version > 10) {
       await windowManager.setTitleBarStyle(TitleBarStyle.hidden);

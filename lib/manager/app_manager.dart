@@ -4,10 +4,9 @@ import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/permission.dart';
 import 'package:fl_clash/common/system_dns.dart';
 import 'package:fl_clash/enum/enum.dart';
-import 'package:fl_clash/manager/window_manager.dart';
-import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/desktop/desktop.dart';
 import 'package:fl_clash/widgets/animated_visibility.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
@@ -129,65 +128,27 @@ class AppEnvManager extends StatelessWidget {
   }
 }
 
-class _SidebarRail extends StatelessWidget {
-  const _SidebarRail({
-    required this.items,
-    required this.currentIndex,
-    required this.showLabel,
-    required this.onSelected,
-  });
-
-  final List<NavigationItem> items;
-  final int currentIndex;
-  final bool showLabel;
-  final void Function(int index) onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelStyle = context.textTheme.labelLarge!.copyWith(
-      color: context.colorScheme.onSurface,
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: NavigationRail(
-            scrollable: true,
-            minExtendedWidth: 200,
-            backgroundColor: Colors.transparent,
-            selectedLabelTextStyle: labelStyle,
-            unselectedLabelTextStyle: labelStyle,
-            destinations: [
-              for (final item in items)
-                NavigationRailDestination(
-                  icon: item.icon,
-                  label: Text(item.label.label),
-                ),
-            ],
-            onDestinationSelected: onSelected,
-            extended: false,
-            selectedIndex: currentIndex,
-            labelType: showLabel
-                ? NavigationRailLabelType.all
-                : NavigationRailLabelType.none,
-          ),
-        ),
-      ],
-    );
+/// Page switches drop nav focus; restore it so keyboard users stay put.
+void _handleToPage(WidgetRef ref, PageLabel pageLabel) {
+  final focusNode = FocusManager.instance.primaryFocus;
+  final preserveNavFocus =
+      focusNode?.context?.findAncestorWidgetOfExactType<DesktopSideNav>() !=
+      null;
+  ref.read(currentPageLabelProvider.notifier).toPage(pageLabel);
+  if (!preserveNavFocus || focusNode == null) {
+    return;
   }
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (focusNode.context != null && focusNode.canRequestFocus) {
+      focusNode.requestFocus();
+    }
+  });
 }
 
 class AppSidebarContainer extends ConsumerWidget {
   final Widget child;
 
   const AppSidebarContainer({super.key, required this.child});
-
-  Widget _buildBackground({
-    required BuildContext context,
-    required Widget child,
-  }) {
-    return Material(color: context.colorScheme.surfaceContainer, child: child);
-  }
 
   void _updateSideBarWidth(WidgetRef ref, double contentWidth) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -197,79 +158,31 @@ class AppSidebarContainer extends ConsumerWidget {
     });
   }
 
-  void _handleToPage(WidgetRef ref, PageLabel pageLabel) {
-    final focusNode = FocusManager.instance.primaryFocus;
-    final preserveNavigationFocus =
-        focusNode?.context?.findAncestorWidgetOfExactType<NavigationRail>() !=
-        null;
-    ref.read(currentPageLabelProvider.notifier).toPage(pageLabel);
-    if (!preserveNavigationFocus || focusNode == null) {
-      return;
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (focusNode.context != null && focusNode.canRequestFocus) {
-        focusNode.requestFocus();
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navigationState = ref.watch(navigationStateProvider);
     final navigationItems = navigationState.navigationItems;
     final isMobileView = navigationState.viewMode == ViewMode.mobile;
     final currentIndex = navigationState.currentIndex;
-    final showLabel = ref.watch(appSettingProvider).showLabel;
+    final isRunning = ref.watch(
+      coreStatusProvider.select((status) => status == CoreStatus.connected),
+    );
     return Container(
       color: context.colorScheme.surfaceContainer,
       child: Row(
         children: [
           AnimatedVisibility.sidebar(
             visible: !isMobileView,
-            child: _buildBackground(
-              context: context,
-              child: SafeArea(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (system.isMacOS) const SizedBox(height: 22),
-                    const SizedBox(height: 10),
-                    if (!system.isMacOS) ...[
-                      const ClipRect(child: AppIcon()),
-                      const SizedBox(height: 12),
-                    ],
-                    Expanded(
-                      child: ScrollConfiguration(
-                        behavior: const HiddenBarScrollBehavior(),
-                        child: _SidebarRail(
-                          items: navigationItems,
-                          currentIndex: currentIndex,
-                          showLabel: showLabel,
-                          onSelected: (index) {
-                            _handleToPage(ref, navigationItems[index].label);
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    IconButton(
-                      tooltip: context.appLocalizations.toggleLabel,
-                      onPressed: () {
-                        ref
-                            .read(appSettingProvider.notifier)
-                            .update(
-                              (state) =>
-                                  state.copyWith(showLabel: !state.showLabel),
-                            );
-                      },
-                      icon: Icon(
-                        Icons.menu,
-                        color: context.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
+            child: SafeArea(
+              child: DesktopSideNav(
+                items: navigationItems,
+                currentIndex: currentIndex,
+                onSelected: (index) {
+                  _handleToPage(ref, navigationItems[index].label);
+                },
+                version: globalState.packageInfo.version,
+                isRunning: isRunning,
+                isMacOS: system.isMacOS,
               ),
             ),
           ),

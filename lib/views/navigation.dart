@@ -1,6 +1,7 @@
 import 'package:fl_clash/common/app_ports.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
+import 'package:fl_clash/views/desktop/desktop.dart';
 import 'package:fl_clash/views/views.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -25,6 +26,14 @@ class Navigation implements NavigationPort {
         label: PageLabel.config,
         builder: (_) =>
             const ProfilesView(key: GlobalObjectKey(PageLabel.config)),
+      ),
+      NavigationItem(
+        icon: const Icon(Icons.extension_outlined),
+        label: PageLabel.modules,
+        modes: const [NavigationItemMode.desktop],
+        builder: (_) => const DesktopModulesPlaceholder(
+          key: GlobalObjectKey(PageLabel.modules),
+        ),
       ),
       NavigationItem(
         icon: const Icon(Icons.analytics_outlined),

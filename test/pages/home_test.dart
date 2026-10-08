@@ -12,11 +12,13 @@ import 'package:fl_clash/views/application_setting.dart';
 import 'package:fl_clash/views/data_view.dart';
 import 'package:fl_clash/views/settings/settings.dart';
 import 'package:fl_clash/widgets/widgets.dart';
+import 'package:fl_clash/views/desktop/desktop.dart';
 import 'package:fl_clash/views/navigation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../helpers/test_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,6 +26,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   // The Config tab embeds the module list, which reads SharedPreferences.
   SharedPreferences.setMockInitialValues({});
+
+  setUpAll(() {
+    globalState.packageInfo = PackageInfo(
+      appName: 'Eclipse',
+      packageName: 'com.eclipse.clash',
+      version: '1.2.3',
+      buildNumber: '1',
+    );
+  });
 
   setUp(() {
     navigationPort = navigation;
@@ -75,7 +86,7 @@ void main() {
 
     await tester.pump();
 
-    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(DesktopSideNav), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
 
     await tester.pump(const Duration(milliseconds: 150));
@@ -145,7 +156,7 @@ void main() {
       await tester.tap(find.text('count: 0'));
       await tester.pump();
       expect(find.text('count: 1'), findsOneWidget);
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
 
       for (var width = 1180.0; width >= 500; width -= 20) {
@@ -156,13 +167,13 @@ void main() {
       }
 
       expect(find.text('count: 1'), findsOneWidget);
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
       await tester.pump(const Duration(milliseconds: 150));
       expect(tester.takeException(), isNull);
 
       final outgoingTools = find.descendant(
-        of: find.byType(NavigationRail),
+        of: find.byType(DesktopSideNav),
         matching: find.byIcon(Icons.construction),
       );
       await tester.tap(outgoingTools, warnIfMissed: false);
@@ -170,7 +181,7 @@ void main() {
       expect(container.read(currentPageLabelProvider), PageLabel.dashboard);
 
       await tester.pump(const Duration(milliseconds: 301));
-      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.byType(DesktopSideNav), findsNothing);
       expect(find.byType(NavigationBar), findsOneWidget);
 
       tester.view.physicalSize = const Size(1200, 800);
@@ -178,11 +189,11 @@ void main() {
       await tester.pump();
 
       expect(find.text('count: 1'), findsOneWidget);
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
       expect(find.byType(NavigationBar), findsOneWidget);
 
       await tester.pump(const Duration(milliseconds: 301));
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
       expect(tester.takeException(), isNull);
     },
@@ -311,7 +322,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 301));
       expect(tester.takeException(), isNull);
       expect(find.byType(_StatefulContent), findsOneWidget);
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
       expect(container.read(currentPageLabelProvider), PageLabel.tools);
 
       for (var width = 1180.0; width >= 500; width -= 20) {
@@ -478,11 +489,11 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
 
       bool focusInRail() {
         final context = FocusManager.instance.primaryFocus?.context;
-        return context?.findAncestorWidgetOfExactType<NavigationRail>() != null;
+        return context?.findAncestorWidgetOfExactType<DesktopSideNav>() != null;
       }
 
       IconData? focusedRailIcon() {
@@ -517,8 +528,10 @@ void main() {
       await tester.pump();
 
       expect(container.read(currentPageLabelProvider), PageLabel.proxies);
-      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.selectedIndex, 1);
+      final sideNav = tester.widget<DesktopSideNav>(
+        find.byType(DesktopSideNav),
+      );
+      expect(sideNav.currentIndex, 1);
       expect(focusedRailIcon(), Icons.article);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
@@ -774,19 +787,16 @@ void main() {
     await tester.enterText(find.byType(TextField), 'needle');
     expect(query, 'needle');
 
-    final navigationRail = find.byType(NavigationRail);
+    final sideNav = find.byType(DesktopSideNav);
     await tester.tap(
-      find.descendant(
-        of: navigationRail,
-        matching: find.byIcon(Icons.construction),
-      ),
+      find.descendant(of: sideNav, matching: find.byIcon(Icons.construction)),
     );
     await tester.pumpAndSettle();
     expect(query, isEmpty);
 
     await tester.tap(
       find.descendant(
-        of: navigationRail,
+        of: sideNav,
         matching: find.byIcon(Icons.space_dashboard),
       ),
     );
@@ -848,10 +858,10 @@ void main() {
         ),
       );
       await tester.pump();
-      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(DesktopSideNav), findsOneWidget);
 
       Finder railIcon(IconData icon) => find.descendant(
-        of: find.byType(NavigationRail),
+        of: find.byType(DesktopSideNav),
         matching: find.byIcon(icon),
       );
 
@@ -865,7 +875,7 @@ void main() {
 
       bool focusInRail() {
         final context = FocusManager.instance.primaryFocus?.context;
-        return context?.findAncestorWidgetOfExactType<NavigationRail>() != null;
+        return context?.findAncestorWidgetOfExactType<DesktopSideNav>() != null;
       }
 
       for (var i = 0; i < 40 && !focusInRail(); i++) {
@@ -887,15 +897,19 @@ void main() {
     },
   );
 
-  testWidgets('eclipse navigation exposes four tabs in shadowrocket order', (
+  testWidgets('eclipse navigation exposes five desktop items in order', (
     tester,
   ) async {
     final items = navigation.getItems(openLogs: true, hasProxies: true);
     expect(items.map((item) => item.label).toList(), [
       PageLabel.dashboard,
       PageLabel.config,
+      PageLabel.modules,
       PageLabel.data,
       PageLabel.settings,
+    ]);
+    expect(items.firstWhere((item) => item.label == PageLabel.modules).modes, [
+      NavigationItemMode.desktop,
     ]);
 
     tester.view.physicalSize = const Size(500, 900);
@@ -942,6 +956,71 @@ void main() {
     expect(container.read(currentPageLabelProvider), PageLabel.settings);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'digit keys switch desktop pages unless a text field is focused',
+    (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final container = ProviderContainer(
+        overrides: [
+          navigationItemsStateProvider.overrideWithValue(
+            NavigationItemsState(
+              value: [
+                NavigationItem(
+                  icon: const Icon(Icons.space_dashboard),
+                  label: PageLabel.dashboard,
+                  builder: (_) => const TextField(key: ValueKey('page-search')),
+                ),
+                NavigationItem(
+                  icon: const Icon(Icons.construction),
+                  label: PageLabel.tools,
+                  builder: (_) => const SizedBox.shrink(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      globalState.container = container;
+      container.read(viewSizeProvider.notifier).value = const Size(1200, 800);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: const TestApp(includeNavigatorKey: false, child: HomePage()),
+        ),
+      );
+      await tester.pump();
+
+      expect(container.read(currentPageLabelProvider), PageLabel.dashboard);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit2);
+      await tester.pump();
+      expect(container.read(currentPageLabelProvider), PageLabel.tools);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+      await tester.pump();
+      expect(container.read(currentPageLabelProvider), PageLabel.dashboard);
+
+      await tester.tap(find.byKey(const ValueKey('page-search')));
+      await tester.pump();
+      expect(FocusManager.instance.primaryFocus, isNotNull);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit2);
+      await tester.pump();
+      expect(
+        container.read(currentPageLabelProvider),
+        PageLabel.dashboard,
+        reason: 'digit keys must not fire while a text field is focused',
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 class _ThemeManagedTestApp extends StatelessWidget {

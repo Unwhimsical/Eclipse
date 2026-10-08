@@ -152,7 +152,7 @@ abstract class WindowProps with _$WindowProps {
 extension WindowPropsExt on WindowProps {
   Size get _size => Size(width, height);
 
-  Size get size => _size.isEmpty ? const Size(680, 580) : _size;
+  Size get size => _size.isEmpty ? const Size(1280, 800) : _size;
 }
 
 @freezed

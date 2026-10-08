@@ -354,7 +354,6 @@ void main() {
         TestApp(
           child: WindowHeaderActions(
             state: caption,
-            onPin: () => pressed.add('pin'),
             onMinimize: () => pressed.add('minimize'),
             onMaximize: () => pressed.add('maximize'),
             onClose: () => pressed.add('close'),
@@ -380,10 +379,6 @@ void main() {
       await pumpActions(tester);
 
       expect(
-        tooltipOf(tester, find.byIcon(Icons.push_pin_outlined)),
-        currentAppLocalizations.pinWindow,
-      );
-      expect(
         tooltipOf(tester, glyph(CaptionGlyph.minimize)),
         currentAppLocalizations.minimize,
       );
@@ -397,21 +392,12 @@ void main() {
       );
     });
 
-    testWidgets('the pin and maximize labels follow their state', (
-      tester,
-    ) async {
+    testWidgets('the maximize label follows its state', (tester) async {
       await pumpActions(tester);
 
-      caption.value = const WindowCaptionState(
-        isPinned: true,
-        isMaximized: true,
-      );
+      caption.value = const WindowCaptionState(isMaximized: true);
       await tester.pump();
 
-      expect(
-        tooltipOf(tester, find.byIcon(Icons.push_pin)),
-        currentAppLocalizations.unpinWindow,
-      );
       expect(
         tooltipOf(tester, glyph(CaptionGlyph.restore)),
         currentAppLocalizations.unmaximize,
@@ -439,13 +425,12 @@ void main() {
     testWidgets('each button reports its own press', (tester) async {
       await pumpActions(tester);
 
-      await tester.tap(find.byIcon(Icons.push_pin_outlined));
       await tester.tap(glyph(CaptionGlyph.minimize));
       await tester.tap(glyph(CaptionGlyph.maximize));
       await tester.tap(glyph(CaptionGlyph.close));
       await tester.pump();
 
-      expect(pressed, ['pin', 'minimize', 'maximize', 'close']);
+      expect(pressed, ['minimize', 'maximize', 'close']);
     });
   });
 
@@ -472,15 +457,11 @@ void main() {
         calls.map((call) => call.method).toList();
 
     testWidgets('starts from the state the window already has', (tester) async {
-      isAlwaysOnTop = true;
       isMaximized = true;
 
       final caption = await pumpController(tester);
 
-      expect(
-        caption.value,
-        const WindowCaptionState(isPinned: true, isMaximized: true),
-      );
+      expect(caption.value, const WindowCaptionState(isMaximized: true));
     });
 
     testWidgets('a maximize request only shows once the window reports it', (
@@ -555,16 +536,6 @@ void main() {
       await emitWindowEvent('leave-full-screen');
       await emitWindowEvent('unmaximize');
       expect(caption.value, const WindowCaptionState());
-    });
-
-    testWidgets('pinning reads the applied state back', (tester) async {
-      final caption = await pumpController(tester);
-
-      await caption.togglePin();
-      expect(caption.value.isPinned, isTrue);
-
-      await caption.togglePin();
-      expect(caption.value.isPinned, isFalse);
     });
 
     testWidgets('disposing stops listening to the window', (tester) async {

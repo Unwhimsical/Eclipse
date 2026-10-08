@@ -15,10 +15,6 @@ double getWindowHeaderHeight({required bool isDesktop, required bool isMacOS}) {
 const captionButtonWidth = 46.0;
 const captionGlyphSize = 10.0;
 
-/// The pin is not a caption button: it keeps the round Material button in a
-/// square slot the height of the bar, with a regular icon size.
-const pinIconSize = 16.0;
-
 Size getCaptionButtonSize(double headerHeight) =>
     Size(captionButtonWidth, headerHeight);
 
@@ -31,6 +27,10 @@ bool showsWindowHeader({
   if (!isDesktop) return false;
   return !(isMacOS && (version <= 10 || !isMobileView));
 }
+
+/// Desktop shell floor: the window never shrinks below the desktop layout
+/// breakpoint, keeping the self-drawn sidebar usable.
+const kMinDesktopWindowSize = Size(1160, 720);
 
 ViewMode getViewMode(double viewWidth) {
   if (viewWidth <= maxMobileWidth) return ViewMode.mobile;

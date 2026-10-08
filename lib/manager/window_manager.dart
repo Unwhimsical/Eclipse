@@ -6,6 +6,7 @@ import 'package:fl_clash/common/launch.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/config.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -255,22 +256,15 @@ class WindowHeaderLayout extends StatelessWidget {
 @immutable
 class WindowCaptionState {
   const WindowCaptionState({
-    this.isPinned = false,
     this.isMaximized = false,
     this.isFullScreen = false,
   });
 
-  final bool isPinned;
   final bool isMaximized;
   final bool isFullScreen;
 
-  WindowCaptionState copyWith({
-    bool? isPinned,
-    bool? isMaximized,
-    bool? isFullScreen,
-  }) {
+  WindowCaptionState copyWith({bool? isMaximized, bool? isFullScreen}) {
     return WindowCaptionState(
-      isPinned: isPinned ?? this.isPinned,
       isMaximized: isMaximized ?? this.isMaximized,
       isFullScreen: isFullScreen ?? this.isFullScreen,
     );
@@ -279,13 +273,12 @@ class WindowCaptionState {
   @override
   bool operator ==(Object other) {
     return other is WindowCaptionState &&
-        other.isPinned == isPinned &&
         other.isMaximized == isMaximized &&
         other.isFullScreen == isFullScreen;
   }
 
   @override
-  int get hashCode => Object.hash(isPinned, isMaximized, isFullScreen);
+  int get hashCode => Object.hash(isMaximized, isFullScreen);
 }
 
 /// Maximize and fullscreen are written only from window events: the window
@@ -302,17 +295,10 @@ class WindowCaptionController extends ValueNotifier<WindowCaptionState>
 
   Future<void> _syncFromWindow() async {
     final states = await Future.wait<bool>([
-      windowManager.isAlwaysOnTop(),
       windowManager.isMaximized(),
       windowManager.isFullScreen(),
     ]);
-    _set(
-      WindowCaptionState(
-        isPinned: states[0],
-        isMaximized: states[1],
-        isFullScreen: states[2],
-      ),
-    );
+    _set(WindowCaptionState(isMaximized: states[0], isFullScreen: states[1]));
   }
 
   void _set(WindowCaptionState state) {
@@ -354,12 +340,6 @@ class WindowCaptionController extends ValueNotifier<WindowCaptionState>
     }
   }
 
-  Future<void> togglePin() async {
-    final isPinned = await windowManager.isAlwaysOnTop();
-    await windowManager.setAlwaysOnTop(!isPinned);
-    _set(value.copyWith(isPinned: await windowManager.isAlwaysOnTop()));
-  }
-
   @override
   void dispose() {
     _disposed = true;
@@ -395,7 +375,6 @@ class _WindowHeaderState extends ConsumerState<WindowHeader> {
           ? null
           : WindowHeaderActions(
               state: caption,
-              onPin: caption.togglePin,
               onMinimize: windowManager.minimize,
               onMaximize: caption.toggleMaximized,
               onClose: () {
@@ -484,14 +463,12 @@ class WindowHeaderActions extends StatelessWidget {
   const WindowHeaderActions({
     super.key,
     required this.state,
-    required this.onPin,
     required this.onMinimize,
     required this.onMaximize,
     required this.onClose,
   });
 
   final ValueListenable<WindowCaptionState> state;
-  final VoidCallback onPin;
   final VoidCallback onMinimize;
   final VoidCallback onMaximize;
   final VoidCallback onClose;
@@ -499,6 +476,10 @@ class WindowHeaderActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
+    // Close hovers to the danger fill (§1 keeps white text legible on it).
+    final tokens = Theme.of(context).extension<DesktopThemeTokens>();
+    final hoverFill = tokens?.bg3;
+    final closeFill = tokens?.dangerHover ?? context.colorScheme.error;
     return ValueListenableBuilder(
       valueListenable: state,
       builder: (_, state, _) {
@@ -516,31 +497,27 @@ class WindowHeaderActions extends StatelessWidget {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: IconButton(
-                tooltip: state.isPinned
-                    ? appLocalizations.unpinWindow
-                    : appLocalizations.pinWindow,
-                style: const ButtonStyle(
-                  shape: WidgetStatePropertyAll(CircleBorder()),
-                  minimumSize: WidgetStatePropertyAll(Size.zero),
-                  maximumSize: WidgetStatePropertyAll(Size.infinite),
-                  iconSize: WidgetStatePropertyAll(pinIconSize),
-                ),
-                onPressed: onPin,
-                icon: Icon(
-                  state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                ),
-              ),
-            ),
             IconButton(
               tooltip: appLocalizations.minimize,
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  return states.contains(WidgetState.hovered)
+                      ? hoverFill
+                      : null;
+                }),
+              ),
               onPressed: onMinimize,
               icon: const CaptionIcon(CaptionGlyph.minimize),
             ),
             IconButton(
               tooltip: maximizeTooltip,
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  return states.contains(WidgetState.hovered)
+                      ? hoverFill
+                      : null;
+                }),
+              ),
               onPressed: onMaximize,
               icon: CaptionIcon(maximizeGlyph),
             ),
@@ -551,7 +528,7 @@ class WindowHeaderActions extends StatelessWidget {
                   final active =
                       states.contains(WidgetState.hovered) ||
                       states.contains(WidgetState.pressed);
-                  return active ? context.colorScheme.error : null;
+                  return active ? closeFill : null;
                 }),
                 foregroundColor: WidgetStateProperty.resolveWith((states) {
                   final active =
