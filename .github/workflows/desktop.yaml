@@ -19,6 +19,7 @@ jobs:
     name: Build desktop (${{ matrix.platform }}-${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
           - platform: windows
