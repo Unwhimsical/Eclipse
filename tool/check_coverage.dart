@@ -7,6 +7,9 @@ const _excludedPatterns = [
   'lib/l10n/',
   '.g.dart',
   '.freezed.dart',
+  // Desktop UI is verified via screenshot tests (test/views/desktop/),
+  // not unit coverage.
+  'views/desktop/',
 ];
 
 // Every measured group needs a floor. A group that only answers to the total
@@ -27,7 +30,6 @@ const _groupFloors = <String, double>{
   'common': 74.0,
   'manager': 68.0,
   'views': 66.0,
-  'desktop': 5.0,
   'enum': 86.0,
   'pages': 71.0,
   'plugins': 67.0,
@@ -64,11 +66,6 @@ String _group(String path) {
     start = index + 5;
   }
   final relative = normalized.substring(start);
-  // Desktop UI lives under views/desktop and gets its own floor so its
-  // smoke-level coverage does not drag down the mobile views group.
-  if (relative.startsWith('views/desktop/')) {
-    return 'desktop';
-  }
   final separator = relative.indexOf('/');
   return separator == -1 ? 'lib' : relative.substring(0, separator);
 }
