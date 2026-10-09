@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Mutable holder for desktop UI state; Riverpod 3 keeps [StateProvider] in
 /// the legacy import only.
-class ValueHolder<T> extends Notifier<T> {
-  ValueHolder(this._initial);
+class _ValueHolder<T> extends Notifier<T> {
+  _ValueHolder(this._initial);
 
   final T _initial;
 
@@ -15,6 +15,6 @@ class ValueHolder<T> extends Notifier<T> {
   }
 }
 
-NotifierProvider<ValueHolder<T>, T> valueHolder<T>(T initial) {
-  return NotifierProvider<ValueHolder<T>, T>(() => ValueHolder<T>(initial));
+NotifierProvider<_ValueHolder<T>, T> valueHolder<T>(T initial) {
+  return NotifierProvider<_ValueHolder<T>, T>(() => _ValueHolder<T>(initial));
 }
