@@ -936,7 +936,6 @@
   "profileUrlHint": "サブスクリプションURLを貼り付け、空欄でファイル選択",
   "subscriptionLink": "サブスクリプションリンク",
   "setAsCurrent": "現在選択に設定",
-  "current": "現在",
   "noRules": "ルールがありません",
   "noOverrideRules": "上書きルールがありません",
   "invalidRule": "無効なルール形式",

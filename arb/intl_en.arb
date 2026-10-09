@@ -936,7 +936,6 @@
   "profileUrlHint": "Paste a subscription URL, or leave empty to pick a file",
   "subscriptionLink": "Subscription link",
   "setAsCurrent": "Set as current",
-  "current": "Current",
   "noRules": "No rules",
   "noOverrideRules": "No override rules yet",
   "invalidRule": "Invalid rule format",

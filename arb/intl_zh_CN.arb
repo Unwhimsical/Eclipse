@@ -936,7 +936,6 @@
   "profileUrlHint": "粘贴订阅链接，留空则选择本地文件",
   "subscriptionLink": "订阅链接",
   "setAsCurrent": "设为当前",
-  "current": "当前",
   "noRules": "暂无规则",
   "noOverrideRules": "暂无覆写规则",
   "invalidRule": "规则格式无效",

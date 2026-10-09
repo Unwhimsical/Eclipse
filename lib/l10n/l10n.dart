@@ -7654,8 +7654,6 @@ class AppLocalizations {
     );
   }
 
-  // skipped getter for the 'current' key
-
   /// `No rules`
   String get noRules {
     return Intl.message('No rules', name: 'noRules', desc: '', args: []);
