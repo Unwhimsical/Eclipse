@@ -157,6 +157,7 @@ jobs:
         id: ndk
         with:
           ndk-version: ${{ env.NDK_VERSION }}
+          link-to-sdk: true
 
       - name: Setup Java
         uses: actions/setup-java@v4
