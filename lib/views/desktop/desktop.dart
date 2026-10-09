@@ -1,9 +1,11 @@
-export 'components/components.dart';
+export 'command_palette.dart';
 export 'page_header.dart';
 export 'pages/data_page.dart';
 export 'pages/config_page.dart';
 export 'pages/home_page.dart';
 export 'pages/modules_page.dart';
 export 'pages/settings_page.dart';
+export 'shortcuts/shortcut.dart';
+export 'shortcuts/shortcut_scope.dart';
 export 'side_nav.dart';
 export 'value_holder.dart';

@@ -167,37 +167,39 @@ class AppSidebarContainer extends ConsumerWidget {
     final isRunning = ref.watch(
       coreStatusProvider.select((status) => status == CoreStatus.connected),
     );
-    return Container(
-      color: context.colorScheme.surfaceContainer,
-      child: Row(
-        children: [
-          AnimatedVisibility.sidebar(
-            visible: !isMobileView,
-            child: SafeArea(
-              child: DesktopSideNav(
-                items: navigationItems,
-                currentIndex: currentIndex,
-                onSelected: (index) {
-                  _handleToPage(ref, navigationItems[index].label);
-                },
-                version: globalState.packageInfo.version,
-                isRunning: isRunning,
-                isMacOS: system.isMacOS,
+    return DesktopShortcutScope(
+      child: Container(
+        color: context.colorScheme.surfaceContainer,
+        child: Row(
+          children: [
+            AnimatedVisibility.sidebar(
+              visible: !isMobileView,
+              child: SafeArea(
+                child: DesktopSideNav(
+                  items: navigationItems,
+                  currentIndex: currentIndex,
+                  onSelected: (index) {
+                    _handleToPage(ref, navigationItems[index].label);
+                  },
+                  version: globalState.packageInfo.version,
+                  isRunning: isRunning,
+                  isMacOS: system.isMacOS,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 1,
-            child: ClipRect(
-              child: LayoutBuilder(
-                builder: (_, constraints) {
-                  _updateSideBarWidth(ref, constraints.maxWidth);
-                  return child;
-                },
+            Expanded(
+              flex: 1,
+              child: ClipRect(
+                child: LayoutBuilder(
+                  builder: (_, constraints) {
+                    _updateSideBarWidth(ref, constraints.maxWidth);
+                    return child;
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

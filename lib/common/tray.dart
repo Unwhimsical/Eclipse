@@ -120,6 +120,19 @@ class AppTray implements TrayPort {
         checked: false,
         onSelected: commonAction.toggleRunning,
       ),
+      TrayMenuAction(
+        label: appLocalizations.delayTest,
+        onSelected: () {
+          final groups = trayState.groups;
+          final group = groups
+              .where((g) => (g.now ?? '').isNotEmpty)
+              .firstOrNull;
+          if (group != null) {
+            read(proxiesActionProvider.notifier).delayTest(group.all);
+          }
+        },
+      ),
+      ..._buildProfileMenu(read: read),
       if (isMacOS)
         TrayMenuCheckbox(
           label: appLocalizations.speedStatistics,
@@ -168,6 +181,31 @@ class AppTray implements TrayPort {
           systemAction.handleExit();
         },
       ),
+    ];
+  }
+
+  List<TrayMenuItem> _buildProfileMenu({required ProviderReader read}) {
+    final appLocalizations = currentAppLocalizations;
+    final profiles = read(profilesProvider);
+    if (profiles.isEmpty) {
+      return const [];
+    }
+    final currentId = read(currentProfileIdProvider);
+    return [
+      TrayMenuSubmenu(
+        label: appLocalizations.profiles,
+        items: [
+          for (final profile in profiles)
+            TrayMenuCheckbox(
+              label: profile.realLabel,
+              checked: profile.id == currentId,
+              onSelected: () {
+                read(currentProfileIdProvider.notifier).value = profile.id;
+              },
+            ),
+        ],
+      ),
+      const TrayMenuSeparator(),
     ];
   }
 
