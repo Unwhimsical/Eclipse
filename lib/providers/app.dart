@@ -47,6 +47,13 @@ class Logs extends _$Logs with AutoDisposeNotifierMixin {
     res = await picker.saveFileWithPath(logFileName, tempFilePath) != null;
     return res;
   }
+
+  void clear() {
+    if (!ref.mounted) {
+      return;
+    }
+    value = state.copyWith()..clear();
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -61,6 +68,13 @@ class Requests extends _$Requests with AutoDisposeNotifierMixin {
       return;
     }
     this.value = state.append(value);
+  }
+
+  void clear() {
+    if (!ref.mounted) {
+      return;
+    }
+    value = state.copyWith()..clear();
   }
 }
 
