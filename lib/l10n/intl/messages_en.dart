@@ -159,6 +159,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "add": MessageLookupByLibrary.simpleMessage("Add"),
     "addModule": MessageLookupByLibrary.simpleMessage("Add module"),
+    "addNode": MessageLookupByLibrary.simpleMessage("Add node"),
     "addProfile": MessageLookupByLibrary.simpleMessage("Add profile"),
     "addProxies": MessageLookupByLibrary.simpleMessage("Add proxies"),
     "addProxyGroup": MessageLookupByLibrary.simpleMessage("Add proxy group"),
@@ -976,6 +977,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "noNodesDesc": MessageLookupByLibrary.simpleMessage(
       "No nodes yet. Add a subscription or import nodes to get started.",
     ),
+    "noNodesHint": MessageLookupByLibrary.simpleMessage(
+      "Import a subscription or paste node links to get started",
+    ),
     "noOverrideRules": MessageLookupByLibrary.simpleMessage(
       "No override rules yet",
     ),
@@ -1009,6 +1013,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeDetail": MessageLookupByLibrary.simpleMessage("Node detail"),
     "nodeImportExport": MessageLookupByLibrary.simpleMessage(
       "Node import & export",
+    ),
+    "nodeLinkHint": MessageLookupByLibrary.simpleMessage(
+      "Paste node links, one per line (vless://, vmess://, trojan://, ss://…)",
     ),
     "nodes": MessageLookupByLibrary.simpleMessage("Nodes"),
     "none": MessageLookupByLibrary.simpleMessage("None"),
@@ -1766,6 +1773,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "value": MessageLookupByLibrary.simpleMessage("Value"),
     "vibrantScheme": MessageLookupByLibrary.simpleMessage("Vibrant"),
     "view": MessageLookupByLibrary.simpleMessage("View"),
+    "viewDocs": MessageLookupByLibrary.simpleMessage("View docs"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN-related configuration change detected",
     ),

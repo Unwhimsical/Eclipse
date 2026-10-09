@@ -141,6 +141,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "activeConnections": MessageLookupByLibrary.simpleMessage("活动连接"),
     "add": MessageLookupByLibrary.simpleMessage("添加"),
     "addModule": MessageLookupByLibrary.simpleMessage("添加模块"),
+    "addNode": MessageLookupByLibrary.simpleMessage("添加节点"),
     "addProfile": MessageLookupByLibrary.simpleMessage("添加配置"),
     "addProxies": MessageLookupByLibrary.simpleMessage("添加代理"),
     "addProxyGroup": MessageLookupByLibrary.simpleMessage("添加策略组"),
@@ -711,6 +712,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "noNetworkApp": MessageLookupByLibrary.simpleMessage("无网络应用"),
     "noNodes": MessageLookupByLibrary.simpleMessage("该配置暂无节点"),
     "noNodesDesc": MessageLookupByLibrary.simpleMessage("暂无节点，请添加订阅或导入节点。"),
+    "noNodesHint": MessageLookupByLibrary.simpleMessage("导入订阅或粘贴节点链接，开始使用代理"),
     "noOverrideRules": MessageLookupByLibrary.simpleMessage("暂无覆写规则"),
     "noProfileSelected": MessageLookupByLibrary.simpleMessage("当前没有配置"),
     "noProfiles": MessageLookupByLibrary.simpleMessage("还没有配置文件"),
@@ -729,6 +731,9 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "nodeDetail": MessageLookupByLibrary.simpleMessage("节点详情"),
     "nodeImportExport": MessageLookupByLibrary.simpleMessage("节点导入导出"),
+    "nodeLinkHint": MessageLookupByLibrary.simpleMessage(
+      "粘贴节点链接，每行一个（vless://、vmess://、trojan://、ss://…）",
+    ),
     "nodes": MessageLookupByLibrary.simpleMessage("节点"),
     "none": MessageLookupByLibrary.simpleMessage("无"),
     "notRebindable": MessageLookupByLibrary.simpleMessage("固定"),
@@ -1303,6 +1308,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "value": MessageLookupByLibrary.simpleMessage("值"),
     "vibrantScheme": MessageLookupByLibrary.simpleMessage("活力"),
     "view": MessageLookupByLibrary.simpleMessage("查看"),
+    "viewDocs": MessageLookupByLibrary.simpleMessage("查看文档"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "检测到VPN相关配置改动",
     ),

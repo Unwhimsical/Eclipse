@@ -143,6 +143,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "activeConnections": MessageLookupByLibrary.simpleMessage("アクティブ接続"),
     "add": MessageLookupByLibrary.simpleMessage("追加"),
     "addModule": MessageLookupByLibrary.simpleMessage("モジュール追加"),
+    "addNode": MessageLookupByLibrary.simpleMessage("ノードを追加"),
     "addProfile": MessageLookupByLibrary.simpleMessage("プロファイルを追加"),
     "addProxies": MessageLookupByLibrary.simpleMessage("プロキシを追加"),
     "addProxyGroup": MessageLookupByLibrary.simpleMessage("プロキシグループを追加"),
@@ -819,6 +820,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "noNodesDesc": MessageLookupByLibrary.simpleMessage(
       "ノードがありません。サブスクリプションを追加してください。",
     ),
+    "noNodesHint": MessageLookupByLibrary.simpleMessage(
+      "サブスクリプションをインポートするか、ノードリンクを貼り付けて開始",
+    ),
     "noOverrideRules": MessageLookupByLibrary.simpleMessage("上書きルールがありません"),
     "noProfileSelected": MessageLookupByLibrary.simpleMessage(
       "プロファイルが選択されていません",
@@ -842,6 +846,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeDetail": MessageLookupByLibrary.simpleMessage("ノード詳細"),
     "nodeImportExport": MessageLookupByLibrary.simpleMessage(
       "ノードのインポート/エクスポート",
+    ),
+    "nodeLinkHint": MessageLookupByLibrary.simpleMessage(
+      "ノードリンクを1行ずつ貼り付け（vless://、vmess://、trojan://、ss://…）",
     ),
     "nodes": MessageLookupByLibrary.simpleMessage("ノード"),
     "none": MessageLookupByLibrary.simpleMessage("なし"),
@@ -1509,6 +1516,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "value": MessageLookupByLibrary.simpleMessage("値"),
     "vibrantScheme": MessageLookupByLibrary.simpleMessage("ビブラント"),
     "view": MessageLookupByLibrary.simpleMessage("表示"),
+    "viewDocs": MessageLookupByLibrary.simpleMessage("ドキュメントを見る"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "VPN関連の設定変更を検出しました",
     ),

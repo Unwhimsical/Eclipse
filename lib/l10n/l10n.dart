@@ -5175,6 +5175,36 @@ class AppLocalizations {
     );
   }
 
+  /// `Add node`
+  String get addNode {
+    return Intl.message('Add node', name: 'addNode', desc: '', args: []);
+  }
+
+  /// `Paste node links, one per line (vless://, vmess://, trojan://, ss://…)`
+  String get nodeLinkHint {
+    return Intl.message(
+      'Paste node links, one per line (vless://, vmess://, trojan://, ss://…)',
+      name: 'nodeLinkHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import a subscription or paste node links to get started`
+  String get noNodesHint {
+    return Intl.message(
+      'Import a subscription or paste node links to get started',
+      name: 'noNodesHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View docs`
+  String get viewDocs {
+    return Intl.message('View docs', name: 'viewDocs', desc: '', args: []);
+  }
+
   /// `General Settings`
   String get generalSettings {
     return Intl.message(

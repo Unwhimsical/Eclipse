@@ -1,4 +1,5 @@
 import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/desktop/desktop.dart';
@@ -110,6 +111,69 @@ void main() {
       );
       await tester.pump();
       expect(find.byType(DesktopSettingsView), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page renders rich node card for a single node', (
+      tester,
+    ) async {
+      final profile = Profile.normal(label: 'Test profile');
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          isStartProvider.overrideWithValue(false),
+          currentGroupsStateProvider.overrideWithValue(
+            const GroupsState(
+              value: [
+                Group(
+                  type: GroupType.Selector,
+                  name: 'PROXY',
+                  now: 'node-1',
+                  all: [Proxy(name: 'node-1', type: 'vless')],
+                ),
+              ],
+            ),
+          ),
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+        ],
+      );
+      await tester.pump();
+      expect(find.byType(DesktopConfigView), findsOneWidget);
+      expect(find.text('Status'), findsOneWidget);
+      expect(find.text('Current node'), findsOneWidget);
+      expect(find.text('node-1'), findsWidgets);
+      expect(find.text('VLESS'), findsOneWidget);
+      expect(find.text('PROXY · select'), findsOneWidget);
+      expect(find.text('Delay test'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page keeps actions visible with zero nodes', (
+      tester,
+    ) async {
+      final profile = Profile.normal(label: 'Test profile');
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          isStartProvider.overrideWithValue(false),
+          currentGroupsStateProvider.overrideWithValue(
+            const GroupsState(value: []),
+          ),
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+        ],
+      );
+      await tester.pump();
+      expect(find.byType(DesktopConfigView), findsOneWidget);
+      expect(find.text('This profile has no nodes'), findsOneWidget);
+      expect(find.text('Add node'), findsOneWidget);
+      expect(find.text('Import subscription'), findsOneWidget);
+      expect(find.text('View docs'), findsOneWidget);
+      expect(find.text('Status'), findsOneWidget);
+      expect(find.text('Delay test'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

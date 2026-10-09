@@ -159,6 +159,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "add": MessageLookupByLibrary.simpleMessage("Добавить"),
     "addModule": MessageLookupByLibrary.simpleMessage("Добавить модуль"),
+    "addNode": MessageLookupByLibrary.simpleMessage("Добавить узел"),
     "addProfile": MessageLookupByLibrary.simpleMessage("Добавить профиль"),
     "addProxies": MessageLookupByLibrary.simpleMessage("Добавить прокси"),
     "addProxyGroup": MessageLookupByLibrary.simpleMessage(
@@ -1018,6 +1019,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "noNodesDesc": MessageLookupByLibrary.simpleMessage(
       "Нет узлов. Добавьте подписку или импортируйте узлы.",
     ),
+    "noNodesHint": MessageLookupByLibrary.simpleMessage(
+      "Импортируйте подписку или вставьте ссылки узлов, чтобы начать",
+    ),
     "noOverrideRules": MessageLookupByLibrary.simpleMessage(
       "Нет правил переопределения",
     ),
@@ -1049,6 +1053,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "nodeDetail": MessageLookupByLibrary.simpleMessage("Сведения об узле"),
     "nodeImportExport": MessageLookupByLibrary.simpleMessage(
       "Импорт/экспорт узлов",
+    ),
+    "nodeLinkHint": MessageLookupByLibrary.simpleMessage(
+      "Вставьте ссылки узлов, по одной на строку (vless://, vmess://, trojan://, ss://…)",
     ),
     "nodes": MessageLookupByLibrary.simpleMessage("Узлы"),
     "none": MessageLookupByLibrary.simpleMessage("Нет"),
@@ -1864,6 +1871,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "value": MessageLookupByLibrary.simpleMessage("Значение"),
     "vibrantScheme": MessageLookupByLibrary.simpleMessage("Яркая"),
     "view": MessageLookupByLibrary.simpleMessage("Просмотр"),
+    "viewDocs": MessageLookupByLibrary.simpleMessage("Открыть документацию"),
     "vpnConfigChangeDetected": MessageLookupByLibrary.simpleMessage(
       "Обнаружено изменение настроек VPN",
     ),

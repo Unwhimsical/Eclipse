@@ -768,21 +768,351 @@ class _NodesTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
     final groups = ref.watch(currentGroupsStateProvider).value;
-    if (groups.isEmpty) {
-      return _EmptyState(
-        icon: Icons.hub_outlined,
-        title: appLocalizations.noNodes,
-        actionLabel: appLocalizations.goAddNode,
-        onAction: () {},
-      );
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-      itemCount: groups.length,
-      itemBuilder: (_, i) => _GroupSection(group: groups[i]),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+          child: _NodesDashboard(groups: groups),
+        ),
+        Expanded(
+          child: groups.isEmpty
+              ? const _NodesEmptyState()
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  itemCount: groups.length,
+                  itemBuilder: (_, i) => _GroupSection(group: groups[i]),
+                ),
+        ),
+      ],
     );
+  }
+}
+
+/// Dashboard strip above the node list: live run state, current node and
+/// traffic plus the node quick actions. The strip stays visible with zero
+/// nodes so the page reads as a dashboard instead of a blank list.
+class _NodesDashboard extends ConsumerWidget {
+  const _NodesDashboard({required this.groups});
+
+  final List<Group> groups;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final isStart = ref.watch(isStartProvider);
+    final status = ref.watch(coreStatusProvider);
+    final lastTraffic = ref.watch(
+      trafficsProvider.select((s) => s.list.safeLast(const Traffic())),
+    );
+    final currentName =
+        groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty)?.now ?? '';
+    final statusText = switch (status) {
+      CoreStatus.connected => appLocalizations.connected,
+      CoreStatus.connecting => appLocalizations.connecting,
+      CoreStatus.disconnected => appLocalizations.disconnected,
+    };
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+      decoration: ShapeDecoration(
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(DesktopThemeTokens.cardRadius),
+        ),
+        color: tokens?.bg1 ?? theme.colorScheme.surfaceContainerLow,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: 12,
+        children: [
+          Row(
+            spacing: 16,
+            children: [
+              _DashStat(
+                label: appLocalizations.runStatus,
+                value: statusText,
+                dot: isStart
+                    ? (tokens?.success ?? theme.colorScheme.primary)
+                    : (tokens?.text3 ?? theme.colorScheme.onSurfaceVariant),
+              ),
+              Container(
+                width: 1,
+                height: 36,
+                color: theme.dividerColor.withValues(alpha: 0.4),
+              ),
+              Expanded(
+                child: _DashStat(
+                  label: appLocalizations.currentNode,
+                  value: currentName.isEmpty ? '—' : currentName,
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 36,
+                color: theme.dividerColor.withValues(alpha: 0.4),
+              ),
+              _DashStat(
+                label: appLocalizations.upload,
+                value: '${lastTraffic.up.traffic.show}/s',
+                mono: true,
+              ),
+              _DashStat(
+                label: appLocalizations.download,
+                value: '${lastTraffic.down.traffic.show}/s',
+                mono: true,
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            spacing: 8,
+            children: [
+              OutlinedButton.icon(
+                onPressed: () => _testAll(ref),
+                icon: const Icon(Icons.speed_rounded, size: 18),
+                label: Text(appLocalizations.delayTest),
+              ),
+              OutlinedButton.icon(
+                onPressed: () {
+                  ref
+                      .read(profilesActionProvider.notifier)
+                      .addProfileFormFile(widgetRef: ref);
+                },
+                icon: const Icon(Icons.file_upload_outlined, size: 18),
+                label: Text(appLocalizations.import),
+              ),
+              FilledButton.icon(
+                onPressed: () => _showAddSubscription(context),
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(appLocalizations.addSubscription),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _testAll(WidgetRef ref) {
+    final proxies = groups.expand((g) => g.all).toList();
+    if (proxies.isEmpty) return;
+    ref.read(proxiesActionProvider.notifier).delayTest(proxies);
+  }
+
+  void _showAddSubscription(BuildContext context) {
+    unawaited(dialogs.showCommonDialog(child: const _AddProfileDialog()));
+  }
+}
+
+class _DashStat extends StatelessWidget {
+  const _DashStat({
+    required this.label,
+    required this.value,
+    this.dot,
+    this.mono = false,
+  });
+
+  final String label;
+  final String value;
+  final Color? dot;
+  final bool mono;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
+      children: [
+        Row(
+          spacing: 6,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (dot != null)
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: dot),
+              ),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(color: text3),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+        Text(
+          value,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontFeatures: mono ? DesktopThemeTokens.kpiFontFeatures : null,
+            color: tokens?.text1 ?? theme.colorScheme.onSurface,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+}
+
+/// Zero-node state: the dashboard strip above keeps the quick actions
+/// visible, so this block only adds the entry-point CTAs.
+class _NodesEmptyState extends ConsumerWidget {
+  const _NodesEmptyState();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text2 = tokens?.text2 ?? theme.colorScheme.onSurfaceVariant;
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 12,
+          children: [
+            Container(
+              width: 88,
+              height: 88,
+              decoration: ShapeDecoration(
+                shape: const CircleBorder(),
+                color: (tokens?.accent ?? theme.colorScheme.primary).withValues(
+                  alpha: 0.1,
+                ),
+              ),
+              child: Icon(Icons.hub_outlined, size: 40, color: text3),
+            ),
+            Text(
+              appLocalizations.noNodes,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: text2,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              appLocalizations.noNodesHint,
+              style: theme.textTheme.bodySmall?.copyWith(color: text3),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () => _showAddNode(context),
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: Text(appLocalizations.addNode),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _showAddSubscription(context),
+                  icon: const Icon(Icons.file_upload_outlined, size: 18),
+                  label: Text(appLocalizations.importSubscription),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _openDocs,
+                  icon: const Icon(Icons.menu_book_outlined, size: 18),
+                  label: Text(appLocalizations.viewDocs),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showAddNode(BuildContext context) {
+    unawaited(dialogs.showCommonDialog(child: const _AddNodeDialog()));
+  }
+
+  void _showAddSubscription(BuildContext context) {
+    unawaited(dialogs.showCommonDialog(child: const _AddProfileDialog()));
+  }
+
+  void _openDocs() {
+    unawaited(dialogs.openUrl('https://github.com/Unwhimsical/Eclipse'));
+  }
+}
+
+/// Paste-share-link dialog backing the empty state's add-node CTA.
+class _AddNodeDialog extends ConsumerStatefulWidget {
+  const _AddNodeDialog();
+
+  @override
+  ConsumerState<_AddNodeDialog> createState() => _AddNodeDialogState();
+}
+
+class _AddNodeDialogState extends ConsumerState<_AddNodeDialog> {
+  final _linkController = TextEditingController();
+
+  @override
+  void dispose() {
+    _linkController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    return CommonDialog(
+      title: appLocalizations.addNode,
+      child: SizedBox(
+        width: 420,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 12,
+          children: [
+            TextField(
+              controller: _linkController,
+              minLines: 3,
+              maxLines: 5,
+              decoration: InputDecoration(
+                hintText: appLocalizations.nodeLinkHint,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 8,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(appLocalizations.cancel),
+                ),
+                FilledButton(
+                  onPressed: _handleConfirm,
+                  child: Text(appLocalizations.confirm),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleConfirm() async {
+    final appLocalizations = context.appLocalizations;
+    final text = _linkController.text.trim();
+    Navigator.of(context).pop();
+    if (text.isEmpty) return;
+    await globalState.safeRun(() async {
+      final label = await ShadowrocketImport.importShareLinks(ref, text: text);
+      dialogs.showNotifier(
+        label ?? appLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
+      );
+    }, title: appLocalizations.addNode);
   }
 }
 
@@ -822,24 +1152,32 @@ class _GroupSection extends ConsumerWidget {
             ],
           ),
         ),
-        for (final proxy in group.all) _ProxyRow(group: group, proxy: proxy),
+        Column(
+          spacing: 8,
+          children: [
+            for (final proxy in group.all)
+              _ProxyCard(group: group, proxy: proxy),
+          ],
+        ),
         const SizedBox(height: 8),
       ],
     );
   }
 }
 
-class _ProxyRow extends ConsumerStatefulWidget {
-  const _ProxyRow({required this.group, required this.proxy});
+/// Rich node card: name, protocol chip, group meta and a tappable latency
+/// chip; the selected node carries an accent ring instead of a bare radio.
+class _ProxyCard extends ConsumerStatefulWidget {
+  const _ProxyCard({required this.group, required this.proxy});
 
   final Group group;
   final Proxy proxy;
 
   @override
-  ConsumerState<_ProxyRow> createState() => _ProxyRowState();
+  ConsumerState<_ProxyCard> createState() => _ProxyCardState();
 }
 
-class _ProxyRowState extends ConsumerState<_ProxyRow> {
+class _ProxyCardState extends ConsumerState<_ProxyCard> {
   bool _hover = false;
 
   @override
@@ -847,62 +1185,77 @@ class _ProxyRowState extends ConsumerState<_ProxyRow> {
     final theme = Theme.of(context);
     final tokens = theme.extension<DesktopThemeTokens>();
     final accent = tokens?.accent ?? theme.colorScheme.primary;
+    final text1 = tokens?.text1 ?? theme.colorScheme.onSurface;
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
     final selected = widget.group.now == widget.proxy.name;
-    final delay = ref.watch(
-      delayProvider(
-        proxyName: widget.proxy.name,
-        testUrl: widget.group.testUrl,
-      ),
-    );
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => _handleSelect(),
+        onTap: _handleSelect,
         onSecondaryTapUp: (details) =>
             _showMenu(context, details.globalPosition),
         child: Container(
-          height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: ShapeDecoration(
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(
+                DesktopThemeTokens.cardRadius,
+              ),
+              side: BorderSide(
+                color: selected ? accent : Colors.white.withValues(alpha: 0.06),
+                width: selected ? 1.5 : 1,
+              ),
+            ),
             color: selected
                 ? (tokens?.accentSoft ?? accent.withValues(alpha: 0.14))
                 : _hover
                 ? DesktopThemeTokens.controlHoverOverlay
-                : null,
-            borderRadius: BorderRadius.circular(10),
+                : Colors.transparent,
           ),
           child: Row(
-            spacing: 10,
+            spacing: 12,
             children: [
               Icon(
                 selected ? Icons.check_circle_rounded : Icons.circle_outlined,
-                size: 18,
-                color: selected
-                    ? accent
-                    : (tokens?.text3 ?? theme.colorScheme.onSurfaceVariant),
+                size: 20,
+                color: selected ? accent : text3,
               ),
               Expanded(
-                child: Text(
-                  widget.proxy.name,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: selected
-                        ? accent
-                        : (tokens?.text1 ?? theme.colorScheme.onSurface),
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 6,
+                  children: [
+                    Text(
+                      widget.proxy.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: selected ? accent : text1,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      spacing: 8,
+                      children: [
+                        _TypeChip(type: widget.proxy.type),
+                        Flexible(
+                          child: Text(
+                            '${widget.group.name} · ${widget.group.type.value}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: text3,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                delay == null ? '' : (delay > 0 ? '$delay ms' : 'Timeout'),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
-                  fontFeatures: DesktopThemeTokens.kpiFontFeatures,
-                ),
-              ),
+              _DelayChip(proxy: widget.proxy, testUrl: widget.group.testUrl),
             ],
           ),
         ),
@@ -985,6 +1338,106 @@ class _ProxyRowState extends ConsumerState<_ProxyRow> {
       return value.map(_plain).toList();
     }
     return value is YamlScalar ? value.value : value;
+  }
+}
+
+class _TypeChip extends StatelessWidget {
+  const _TypeChip({required this.type});
+
+  final String type;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text2 = tokens?.text2 ?? theme.colorScheme.onSurfaceVariant;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: ShapeDecoration(
+        shape: StadiumBorder(
+          side: BorderSide(color: text2.withValues(alpha: 0.35)),
+        ),
+      ),
+      child: Text(
+        type.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: text2,
+          fontFeatures: DesktopThemeTokens.kpiFontFeatures,
+        ),
+      ),
+    );
+  }
+}
+
+/// Latency chip; tapping re-tests just this node.
+class _DelayChip extends ConsumerWidget {
+  const _DelayChip({required this.proxy, required this.testUrl});
+
+  final Proxy proxy;
+  final String? testUrl;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
+    final pending = ref.watch(
+      delayTestPendingProvider(proxyName: proxy.name, testUrl: testUrl),
+    );
+    final delay = ref.watch(
+      delayProvider(proxyName: proxy.name, testUrl: testUrl),
+    );
+    final color = delay == null
+        ? text3
+        : delay <= 0
+        ? (tokens?.danger ?? theme.colorScheme.error)
+        : delay <= 200
+        ? (tokens?.success ?? theme.colorScheme.primary)
+        : delay <= 600
+        ? (tokens?.warning ?? theme.colorScheme.primary)
+        : (tokens?.danger ?? theme.colorScheme.error);
+    final label = delay == null
+        ? '—'
+        : delay <= 0
+        ? 'Timeout'
+        : '$delay ms';
+    return Tooltip(
+      message: context.appLocalizations.delayTest,
+      child: GestureDetector(
+        onTap: () {
+          ref
+              .read(proxiesActionProvider.notifier)
+              .proxyDelayTest(proxy, testUrl);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: ShapeDecoration(
+            shape: StadiumBorder(
+              side: BorderSide(color: color.withValues(alpha: 0.45)),
+            ),
+            color: color.withValues(alpha: 0.1),
+          ),
+          child: pending
+              ? SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: color,
+                  ),
+                )
+              : Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontFeatures: DesktopThemeTokens.kpiFontFeatures,
+                    color: color,
+                  ),
+                ),
+        ),
+      ),
+    );
   }
 }
 
