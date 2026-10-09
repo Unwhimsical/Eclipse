@@ -149,6 +149,7 @@ class ModuleStore {
     Sgmodule parsed,
     String raw, {
     String? fileName,
+    String? sourceUrl,
   }) async {
     final id = DateTime.now().microsecondsSinceEpoch.toString();
     final name = parsed.name.isEmpty
@@ -173,6 +174,7 @@ class ModuleStore {
       importDate: DateTime.now(),
       ruleSetRules: ruleSetRules,
       rulesAppend: parsed.rulesAppend,
+      sourceUrl: sourceUrl,
     );
     final modules = await list();
     modules.add(info);
@@ -206,7 +208,11 @@ class ModuleStore {
 
   /// User values are kept for keys the new file still declares; values for
   /// removed keys are dropped. Global rules are left to the caller.
-  Future<ModuleInfo?> updateContent(String id, String newRaw) async {
+  Future<ModuleInfo?> updateContent(
+    String id,
+    String newRaw, {
+    String? sourceUrl,
+  }) async {
     final modules = await list();
     final index = modules.indexWhere((e) => e.id == id);
     if (index < 0) return null;
@@ -228,6 +234,7 @@ class ModuleStore {
       name: parsed.name.isEmpty ? old.name : parsed.name,
       desc: parsed.desc,
       author: parsed.author,
+      sourceUrl: sourceUrl,
       ruleCount: parsed.rules.length,
       hostCount: parsed.hosts.length,
       rewriteCount: parsed.urlRewrites.length,

@@ -6915,10 +6915,10 @@ class AppLocalizations {
     );
   }
 
-  /// `No modules yet. Tap + to import a .sgmodule file`
+  /// `Tap + to import a .sgmodule file`
   String get noModulesDesc {
     return Intl.message(
-      'No modules yet. Tap + to import a .sgmodule file',
+      'Tap + to import a .sgmodule file',
       name: 'noModulesDesc',
       desc: '',
       args: [],
@@ -7287,6 +7287,748 @@ class AppLocalizations {
       desc: '',
       args: [],
     );
+  }
+
+  /// `Running`
+  String get running {
+    return Intl.message('Running', name: 'running', desc: '', args: []);
+  }
+
+  /// `Stopped`
+  String get stopped {
+    return Intl.message('Stopped', name: 'stopped', desc: '', args: []);
+  }
+
+  /// `Export`
+  String get exportAction {
+    return Intl.message('Export', name: 'exportAction', desc: '', args: []);
+  }
+
+  /// `Clear`
+  String get clearAction {
+    return Intl.message('Clear', name: 'clearAction', desc: '', args: []);
+  }
+
+  /// `Update all`
+  String get updateAll {
+    return Intl.message('Update all', name: 'updateAll', desc: '', args: []);
+  }
+
+  /// `Add module`
+  String get addModule {
+    return Intl.message('Add module', name: 'addModule', desc: '', args: []);
+  }
+
+  /// `Rename`
+  String get rename {
+    return Intl.message('Rename', name: 'rename', desc: '', args: []);
+  }
+
+  /// `Set as default`
+  String get setAsDefault {
+    return Intl.message(
+      'Set as default',
+      name: 'setAsDefault',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable`
+  String get enableAction {
+    return Intl.message('Enable', name: 'enableAction', desc: '', args: []);
+  }
+
+  /// `Disable`
+  String get disableAction {
+    return Intl.message('Disable', name: 'disableAction', desc: '', args: []);
+  }
+
+  /// `Command palette`
+  String get commandPalette {
+    return Intl.message(
+      'Command palette',
+      name: 'commandPalette',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Shortcuts`
+  String get shortcuts {
+    return Intl.message('Shortcuts', name: 'shortcuts', desc: '', args: []);
+  }
+
+  /// `Minimize to tray on close`
+  String get minimizeToTray {
+    return Intl.message(
+      'Minimize to tray on close',
+      name: 'minimizeToTray',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switch`
+  String get switchNode {
+    return Intl.message('Switch', name: 'switchNode', desc: '', args: []);
+  }
+
+  /// `Switch profile`
+  String get switchProfile {
+    return Intl.message(
+      'Switch profile',
+      name: 'switchProfile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Override`
+  String get overrideRules {
+    return Intl.message('Override', name: 'overrideRules', desc: '', args: []);
+  }
+
+  /// `No profiles yet`
+  String get noProfiles {
+    return Intl.message(
+      'No profiles yet',
+      name: 'noProfiles',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Import or create one to get started`
+  String get noProfilesDesc {
+    return Intl.message(
+      'Import or create one to get started',
+      name: 'noProfilesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No matching results`
+  String get noSearchResult {
+    return Intl.message(
+      'No matching results',
+      name: 'noSearchResult',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This profile has no nodes`
+  String get noNodes {
+    return Intl.message(
+      'This profile has no nodes',
+      name: 'noNodes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add nodes`
+  String get goAddNode {
+    return Intl.message('Add nodes', name: 'goAddNode', desc: '', args: []);
+  }
+
+  /// `Traffic trend`
+  String get trafficTrend {
+    return Intl.message(
+      'Traffic trend',
+      name: 'trafficTrend',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Active connections`
+  String get activeConnections {
+    return Intl.message(
+      'Active connections',
+      name: 'activeConnections',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rule hits`
+  String get ruleHits {
+    return Intl.message('Rule hits', name: 'ruleHits', desc: '', args: []);
+  }
+
+  /// `Total upload`
+  String get totalUpload {
+    return Intl.message(
+      'Total upload',
+      name: 'totalUpload',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total download`
+  String get totalDownload {
+    return Intl.message(
+      'Total download',
+      name: 'totalDownload',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Restore defaults`
+  String get restoreDefaults {
+    return Intl.message(
+      'Restore defaults',
+      name: 'restoreDefaults',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Press keys…`
+  String get pressKeys {
+    return Intl.message('Press keys…', name: 'pressKeys', desc: '', args: []);
+  }
+
+  /// `Appearance`
+  String get settingsGroupAppearance {
+    return Intl.message(
+      'Appearance',
+      name: 'settingsGroupAppearance',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Network & core`
+  String get settingsGroupNetwork {
+    return Intl.message(
+      'Network & core',
+      name: 'settingsGroupNetwork',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notifications & tray`
+  String get settingsGroupTray {
+    return Intl.message(
+      'Notifications & tray',
+      name: 'settingsGroupTray',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Shortcuts`
+  String get settingsGroupShortcuts {
+    return Intl.message(
+      'Shortcuts',
+      name: 'settingsGroupShortcuts',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `About`
+  String get settingsGroupAbout {
+    return Intl.message(
+      'About',
+      name: 'settingsGroupAbout',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search settings`
+  String get searchSettings {
+    return Intl.message(
+      'Search settings',
+      name: 'searchSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete?`
+  String get confirmDeleteTitle {
+    return Intl.message(
+      'Delete?',
+      name: 'confirmDeleteTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This cannot be undone.`
+  String get confirmDeleteMessage {
+    return Intl.message(
+      'This cannot be undone.',
+      name: 'confirmDeleteMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Status`
+  String get runStatus {
+    return Intl.message('Status', name: 'runStatus', desc: '', args: []);
+  }
+
+  /// `Parameters`
+  String get moduleParams {
+    return Intl.message('Parameters', name: 'moduleParams', desc: '', args: []);
+  }
+
+  /// `Rule stats`
+  String get moduleRuleStats {
+    return Intl.message(
+      'Rule stats',
+      name: 'moduleRuleStats',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Built-in rules (read-only)`
+  String get rulesReadonly {
+    return Intl.message(
+      'Built-in rules (read-only)',
+      name: 'rulesReadonly',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Collapse`
+  String get collapseEditor {
+    return Intl.message('Collapse', name: 'collapseEditor', desc: '', args: []);
+  }
+
+  /// `Expand`
+  String get expandEditor {
+    return Intl.message('Expand', name: 'expandEditor', desc: '', args: []);
+  }
+
+  /// `Search rules`
+  String get searchRules {
+    return Intl.message(
+      'Search rules',
+      name: 'searchRules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Paste a subscription URL, or leave empty to pick a file`
+  String get profileUrlHint {
+    return Intl.message(
+      'Paste a subscription URL, or leave empty to pick a file',
+      name: 'profileUrlHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Subscription link`
+  String get subscriptionLink {
+    return Intl.message(
+      'Subscription link',
+      name: 'subscriptionLink',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Set as current`
+  String get setAsCurrent {
+    return Intl.message(
+      'Set as current',
+      name: 'setAsCurrent',
+      desc: '',
+      args: [],
+    );
+  }
+
+  // skipped getter for the 'current' key
+
+  /// `No rules`
+  String get noRules {
+    return Intl.message('No rules', name: 'noRules', desc: '', args: []);
+  }
+
+  /// `No override rules yet`
+  String get noOverrideRules {
+    return Intl.message(
+      'No override rules yet',
+      name: 'noOverrideRules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid rule format`
+  String get invalidRule {
+    return Intl.message(
+      'Invalid rule format',
+      name: 'invalidRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No modules yet`
+  String get noModules {
+    return Intl.message(
+      'No modules yet',
+      name: 'noModules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search modules`
+  String get searchModules {
+    return Intl.message(
+      'Search modules',
+      name: 'searchModules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search profiles`
+  String get searchProfiles {
+    return Intl.message(
+      'Search profiles',
+      name: 'searchProfiles',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Level`
+  String get level {
+    return Intl.message('Level', name: 'level', desc: '', args: []);
+  }
+
+  /// `Duration`
+  String get duration {
+    return Intl.message('Duration', name: 'duration', desc: '', args: []);
+  }
+
+  /// `Speed`
+  String get speed {
+    return Intl.message('Speed', name: 'speed', desc: '', args: []);
+  }
+
+  /// `Action`
+  String get tableAction {
+    return Intl.message('Action', name: 'tableAction', desc: '', args: []);
+  }
+
+  /// `Close connection`
+  String get closeConnection {
+    return Intl.message(
+      'Close connection',
+      name: 'closeConnection',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Copy`
+  String get copyAction {
+    return Intl.message('Copy', name: 'copyAction', desc: '', args: []);
+  }
+
+  /// `Clear logs`
+  String get clearLogs {
+    return Intl.message('Clear logs', name: 'clearLogs', desc: '', args: []);
+  }
+
+  /// `This will clear all records.`
+  String get clearConfirmMessage {
+    return Intl.message(
+      'This will clear all records.',
+      name: 'clearConfirmMessage',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enable / disable`
+  String get toggleRun {
+    return Intl.message(
+      'Enable / disable',
+      name: 'toggleRun',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open command palette`
+  String get openCommandPalette {
+    return Intl.message(
+      'Open command palette',
+      name: 'openCommandPalette',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Open settings`
+  String get openSettings {
+    return Intl.message(
+      'Open settings',
+      name: 'openSettings',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Run delay test`
+  String get runDelayTest {
+    return Intl.message(
+      'Run delay test',
+      name: 'runDelayTest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Focus search`
+  String get focusSearch {
+    return Intl.message(
+      'Focus search',
+      name: 'focusSearch',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Close dialog / clear search`
+  String get closeDialogOrClear {
+    return Intl.message(
+      'Close dialog / clear search',
+      name: 'closeDialogOrClear',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete selected row`
+  String get deleteSelectedRow {
+    return Intl.message(
+      'Delete selected row',
+      name: 'deleteSelectedRow',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Switch page`
+  String get switchPage {
+    return Intl.message('Switch page', name: 'switchPage', desc: '', args: []);
+  }
+
+  /// `Fixed`
+  String get notRebindable {
+    return Intl.message('Fixed', name: 'notRebindable', desc: '', args: []);
+  }
+
+  /// `No matching settings`
+  String get noSettingsResult {
+    return Intl.message(
+      'No matching settings',
+      name: 'noSettingsResult',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Commands`
+  String get scopeCommands {
+    return Intl.message('Commands', name: 'scopeCommands', desc: '', args: []);
+  }
+
+  /// `Launch at startup`
+  String get startup {
+    return Intl.message(
+      'Launch at startup',
+      name: 'startup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Show speed in tray`
+  String get trayTitle {
+    return Intl.message(
+      'Show speed in tray',
+      name: 'trayTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No modules with a stored update URL`
+  String get noUpdatableModules {
+    return Intl.message(
+      'No modules with a stored update URL',
+      name: 'noUpdatableModules',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Updated {done}/{total} modules`
+  String modulesUpdated(Object done, Object total) {
+    return Intl.message(
+      'Updated $done/$total modules',
+      name: 'modulesUpdated',
+      desc: '',
+      args: [done, total],
+    );
+  }
+
+  /// `Updated module: {name}`
+  String moduleUpdated(Object name) {
+    return Intl.message(
+      'Updated module: $name',
+      name: 'moduleUpdated',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `Hosts`
+  String get hosts {
+    return Intl.message('Hosts', name: 'hosts', desc: '', args: []);
+  }
+
+  /// `Rewrites`
+  String get rewrites {
+    return Intl.message('Rewrites', name: 'rewrites', desc: '', args: []);
+  }
+
+  /// `Scripts`
+  String get scripts {
+    return Intl.message('Scripts', name: 'scripts', desc: '', args: []);
+  }
+
+  /// `No parameters`
+  String get noModuleParams {
+    return Intl.message(
+      'No parameters',
+      name: 'noModuleParams',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Export failed`
+  String get exportFailed {
+    return Intl.message(
+      'Export failed',
+      name: 'exportFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No active connections`
+  String get noConnections {
+    return Intl.message(
+      'No active connections',
+      name: 'noConnections',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No requests yet`
+  String get noRequests {
+    return Intl.message(
+      'No requests yet',
+      name: 'noRequests',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No logs yet`
+  String get noLogs {
+    return Intl.message('No logs yet', name: 'noLogs', desc: '', args: []);
+  }
+
+  /// `Follow system`
+  String get followSystem {
+    return Intl.message(
+      'Follow system',
+      name: 'followSystem',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Closing the window keeps Eclipse running in the tray`
+  String get minimizeToTrayDesc {
+    return Intl.message(
+      'Closing the window keeps Eclipse running in the tray',
+      name: 'minimizeToTrayDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Space`
+  String get spaceKey {
+    return Intl.message('Space', name: 'spaceKey', desc: '', args: []);
+  }
+
+  /// `Shortcut updated: {name}`
+  String shortcutUpdated(Object name) {
+    return Intl.message(
+      'Shortcut updated: $name',
+      name: 'shortcutUpdated',
+      desc: '',
+      args: [name],
+    );
+  }
+
+  /// `App name`
+  String get appName {
+    return Intl.message('App name', name: 'appName', desc: '', args: []);
+  }
+
+  /// `Version`
+  String get appVersion {
+    return Intl.message('Version', name: 'appVersion', desc: '', args: []);
+  }
+
+  /// `No rules`
+  String get noRuleItems {
+    return Intl.message('No rules', name: 'noRuleItems', desc: '', args: []);
+  }
+
+  /// `Select a module to view details`
+  String get moduleDetailEmpty {
+    return Intl.message(
+      'Select a module to view details',
+      name: 'moduleDetailEmpty',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `In use`
+  String get inUse {
+    return Intl.message('In use', name: 'inUse', desc: '', args: []);
   }
 }
 

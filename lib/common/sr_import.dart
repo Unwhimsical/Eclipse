@@ -124,19 +124,21 @@ class ShadowrocketImport {
     WidgetRef ref, {
     required String raw,
     String? fileName,
+    String? sourceUrl,
   }) async {
     final parsed = await parseSgmoduleWithArgumentsBackground(raw, const {});
     final name = parsed.name;
     if (name.isNotEmpty) {
       final existing = await moduleStore.findByName(name);
       if (existing != null) {
-        return updateModule(ref, existing.id, raw);
+        return updateModule(ref, existing.id, raw, sourceUrl: sourceUrl);
       }
     }
     final info = await moduleStore.importParsed(
       parsed,
       raw,
       fileName: fileName,
+      sourceUrl: sourceUrl,
     );
     if (info.ruleSetRules.isNotEmpty) {
       await _addGlobalRules(ref, info.ruleSetRules);
@@ -156,8 +158,9 @@ class ShadowrocketImport {
   static Future<ModuleInfo?> updateModule(
     WidgetRef ref,
     String id,
-    String newRaw,
-  ) async {
+    String newRaw, {
+    String? sourceUrl,
+  }) async {
     final oldInfo = (await moduleStore.list()).where((e) => e.id == id);
     if (oldInfo.isEmpty) return null;
     final info = oldInfo.first;
@@ -175,7 +178,11 @@ class ShadowrocketImport {
       );
       await _removeGlobalRules(ref, oldParsed.rules);
     }
-    final updated = await moduleStore.updateContent(id, newRaw);
+    final updated = await moduleStore.updateContent(
+      id,
+      newRaw,
+      sourceUrl: sourceUrl,
+    );
     if (updated == null) return null;
     if (updated.ruleSetRules.isNotEmpty) {
       await _addGlobalRules(ref, updated.ruleSetRules);
@@ -268,7 +275,12 @@ class ShadowrocketImport {
     final response = await request.getTextResponseForUrl(url);
     final raw = response.data ?? '';
     if (raw.isEmpty) return null;
-    return importModule(ref, raw: raw, fileName: fileNameFromUrl(url));
+    return importModule(
+      ref,
+      raw: raw,
+      fileName: fileNameFromUrl(url),
+      sourceUrl: url,
+    );
   }
 
   static String fileNameFromUrl(String url) {

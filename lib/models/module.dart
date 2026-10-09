@@ -25,12 +25,17 @@ class ModuleInfo {
   /// Kept when the module file is updated.
   final Map<String, String> argumentValues;
 
+  /// URL the module was imported from; null for file imports. Powers the
+  /// desktop "update" actions.
+  final String? sourceUrl;
+
   const ModuleInfo({
     required this.id,
     required this.name,
     this.desc = '',
     this.author,
     this.enabled = true,
+    this.sourceUrl,
     this.ruleCount = 0,
     this.hostCount = 0,
     this.rewriteCount = 0,
@@ -47,6 +52,7 @@ class ModuleInfo {
     String? desc,
     String? author,
     bool? enabled,
+    String? sourceUrl,
     int? ruleCount,
     int? hostCount,
     int? rewriteCount,
@@ -62,6 +68,7 @@ class ModuleInfo {
       desc: desc ?? this.desc,
       author: author ?? this.author,
       enabled: enabled ?? this.enabled,
+      sourceUrl: sourceUrl ?? this.sourceUrl,
       ruleCount: ruleCount ?? this.ruleCount,
       hostCount: hostCount ?? this.hostCount,
       rewriteCount: rewriteCount ?? this.rewriteCount,
@@ -90,6 +97,7 @@ class ModuleInfo {
       'ruleSetRules': ruleSetRules,
       'rulesAppend': rulesAppend,
       'argumentValues': argumentValues,
+      'sourceUrl': sourceUrl,
     };
   }
 
@@ -117,6 +125,7 @@ class ModuleInfo {
             (key, value) => MapEntry('$key', '$value'),
           ) ??
           const {},
+      sourceUrl: json['sourceUrl'] as String?,
     );
   }
 }
