@@ -36,6 +36,11 @@
           "type": "fix",
           "entries": [
             {
+              "id": "b396007",
+              "scope": "android",
+              "text": "移除 common 模块的 Firebase 依赖"
+            },
+            {
               "id": "aa1334c",
               "scope": "android",
               "text": "删除无用的 google-services.json"

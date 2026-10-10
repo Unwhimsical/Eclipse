@@ -11,6 +11,7 @@
 
 **Bug Fixes**
 
+- **android** 移除 common 模块的 Firebase 依赖 (b396007)
 - **android** 删除无用的 google-services.json (aa1334c)
 - **android** 移除未使用的 Firebase 依赖 (71e7bb6)
 - 格式化 setup_test (0543b89)
