@@ -1,7 +1,7 @@
 name: fl_clash
 description: Eclipse - a multi-platform proxy client, simple and easy to use, open-source and ad-free.
 publish_to: 'none'
-version: 0.9.0+2026101001
+version: 0.9.1+2026101101
 environment:
   sdk: '>=3.10.0 <4.0.0'
 
