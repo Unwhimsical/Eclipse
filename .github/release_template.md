@@ -4,6 +4,13 @@
 
 </div>
 
+**Highlights:**
+
+- 🖥️ Redesigned desktop UI (Windows / macOS): sidebar navigation, five dedicated pages, rich node cards
+- 📱 iOS support with NetworkExtension-based VPN
+- 🔓 MITM engine: TLS decryption, header/body rewrite, Map Local, JS scripting
+- 📦 Shadowrocket-compatible: `.conf` configs, `.sgmodule` modules, share-link subscriptions
+
 **Download based on your OS:**
 
 <div align=left>

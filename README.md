@@ -13,6 +13,37 @@ Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 m
 - **Android**：`.apk`
 - **iOS**：未签名的 `.ipa`，需自行签名后安装
 
+## 安装
+
+### Windows / macOS / Android
+
+下载对应安装包直接安装即可。Windows 也有便携版（zip），解压即用。
+
+### iOS（需自行签名）
+
+1. 在 Releases 页面下载未签名的 `.ipa`。
+2. 用 [Sideloadly](https://sideloadly.io/)、AltStore 或 TrollStore 等工具签名安装。
+3. 需要一个 Apple ID（免费的即可，7 天有效期）或付费开发者证书。
+
+## MITM 证书风险提示
+
+Eclipse 内置 CA 中心，可一键生成 MITM 根证书用于解密 HTTPS 流量（如去广告）。
+
+⚠️ **风险提示**：
+- 安装根证书意味着 Eclipse 可以解密你的 HTTPS 流量，请只在信任的设备上使用。
+- 不要把生成的根证书私钥分享给他人。
+- 仅对你明确需要解密的域名开启 MITM，不要全局解密。
+
+## 支持的平台
+
+| 平台 | 状态 |
+|------|------|
+| Windows (x64) | ✅ 安装包 / 便携版 |
+| macOS (Apple Silicon / Intel) | ✅ DMG |
+| Android (arm64) | ✅ APK |
+| iOS | ✅ 未签名 IPA（需自行签名） |
+| Linux | ✅ AppImage / deb / rpm |
+
 ## 功能特性
 
 - **节点与订阅导入**：分享链接逐行导入、Base64 订阅导入
