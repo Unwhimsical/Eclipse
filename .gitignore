@@ -84,3 +84,11 @@ devtools_options.yaml
 /coverage/lcov.info
 # Widget Preview related
 .widget_preview/
+
+# Personal AI tool configs (not for public repo)
+.claude/
+.codex/
+.gemini/
+.zed/
+.mcp.json
+opencode.jsonc
