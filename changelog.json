@@ -36,6 +36,11 @@
           "type": "fix",
           "entries": [
             {
+              "id": "943173c",
+              "scope": "android",
+              "text": "移除 GlobalState 中的 Firebase 调用"
+            },
+            {
               "id": "b396007",
               "scope": "android",
               "text": "移除 common 模块的 Firebase 依赖"
