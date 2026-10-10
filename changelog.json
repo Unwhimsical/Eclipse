@@ -36,6 +36,11 @@
           "type": "fix",
           "entries": [
             {
+              "id": "f3fa51b",
+              "scope": "ci",
+              "text": "无 KEYSTORE secret 时生成临时调试签名"
+            },
+            {
               "id": "943173c",
               "scope": "android",
               "text": "移除 GlobalState 中的 Firebase 调用"

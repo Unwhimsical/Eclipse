@@ -11,6 +11,7 @@
 
 **Bug Fixes**
 
+- **ci** 无 KEYSTORE secret 时生成临时调试签名 (f3fa51b)
 - **android** 移除 GlobalState 中的 Firebase 调用 (943173c)
 - **android** 移除 common 模块的 Firebase 依赖 (b396007)
 - **android** 删除无用的 google-services.json (aa1334c)
