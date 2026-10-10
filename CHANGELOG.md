@@ -11,6 +11,9 @@
 
 **Bug Fixes**
 
+- 格式化 setup_test (0543b89)
+- 格式化 setup_test (3be52ad)
+- **test** 更新打包测试期望值 (65558d0)
 - 移除不存在的 pacman 打包目标 (d67595b)
 - **core** Keep system resolver fallback when no DNS servers reported (fb041e6)
 - 更新检查地址改为 Unwhimsical/Eclipse (b9e028c)

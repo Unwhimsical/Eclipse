@@ -36,6 +36,19 @@
           "type": "fix",
           "entries": [
             {
+              "id": "0543b89",
+              "text": "格式化 setup_test"
+            },
+            {
+              "id": "3be52ad",
+              "text": "格式化 setup_test"
+            },
+            {
+              "id": "65558d0",
+              "scope": "test",
+              "text": "更新打包测试期望值"
+            },
+            {
               "id": "d67595b",
               "text": "移除不存在的 pacman 打包目标"
             },
