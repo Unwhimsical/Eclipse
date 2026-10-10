@@ -52,11 +52,33 @@
                 <a href="https://github.com/Unwhimsical/Eclipse/releases/download/vVERSION/Eclipse-VERSION-linux-amd64.rpm"><img src="https://img.shields.io/badge/RpmPackage-x64-F1B42F.svg?logo=redhat"> </a>
             </td>
         </tr>
+        <tr>
+            <td>iOS</td>
+            <td>
+                <a href="https://github.com/Unwhimsical/Eclipse/releases/download/vVERSION/Eclipse-VERSION-ios-unsigned.ipa"><img src="https://img.shields.io/badge/IPA-Unsigned-%23000000.svg?logo=apple"></a><br>
+                <sub>未签名包，需自行签名后安装（见下方说明）</sub>
+            </td>
+        </tr>
     </tbody>
 </table>
 
 
 </div>
+
+**安装说明：**
+
+- **Windows**：下载 `*-setup.exe` 安装版，或 `*.zip` 解压即用（绿色版）
+- **macOS**：下载对应芯片的 `.dmg`（Apple Silicon 用 arm64，Intel 用 amd64），拖入应用程序文件夹
+- **Android**：下载对应架构的 `.apk`（主流手机用 arm64-v8a），允许安装未知来源应用后安装
+- **Linux**：`AppImage` 双击运行；`deb`/`rpm` 用包管理器安装；`zip` 解压即用
+- **iOS**：下载 `*-ios-unsigned.ipa`（未签名），需用 Apple 开发者证书自行签名后通过 AltStore / Sideloadly / TrollStore 等工具安装
+
+**MITM 证书风险提示：**
+
+Eclipse 内置 CA 中心可生成 MITM 根证书用于 HTTPS 解密（如去广告）。安装根证书意味着授予应用解密你所有 HTTPS 流量的能力，请确保：
+1. 只在你信任的设备上安装
+2. 证书仅用于你明确需要的域名（模块中可配置）
+3. 不再需要时及时删除证书
 
 <div dir="ltr">
 
