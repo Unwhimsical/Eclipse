@@ -945,6 +945,8 @@
   "invalidRule": "Invalid rule format",
   "noModules": "No modules yet",
   "searchModules": "Search modules",
+  "moduleSectionEmptyHint": "Section is empty. Add lines, one per line.",
+  "moduleSectionTooLarge": "This section is too large to edit here. Please edit the .sgmodule file directly with a text editor.",
   "searchProfiles": "Search profiles",
   "level": "Level",
   "duration": "Duration",

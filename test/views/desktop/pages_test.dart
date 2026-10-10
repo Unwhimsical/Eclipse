@@ -9,6 +9,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/test_app.dart';
 import '../../helpers/test_profiles.dart';
@@ -176,6 +177,7 @@ void main() {
     testWidgets('config page switches profile and placeholder tabs', (
       tester,
     ) async {
+      SharedPreferences.setMockInitialValues({});
       final profile = Profile.normal(label: 'Test profile');
       final other = Profile.normal(label: 'Other profile');
       await _pumpPage(
@@ -195,7 +197,7 @@ void main() {
       expect(find.text('Other profile'), findsWidgets);
       await tester.tap(find.text('Modules'));
       await tester.pumpAndSettle();
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.text('Coming soon'), findsNothing);
       await tester.tap(find.text('DNS'));
       await tester.pumpAndSettle();
       expect(find.text('Coming soon'), findsOneWidget);

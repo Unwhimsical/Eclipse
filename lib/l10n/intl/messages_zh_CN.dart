@@ -675,6 +675,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "moduleRuleCount": m27,
     "moduleRuleStats": MessageLookupByLibrary.simpleMessage("规则统计"),
     "moduleScriptCount": m28,
+    "moduleSectionEmptyHint": MessageLookupByLibrary.simpleMessage(
+      "本节为空。每行一条，可直接添加。",
+    ),
+    "moduleSectionTooLarge": MessageLookupByLibrary.simpleMessage(
+      "本节内容过大，无法在此编辑。请用文本编辑器直接修改 .sgmodule 文件。",
+    ),
     "moduleStatsSummary": m29,
     "moduleUpdated": m30,
     "modules": MessageLookupByLibrary.simpleMessage("模块"),

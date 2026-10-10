@@ -773,6 +773,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "moduleRuleCount": m27,
     "moduleRuleStats": MessageLookupByLibrary.simpleMessage("ルール統計"),
     "moduleScriptCount": m28,
+    "moduleSectionEmptyHint": MessageLookupByLibrary.simpleMessage(
+      "セクションは空です。1行ずつ追加できます。",
+    ),
+    "moduleSectionTooLarge": MessageLookupByLibrary.simpleMessage(
+      "このセクションは大きすぎてここでは編集できません。テキストエディタで .sgmodule ファイルを直接編集してください。",
+    ),
     "moduleStatsSummary": m29,
     "moduleUpdated": m30,
     "modules": MessageLookupByLibrary.simpleMessage("モジュール"),

@@ -764,9 +764,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Enter the rule content",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -916,6 +917,12 @@ class MessageLookup extends MessageLookupByLibrary {
     "moduleRuleCount": m27,
     "moduleRuleStats": MessageLookupByLibrary.simpleMessage("Rule stats"),
     "moduleScriptCount": m28,
+    "moduleSectionEmptyHint": MessageLookupByLibrary.simpleMessage(
+      "Section is empty. Add lines, one per line.",
+    ),
+    "moduleSectionTooLarge": MessageLookupByLibrary.simpleMessage(
+      "This section is too large to edit here. Please edit the .sgmodule file directly with a text editor.",
+    ),
     "moduleStatsSummary": m29,
     "moduleUpdated": m30,
     "modules": MessageLookupByLibrary.simpleMessage("Modules"),

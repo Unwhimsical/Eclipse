@@ -7729,6 +7729,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Section is empty. Add lines, one per line.`
+  String get moduleSectionEmptyHint {
+    return Intl.message(
+      'Section is empty. Add lines, one per line.',
+      name: 'moduleSectionEmptyHint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `This section is too large to edit here. Please edit the .sgmodule file directly with a text editor.`
+  String get moduleSectionTooLarge {
+    return Intl.message(
+      'This section is too large to edit here. Please edit the .sgmodule file directly with a text editor.',
+      name: 'moduleSectionTooLarge',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Search profiles`
   String get searchProfiles {
     return Intl.message(

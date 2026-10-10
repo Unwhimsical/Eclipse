@@ -945,6 +945,8 @@
   "invalidRule": "规则格式无效",
   "noModules": "还没有模块",
   "searchModules": "搜索模块",
+  "moduleSectionEmptyHint": "本节为空。每行一条，可直接添加。",
+  "moduleSectionTooLarge": "本节内容过大，无法在此编辑。请用文本编辑器直接修改 .sgmodule 文件。",
   "searchProfiles": "搜索配置文件",
   "level": "等级",
   "duration": "时长",

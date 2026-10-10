@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
@@ -507,9 +508,11 @@ class _ProfileDetail extends ConsumerWidget {
                 ref.read(desktopConfigTabProvider.notifier).value = i,
           ),
           Expanded(
-            child: tabIndex == 0
-                ? _RulesTab(profile: profile)
-                : _TabPlaceholder(index: tabIndex),
+            child: switch (tabIndex) {
+              0 => _RulesTab(profile: profile),
+              1 => const _ModulesTab(),
+              _ => _TabPlaceholder(index: tabIndex),
+            },
           ),
         ],
       ),
@@ -1131,6 +1134,643 @@ class _TestResultView extends StatelessWidget {
                   ),
               ],
             ),
+    );
+  }
+}
+
+String _extractSection(String raw, String sectionName) {
+  final buffer = <String>[];
+  var inSection = false;
+  final target = sectionName.toLowerCase();
+  for (final line in const LineSplitter().convert(raw)) {
+    final trimmed = line.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      if (inSection) break;
+      final name = trimmed
+          .substring(1, trimmed.length - 1)
+          .trim()
+          .toLowerCase();
+      if (name == target) inSection = true;
+      continue;
+    }
+    if (inSection) buffer.add(line);
+  }
+  while (buffer.isNotEmpty && buffer.last.trim().isEmpty) {
+    buffer.removeLast();
+  }
+  return buffer.join('\n');
+}
+
+String _replaceSection(String raw, String sectionName, String newContent) {
+  final lines = const LineSplitter().convert(raw);
+  final result = <String>[];
+  var inSection = false;
+  var found = false;
+  final target = sectionName.toLowerCase();
+  for (final line in lines) {
+    final trimmed = line.trim();
+    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+      final name = trimmed
+          .substring(1, trimmed.length - 1)
+          .trim()
+          .toLowerCase();
+      if (inSection) {
+        if (newContent.trim().isNotEmpty) result.add(newContent);
+        inSection = false;
+      }
+      if (name == target) {
+        inSection = true;
+        found = true;
+      }
+      result.add(line);
+      continue;
+    }
+    if (!inSection) result.add(line);
+  }
+  if (inSection && newContent.trim().isNotEmpty) result.add(newContent);
+  if (!found) {
+    result.add('');
+    result.add('[$sectionName]');
+    result.add(newContent);
+  }
+  return result.join('\n');
+}
+
+class _ModulesTab extends ConsumerStatefulWidget {
+  const _ModulesTab();
+
+  @override
+  ConsumerState<_ModulesTab> createState() => _ModulesTabState();
+}
+
+class _ModulesTabState extends ConsumerState<_ModulesTab> {
+  List<ModuleInfo> _modules = [];
+  bool _loading = true;
+  String _query = '';
+  String? _selectedId;
+
+  String? _raw;
+  int _sectionIndex = 0;
+  final Map<int, TextEditingController> _editors = {};
+  final Set<int> _changed = {};
+  bool _saving = false;
+
+  static const _sections = [
+    ('rule', '规则'),
+    ('url rewrite', 'URL重写'),
+    ('script', '脚本'),
+    ('mitm', 'MITM'),
+    ('host', 'Host'),
+  ];
+
+  static const _largeSectionLimit = 100 * 1024;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh();
+  }
+
+  @override
+  void dispose() {
+    for (final c in _editors.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    List<ModuleInfo> modules = const [];
+    try {
+      modules = await moduleStore.list();
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() {
+      _modules = modules;
+      _loading = false;
+      if (_selectedId != null && modules.every((m) => m.id != _selectedId)) {
+        _selectedId = null;
+        _clearEditor();
+      }
+      _selectedId ??= modules.firstOrNull?.id;
+    });
+    if (_selectedId != null && _raw == null) {
+      await _loadModule(_selectedId!);
+    }
+  }
+
+  void _clearEditor() {
+    for (final c in _editors.values) {
+      c.dispose();
+    }
+    _editors.clear();
+    _changed.clear();
+    _raw = null;
+    _sectionIndex = 0;
+  }
+
+  Future<void> _loadModule(String id) async {
+    _clearEditor();
+    final raw = await moduleStore.readRaw(id);
+    if (!mounted) return;
+    setState(() {
+      _selectedId = id;
+      _raw = raw ?? '';
+    });
+    _openSection(0);
+  }
+
+  void _openSection(int index) {
+    final old = _editors[index];
+    if (old != null) {
+      setState(() => _sectionIndex = index);
+      return;
+    }
+    final content = _raw == null
+        ? ''
+        : _extractSection(_raw!, _sections[index].$1);
+    final controller = TextEditingController(text: content);
+    controller.addListener(() => _changed.add(index));
+    _editors[index] = controller;
+    setState(() => _sectionIndex = index);
+  }
+
+  Future<void> _save() async {
+    final id = _selectedId;
+    final raw = _raw;
+    if (id == null || raw == null || _saving || _changed.isEmpty) return;
+    setState(() => _saving = true);
+    try {
+      var updated = raw;
+      for (final index in _changed) {
+        final controller = _editors[index];
+        if (controller != null) {
+          updated = _replaceSection(
+            updated,
+            _sections[index].$1,
+            controller.text,
+          );
+        }
+      }
+      final info = await globalState.safeRun(
+        () => moduleStore.updateContent(id, updated),
+      );
+      if (!mounted) return;
+      if (info != null) {
+        _clearEditor();
+        await _refresh();
+      }
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _toggle(ModuleInfo info, bool enabled) async {
+    await globalState.safeRun(
+      () => ShadowrocketImport.setModuleEnabled(ref, info, enabled),
+    );
+    await _refresh();
+  }
+
+  Future<void> _delete(ModuleInfo info) async {
+    final appLocalizations = context.appLocalizations;
+    final confirmed = await dialogs.showMessage(
+      title: appLocalizations.tip,
+      message: TextSpan(text: appLocalizations.deleteModuleConfirm(info.name)),
+    );
+    if (confirmed != true) return;
+    if (info.enabled) {
+      await ShadowrocketImport.setModuleEnabled(ref, info, false);
+    }
+    await moduleStore.delete(info.id);
+    await _refresh();
+  }
+
+  Future<void> _importFromFile() async {
+    final appLocalizations = context.appLocalizations;
+    final platformFile = await globalState.safeRun(picker.pickerFile);
+    if (platformFile == null || !mounted) return;
+    final bytes = await platformFile.readBytes();
+    final info = await globalState.safeRun(
+      () => ShadowrocketImport.importModule(
+        ref,
+        raw: String.fromCharCodes(bytes),
+        fileName: platformFile.name,
+      ),
+    );
+    if (!mounted) return;
+    if (info == null) {
+      dialogs.showNotifier(
+        appLocalizations.moduleInvalid,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    dialogs.showNotifier(
+      appLocalizations.moduleImported(info.name),
+      level: MessageLevel.success,
+    );
+    await _refresh();
+  }
+
+  Future<void> _importFromUrl() async {
+    final appLocalizations = context.appLocalizations;
+    final url = await dialogs.showCommonDialog<String>(
+      child: InputDialog(
+        autovalidateMode: AutovalidateMode.onUnfocus,
+        title: appLocalizations.importFromURL,
+        labelText: appLocalizations.url,
+        hintText: 'https://example.com/module.sgmodule',
+        value: '',
+        keyboardType: TextInputType.url,
+        inputFormatters: TextInputLimits.limit(TextInputLimits.url),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return appLocalizations.emptyTip('').trim();
+          }
+          if (!value.isUrl) return appLocalizations.urlTip('').trim();
+          return null;
+        },
+      ),
+    );
+    if (url == null || url.isEmpty || !mounted) return;
+    final info = await globalState.safeRun(
+      () => ShadowrocketImport.importModuleFromUrl(ref, url: url),
+    );
+    if (!mounted) return;
+    if (info == null) {
+      dialogs.showNotifier(
+        appLocalizations.moduleDownloadFailed,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    dialogs.showNotifier(
+      appLocalizations.moduleImported(info.name),
+      level: MessageLevel.success,
+    );
+    await _refresh();
+  }
+
+  void _showImportMenu() {
+    final appLocalizations = context.appLocalizations;
+    dialogs.showCommonDialog(
+      child: CommonDialog(
+        title: appLocalizations.importModule,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListItem(
+              leading: const Icon(Icons.file_open),
+              title: Text(appLocalizations.importModuleFromFile),
+              onTap: () {
+                Navigator.of(context).pop();
+                _importFromFile();
+              },
+            ),
+            ListItem(
+              leading: const Icon(Icons.link),
+              title: Text(appLocalizations.importFromUrl),
+              onTap: () {
+                Navigator.of(context).pop();
+                _importFromUrl();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<ModuleInfo> get _filtered {
+    if (_query.isEmpty) return _modules;
+    final q = _query.toLowerCase();
+    return _modules
+        .where(
+          (m) =>
+              m.name.toLowerCase().contains(q) ||
+              m.desc.toLowerCase().contains(q),
+        )
+        .toList();
+  }
+
+  Widget _buildModuleRow(ModuleInfo info) {
+    final appLocalizations = context.appLocalizations;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final selected = info.id == _selectedId;
+    final accent = tokens?.accent ?? theme.colorScheme.primary;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => _loadModule(info.id),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(10),
+            side: selected
+                ? BorderSide(color: accent, width: 1.5)
+                : BorderSide.none,
+          ),
+          color: selected
+              ? (tokens?.accentSoft ?? accent.withValues(alpha: 0.12))
+              : Colors.transparent,
+        ),
+        child: Row(
+          spacing: 10,
+          children: [
+            Icon(
+              Icons.extension_outlined,
+              size: 20,
+              color: info.enabled
+                  ? accent
+                  : (tokens?.text3 ?? theme.colorScheme.onSurfaceVariant),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  Text(
+                    info.name,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    appLocalizations.moduleStatsSummary(
+                      info.ruleCount,
+                      info.rewriteCount,
+                      info.scriptCount,
+                    ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color:
+                          tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Switch(value: info.enabled, onChanged: (v) => _toggle(info, v)),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 18),
+              tooltip: appLocalizations.delete,
+              onPressed: () => _delete(info),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditor() {
+    final appLocalizations = context.appLocalizations;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final info = _modules.firstWhereOrNull((m) => m.id == _selectedId);
+    if (info == null) {
+      return Center(
+        child: Text(
+          appLocalizations.noModulesDesc,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      );
+    }
+    final controller = _editors[_sectionIndex];
+    final isLarge =
+        controller != null && controller.text.length > _largeSectionLimit;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: Row(
+            spacing: 8,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 2,
+                  children: [
+                    Text(
+                      info.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (info.desc.isNotEmpty)
+                      Text(
+                        info.desc,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color:
+                              tokens?.text3 ??
+                              theme.colorScheme.onSurfaceVariant,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
+              ),
+              if (_changed.isNotEmpty)
+                OutlinedButton(
+                  onPressed: () {
+                    _clearEditor();
+                    _loadModule(info.id);
+                  },
+                  child: Text(appLocalizations.reset),
+                ),
+              FilledButton.icon(
+                onPressed: _changed.isEmpty || _saving ? null : _save,
+                icon: _saving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.save_outlined, size: 18),
+                label: Text(appLocalizations.save),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            spacing: 4,
+            children: [
+              for (var i = 0; i < _sections.length; i++)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _openSection(i),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: ShapeDecoration(
+                      shape: RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      color: _sectionIndex == i
+                          ? (tokens?.accentSoft ??
+                                theme.colorScheme.primary.withValues(
+                                  alpha: 0.14,
+                                ))
+                          : Colors.transparent,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 4,
+                      children: [
+                        Text(
+                          _sections[i].$2,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: _sectionIndex == i
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: _sectionIndex == i
+                                ? (tokens?.accent ?? theme.colorScheme.primary)
+                                : (tokens?.text2 ??
+                                      theme.colorScheme.onSurfaceVariant),
+                          ),
+                        ),
+                        if (_changed.contains(i))
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.orange,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: isLarge
+                ? Center(
+                    child: Text(
+                      appLocalizations.moduleSectionTooLarge,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color:
+                            tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                : controller == null
+                ? const Center(child: CircularProgressIndicator())
+                : TextField(
+                    controller: controller,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontFamily: 'monospace',
+                      fontFamilyFallback: const ['Menlo', 'Consolas'],
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor:
+                          tokens?.bg1 ?? theme.colorScheme.surfaceContainerLow,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.all(12),
+                      hintText: appLocalizations.moduleSectionEmptyHint,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+          child: Row(
+            spacing: 8,
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: appLocalizations.searchModules,
+                      prefixIcon: const Icon(Icons.search_rounded, size: 16),
+                      isDense: true,
+                    ),
+                    onChanged: (v) => setState(() => _query = v),
+                  ),
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: _showImportMenu,
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(appLocalizations.importModule),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(
+                width: 300,
+                child: _filtered.isEmpty
+                    ? Center(
+                        child: Text(
+                          appLocalizations.noModulesDesc,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).extension<DesktopThemeTokens>()?.text3 ??
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                              ),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(12, 4, 8, 12),
+                        itemCount: _filtered.length,
+                        itemBuilder: (_, i) => _buildModuleRow(_filtered[i]),
+                      ),
+              ),
+              const VerticalDivider(width: 1),
+              Expanded(child: _buildEditor()),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -945,6 +945,8 @@
   "invalidRule": "無効なルール形式",
   "noModules": "モジュールがありません",
   "searchModules": "モジュールを検索",
+  "moduleSectionEmptyHint": "セクションは空です。1行ずつ追加できます。",
+  "moduleSectionTooLarge": "このセクションは大きすぎてここでは編集できません。テキストエディタで .sgmodule ファイルを直接編集してください。",
   "searchProfiles": "プロファイルを検索",
   "level": "レベル",
   "duration": "継続時間",

@@ -800,9 +800,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Введите содержимое правила",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "Разрешение на список приложений отклонено, поэтому установленные приложения недоступны. Предоставьте его вручную в системных настройках.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "Эта система не выдаёт список установленных приложений без разрешения. Предоставьте его, чтобы настроить прокси для отдельных приложений.",
     ),
@@ -962,6 +963,12 @@ class MessageLookup extends MessageLookupByLibrary {
       "Статистика правил",
     ),
     "moduleScriptCount": m28,
+    "moduleSectionEmptyHint": MessageLookupByLibrary.simpleMessage(
+      "Раздел пуст. Добавляйте строки, по одной на строку.",
+    ),
+    "moduleSectionTooLarge": MessageLookupByLibrary.simpleMessage(
+      "Этот раздел слишком велик для редактирования здесь. Отредактируйте файл .sgmodule напрямую в текстовом редакторе.",
+    ),
     "moduleStatsSummary": m29,
     "moduleUpdated": m30,
     "modules": MessageLookupByLibrary.simpleMessage("Модули"),
