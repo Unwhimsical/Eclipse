@@ -2,6 +2,8 @@
 
 Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 macOS。
 
+![Eclipse](docs/images/hero.png)
+
 ## 功能特性
 
 - **节点与订阅导入**：分享链接逐行导入、Base64 订阅导入
@@ -13,6 +15,12 @@ Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 m
 - **代理链**：节点 A 经节点 B 出站
 - **其他**：延迟测试、代理共享、按需连接、统计分类、剪贴板导入、DNS / TUN / 代理设置
 - **自动构建**：GitHub Actions 自动产出 Android APK、未签名 iOS IPA、Windows / macOS 桌面包
+
+## 界面预览
+
+桌面端（Windows / macOS）：
+
+![桌面端配置页](docs/images/desktop-config.png)
 
 ## 构建
 
