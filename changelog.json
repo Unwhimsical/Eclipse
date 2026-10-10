@@ -36,6 +36,16 @@
           "type": "fix",
           "entries": [
             {
+              "id": "aa1334c",
+              "scope": "android",
+              "text": "删除无用的 google-services.json"
+            },
+            {
+              "id": "71e7bb6",
+              "scope": "android",
+              "text": "移除未使用的 Firebase 依赖"
+            },
+            {
               "id": "0543b89",
               "text": "格式化 setup_test"
             },

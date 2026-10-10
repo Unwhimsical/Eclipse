@@ -11,6 +11,8 @@
 
 **Bug Fixes**
 
+- **android** 删除无用的 google-services.json (aa1334c)
+- **android** 移除未使用的 Firebase 依赖 (71e7bb6)
 - 格式化 setup_test (0543b89)
 - 格式化 setup_test (3be52ad)
 - **test** 更新打包测试期望值 (65558d0)
