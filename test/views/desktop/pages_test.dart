@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:fl_clash/core/controller.dart';
-import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/desktop/desktop.dart';
@@ -13,6 +14,15 @@ import '../../helpers/test_app.dart';
 import '../../helpers/test_profiles.dart';
 
 class _FakeCoreController extends Mock implements CoreController {}
+
+class _TestCustomRules extends ProfileCustomRules {
+  _TestCustomRules(this.initial);
+
+  final List<Rule> initial;
+
+  @override
+  Stream<List<Rule>> build(int profileId) => Stream.value(initial);
+}
 
 ThemeData _desktopTheme() {
   return ThemeData(
@@ -114,66 +124,81 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('config page renders rich node card for a single node', (
+    testWidgets('config page shows profile list with rules toolbar', (
       tester,
     ) async {
       final profile = Profile.normal(label: 'Test profile');
+      final other = Profile.normal(label: 'Other profile');
+      final rules = [
+        const Rule(
+          id: 1,
+          content: 'example.com',
+          ruleTarget: 'REJECT',
+          order: 'a0',
+        ),
+        const Rule(
+          id: 2,
+          content: 'proxy.example.com',
+          ruleTarget: 'DIRECT',
+          order: 'a1',
+        ),
+      ];
       await _pumpPage(
         tester,
         const DesktopConfigView(),
         overrides: [
-          isStartProvider.overrideWithValue(false),
-          currentGroupsStateProvider.overrideWithValue(
-            const GroupsState(
-              value: [
-                Group(
-                  type: GroupType.Selector,
-                  name: 'PROXY',
-                  now: 'node-1',
-                  all: [Proxy(name: 'node-1', type: 'vless')],
-                ),
-              ],
-            ),
-          ),
-          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          profilesProvider.overrideWith(() => TestProfiles([profile, other])),
           currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          profileCustomRulesProvider.overrideWith2(
+            (_) => _TestCustomRules(rules),
+          ),
         ],
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.byType(DesktopConfigView), findsOneWidget);
-      expect(find.text('Status'), findsOneWidget);
-      expect(find.text('Current node'), findsOneWidget);
-      expect(find.text('node-1'), findsWidgets);
-      expect(find.text('VLESS'), findsOneWidget);
-      expect(find.text('PROXY · select'), findsOneWidget);
-      expect(find.text('Delay test'), findsWidgets);
+      expect(find.text('Test profile'), findsWidgets);
+      expect(find.text('Other profile'), findsOneWidget);
+      expect(find.text('In use'), findsWidgets);
+      expect(find.text('Rules'), findsOneWidget);
+      expect(find.text('Modules'), findsOneWidget);
+      expect(find.text('Proxy group'), findsOneWidget);
+      expect(find.text('General'), findsOneWidget);
+      expect(find.text('DNS'), findsOneWidget);
+      expect(find.text('Test Rules'), findsOneWidget);
+      expect(find.text('Add rule'), findsOneWidget);
+      expect(find.text('example.com'), findsOneWidget);
+      expect(find.text('proxy.example.com'), findsOneWidget);
+      expect(find.text('REJECT'), findsOneWidget);
+      expect(find.text('DIRECT'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('config page keeps actions visible with zero nodes', (
+    testWidgets('config page switches profile and placeholder tabs', (
       tester,
     ) async {
       final profile = Profile.normal(label: 'Test profile');
+      final other = Profile.normal(label: 'Other profile');
       await _pumpPage(
         tester,
         const DesktopConfigView(),
         overrides: [
-          isStartProvider.overrideWithValue(false),
-          currentGroupsStateProvider.overrideWithValue(
-            const GroupsState(value: []),
-          ),
-          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          profilesProvider.overrideWith(() => TestProfiles([profile, other])),
           currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          profileCustomRulesProvider.overrideWith2(
+            (_) => _TestCustomRules(const []),
+          ),
         ],
       );
-      await tester.pump();
-      expect(find.byType(DesktopConfigView), findsOneWidget);
-      expect(find.text('This profile has no nodes'), findsOneWidget);
-      expect(find.text('Add node'), findsOneWidget);
-      expect(find.text('Import subscription'), findsOneWidget);
-      expect(find.text('View docs'), findsOneWidget);
-      expect(find.text('Status'), findsOneWidget);
-      expect(find.text('Delay test'), findsOneWidget);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Other profile'));
+      await tester.pumpAndSettle();
+      expect(find.text('Other profile'), findsWidgets);
+      await tester.tap(find.text('Modules'));
+      await tester.pumpAndSettle();
+      expect(find.text('Coming soon'), findsOneWidget);
+      await tester.tap(find.text('DNS'));
+      await tester.pumpAndSettle();
+      expect(find.text('Coming soon'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
