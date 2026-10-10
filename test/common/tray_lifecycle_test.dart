@@ -6,10 +6,27 @@ import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:tray/tray.dart';
+import 'dart:io';
 
 const _channel = MethodChannel('tray');
+
+class _FakePathProvider extends PathProviderPlatform {
+  _FakePathProvider(this.root);
+
+  final String root;
+
+  @override
+  Future<String?> getTemporaryPath() async => root;
+
+  @override
+  Future<String?> getApplicationSupportPath() async => root;
+
+  @override
+  Future<String?> getApplicationCachePath() async => root;
+}
 
 TrayState _trayState({bool isStart = false}) {
   return TrayState(
@@ -32,6 +49,8 @@ void main() {
   late ProviderContainer container;
 
   setUpAll(() async {
+    final root = await Directory.systemTemp.createTemp('tray_lifecycle_test');
+    PathProviderPlatform.instance = _FakePathProvider(root.path);
     await AppLocalizations.load(const Locale('en'));
   });
 
