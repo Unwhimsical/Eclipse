@@ -131,8 +131,8 @@ class CommonAction extends _$CommonAction {
             final appLocalizations = context.appLocalizations;
             return CommonDialog(
               title: appLocalizations.discoverNewVersion,
-              child: RichText(
-                text: _releaseSpan(
+              child: Text.rich(
+                _releaseSpan(
                   context,
                   data['tag_name'] as String,
                   data['body'] as String?,
