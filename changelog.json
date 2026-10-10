@@ -2,6 +2,49 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.9.0",
+      "tag": "v0.9.0",
+      "date": "2026-10-10",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "4135823",
+              "scope": "desktop",
+              "text": "Redesign the desktop UI with a self-drawn sidebar and five dedicated pages: home, config, modules, data, settings"
+            },
+            {
+              "id": "36bdccf",
+              "scope": "desktop",
+              "text": "Rich node cards with protocol and latency chips plus a dashboard strip, so the config page never looks empty with one node"
+            },
+            {
+              "id": "966635a",
+              "scope": "desktop",
+              "text": "System tray menu, global shortcuts, and a command palette"
+            }
+          ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "b918b04",
+              "scope": "ci",
+              "text": "Link the NDK into the SDK dir for Android unit tests"
+            },
+            {
+              "id": "afcc233",
+              "scope": "test",
+              "text": "Mock path_provider in the tray lifecycle test"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.8.98",
       "tag": "v0.8.98",
       "date": "2026-09-14",

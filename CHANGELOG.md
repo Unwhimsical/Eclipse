@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.0 (2026-10-10)
+
+**Features**
+
+- **desktop** Redesign the desktop UI with a self-drawn sidebar and five dedicated pages: home, config, modules, data, settings (4135823)
+- **desktop** Rich node cards with protocol and latency chips plus a dashboard strip, so the config page never looks empty with one node (36bdccf)
+- **desktop** System tray menu, global shortcuts, and a command palette (966635a)
+
+**Bug Fixes**
+
+- **ci** Link the NDK into the SDK dir for Android unit tests (b918b04)
+- **test** Mock path_provider in the tray lifecycle test (afcc233)
+
 ## v0.8.98 (2026-09-14)
 
 **Bug Fixes**
