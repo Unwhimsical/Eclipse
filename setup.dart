@@ -12,7 +12,7 @@ import 'tool/geodata.dart';
 const _allTargets = <String, String>{
   'android': 'apk',
   'ios': 'ipa',
-  'linux': 'deb,rpm,pacman,appimage,zip',
+  'linux': 'deb,rpm,appimage,zip',
   'macos': 'dmg',
   'windows': 'exe,zip',
 };
