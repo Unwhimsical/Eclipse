@@ -1,6 +1,6 @@
 # Attribution / 归属说明
 
-本目录（`ios-port-staging`）中的 iOS 移植内容基于以下两个开源项目，依据
+Eclipse 中的 iOS 移植内容基于以下两个开源项目，依据
 GNU General Public License v3.0 (GPL-3.0) 保持开源：
 
 1. **chen08209/FlClash** — https://github.com/chen08209/FlClash

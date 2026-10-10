@@ -154,7 +154,7 @@ class AppPath {
 
   Future<String> get lockFilePath async {
     final homeDirPath = await appPath.homeDirPath;
-    return join(homeDirPath, 'FlClash.lock');
+    return join(homeDirPath, 'Eclipse.lock');
   }
 
   Future<String> get configFilePath async {
