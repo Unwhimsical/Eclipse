@@ -11,6 +11,9 @@
 
 **Bug Fixes**
 
+- 移除不存在的 pacman 打包目标 (d67595b)
+- **core** Keep system resolver fallback when no DNS servers reported (fb041e6)
+- 更新检查地址改为 Unwhimsical/Eclipse (b9e028c)
 - **test** Mock path_provider in tray lifecycle test (afcc233)
 - **ci** Link NDK into SDK dir for Android unit tests (b918b04)
 - **desktop** Make ValueHolder class private (dead_file_test) (b1f4152)

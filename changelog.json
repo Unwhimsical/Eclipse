@@ -36,6 +36,19 @@
           "type": "fix",
           "entries": [
             {
+              "id": "d67595b",
+              "text": "移除不存在的 pacman 打包目标"
+            },
+            {
+              "id": "fb041e6",
+              "scope": "core",
+              "text": "Keep system resolver fallback when no DNS servers reported"
+            },
+            {
+              "id": "b9e028c",
+              "text": "更新检查地址改为 Unwhimsical/Eclipse"
+            },
+            {
               "id": "afcc233",
               "scope": "test",
               "text": "Mock path_provider in tray lifecycle test"
