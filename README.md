@@ -56,6 +56,18 @@ Eclipse 内置 CA 中心，可一键生成 MITM 根证书用于解密 HTTPS 流�
 - **其他**：延迟测试、代理共享、按需连接、统计分类、剪贴板导入、DNS / TUN / 代理设置
 - **自动构建**：GitHub Actions 自动产出 Android APK、未签名 iOS IPA、Windows / macOS 桌面包
 
+## 规则与模块
+
+推荐搭配 [NetPilot](https://github.com/Unwhimsical/NetPilot) 使用——自动维护的 Shadowrocket 规则与模块仓库，每天定时更新：
+
+| 模块 | 说明 | 导入链接 |
+|------|------|----------|
+| NetPilot Direct | 国内直连规则（11 万+条） | [NetPilot_Direct.module](https://raw.githubusercontent.com/Unwhimsical/NetPilot/refs/heads/main/modules/NetPilot_Direct.module) |
+| NetPilot Shield | 去广告 + 代理分流（20 万+条去广告规则） | [NetPilot_Shield.module](https://raw.githubusercontent.com/Unwhimsical/NetPilot/refs/heads/main/modules/NetPilot_Shield.module) |
+| NetPilot Route | 主规则配置 | [NetPilot Route.conf](https://raw.githubusercontent.com/Unwhimsical/NetPilot/refs/heads/main/NetPilot%20Route.conf) |
+
+Eclipse 原生支持 `.sgmodule` 模块导入（规则 / Host / URL Rewrite / Script / MITM）与 `.conf` 配置导入，复制上方链接即可在应用内添加。
+
 ## 构建
 
 ```bash
