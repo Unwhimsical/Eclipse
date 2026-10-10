@@ -25,13 +25,6 @@ Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 m
 - **其他**：延迟测试、代理共享、按需连接、统计分类、剪贴板导入、DNS / TUN / 代理设置
 - **自动构建**：GitHub Actions 自动产出 Android APK、未签名 iOS IPA、Windows / macOS 桌面包
 
-## 界面预览
-
-桌面端（Windows / macOS）：
-
-![桌面端配置页](docs/images/desktop-config.png)
-![桌面端首页](docs/images/desktop-home.png)
-
 ## 构建
 
 ```bash
