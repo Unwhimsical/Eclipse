@@ -54,19 +54,19 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash は QR コードをスキャンするためにこの権限が必要です。"
+            "value" : "Eclipse は QR コードをスキャンするためにこの権限が必要です。"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash запрашивает это разрешение для сканирования QR-кода."
+            "value" : "Eclipse запрашивает это разрешение для сканирования QR-кода."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash 需要此权限以扫描二维码。"
+            "value" : "Eclipse 需要此权限以扫描二维码。"
           }
         }
       }
@@ -83,19 +83,19 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash はローカルネットワーク上のサーバーに接続するためにこの権限が必要です。"
+            "value" : "Eclipse はローカルネットワーク上のサーバーに接続するためにこの権限が必要です。"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash запрашивает это разрешение для подключения к серверам в вашей локальной сети."
+            "value" : "Eclipse запрашивает это разрешение для подключения к серверам в вашей локальной сети."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash 需要此权限以连接本地网络中的服务器。"
+            "value" : "Eclipse 需要此权限以连接本地网络中的服务器。"
           }
         }
       }
@@ -112,19 +112,19 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash は Wi-Fi SSID を取得するためにこの権限が必要です。"
+            "value" : "Eclipse は Wi-Fi SSID を取得するためにこの権限が必要です。"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash запрашивает это разрешение для получения SSID Wi-Fi."
+            "value" : "Eclipse запрашивает это разрешение для получения SSID Wi-Fi."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "FlClash 需要此权限以获取 Wi-Fi SSID。"
+            "value" : "Eclipse 需要此权限以获取 Wi-Fi SSID。"
           }
         }
       }

@@ -154,7 +154,19 @@ class AppPath {
 
   Future<String> get lockFilePath async {
     final homeDirPath = await appPath.homeDirPath;
-    return join(homeDirPath, 'Eclipse.lock');
+    final newPath = join(homeDirPath, 'Eclipse.lock');
+    // Migrate from old FlClash.lock (pre-rename versions)
+    final oldPath = join(homeDirPath, 'FlClash.lock');
+    final oldFile = File(oldPath);
+    if (await oldFile.exists()) {
+      try {
+        await oldFile.rename(newPath);
+      } catch (_) {
+        // If rename fails, just delete the old lock file
+        await oldFile.delete();
+      }
+    }
+    return newPath;
   }
 
   Future<String> get configFilePath async {
