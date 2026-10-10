@@ -271,13 +271,26 @@ jobs:
       - name: Setup Android Signing
         if: startsWith(matrix.platform,'android')
         run: |
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
-          echo "${{ secrets.SERVICE_JSON }}" | base64 --decode > android/app/google-services.json
-          {
-            echo "keyAlias=${{ secrets.KEY_ALIAS }}"
-            echo "storePassword=${{ secrets.STORE_PASSWORD }}"
-            echo "keyPassword=${{ secrets.KEY_PASSWORD }}"
-          } >> android/local.properties
+          if [ -n "${{ secrets.KEYSTORE }}" ]; then
+            echo "${{ secrets.KEYSTORE }}" | base64 --decode > android/app/keystore.jks
+            {
+              echo "keyAlias=${{ secrets.KEY_ALIAS }}"
+              echo "storePassword=${{ secrets.STORE_PASSWORD }}"
+              echo "keyPassword=${{ secrets.KEY_PASSWORD }}"
+            } >> android/local.properties
+          else
+            # No production keystore configured: generate a temporary debug key
+            # so the build can succeed. Replace with real KEYSTORE secret for release.
+            keytool -genkeypair -v -keystore android/app/keystore.jks \
+              -alias debug -keyalg RSA -keysize 2048 -validity 3650 \
+              -storepass android -keypass android \
+              -dname "CN=Eclipse Debug, OU=Dev, O=Eclipse, L=Unknown, ST=Unknown, C=US"
+            {
+              echo "keyAlias=debug"
+              echo "storePassword=android"
+              echo "keyPassword=android"
+            } >> android/local.properties
+          fi
 
       - name: Setup Go
         uses: actions/setup-go@v5
