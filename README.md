@@ -4,6 +4,15 @@ Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 m
 
 ![Eclipse](docs/images/hero.png)
 
+## 下载
+
+在 [Releases](https://github.com/Unwhimsical/Eclipse/releases) 页面下载最新版本：
+
+- **Windows**：安装包（`.exe`）或便携版（`.zip`）
+- **macOS**：`.dmg`（Apple Silicon / Intel）
+- **Android**：`.apk`
+- **iOS**：未签名的 `.ipa`，需自行签名后安装
+
 ## 功能特性
 
 - **节点与订阅导入**：分享链接逐行导入、Base64 订阅导入
