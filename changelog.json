@@ -11,19 +11,24 @@
           "type": "feat",
           "entries": [
             {
-              "id": "4135823",
-              "scope": "desktop",
-              "text": "Redesign the desktop UI with a self-drawn sidebar and five dedicated pages: home, config, modules, data, settings"
-            },
-            {
               "id": "36bdccf",
               "scope": "desktop",
-              "text": "Rich node cards with protocol and latency chips plus a dashboard strip, so the config page never looks empty with one node"
+              "text": "Config page now shows rich node cards (protocol, latency, selection ring) under a live status dashboard with quick actions, plus a guided empty state when there are no nodes"
             },
             {
               "id": "966635a",
               "scope": "desktop",
-              "text": "System tray menu, global shortcuts, and a command palette"
+              "text": "Tray menu, shortcuts, command palette, navigation wiring"
+            },
+            {
+              "id": "4135823",
+              "scope": "desktop",
+              "text": "Five desktop pages (home, config, modules, data, settings)"
+            },
+            {
+              "id": "eecf12f",
+              "scope": "desktop",
+              "text": "Shared components, value holder, proxy link serializer, module sourceUrl"
             }
           ]
         },
@@ -31,80 +36,29 @@
           "type": "fix",
           "entries": [
             {
-              "id": "b918b04",
-              "scope": "ci",
-              "text": "Link the NDK into the SDK dir for Android unit tests"
-            },
-            {
               "id": "afcc233",
               "scope": "test",
-              "text": "Mock path_provider in the tray lifecycle test"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "version": "0.8.98",
-      "tag": "v0.8.98",
-      "date": "2026-09-14",
-      "prerelease": false,
-      "groups": [
-        {
-          "type": "fix",
-          "entries": [
-            {
-              "id": "c5bf5bd",
-              "scope": "resources",
-              "text": "Refresh the geo file size and time after an update finishes"
+              "text": "Mock path_provider in tray lifecycle test"
             },
             {
-              "id": "60f371a",
-              "scope": "core",
-              "text": "Keep the core running while Windows sleeps with the app suspended"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "version": "0.8.97",
-      "tag": "v0.8.97",
-      "date": "2026-09-10",
-      "prerelease": false,
-      "groups": [
-        {
-          "type": "feat",
-          "entries": [
-            {
-              "id": "26cfbaf",
-              "scope": "ui",
-              "text": "Rework the app UI and refresh the localization"
+              "id": "b918b04",
+              "scope": "ci",
+              "text": "Link NDK into SDK dir for Android unit tests"
             },
             {
-              "id": "aaf934c",
-              "scope": "app",
-              "text": "Rework the app layer and window handling, and add proxy authentication"
-            },
-            {
-              "id": "c0fcbc0",
+              "id": "b1f4152",
               "scope": "desktop",
-              "text": "Rework the desktop runners, packaging, and native build"
+              "text": "Make ValueHolder class private (dead_file_test)"
             },
             {
-              "id": "ae29f38",
-              "scope": "android",
-              "text": "Rework the Android VPN service and lifecycle handling"
+              "id": "da8a0eb",
+              "scope": "desktop",
+              "text": "Drop obsolete current l10n key, regen messages"
             },
             {
-              "id": "adf715f",
-              "scope": "plugins",
-              "text": "Rework the desktop plugins and add the Helper service and Rust bridge"
-            },
-            {
-              "id": "c6eaa0a",
-              "scope": "core",
-              "text": "Rework the core IPC and process lifecycle"
+              "id": "2ff809b",
+              "scope": "desktop",
+              "text": "Remove unused imports in desktop tests"
             }
           ]
         }

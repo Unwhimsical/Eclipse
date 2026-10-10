@@ -4,14 +4,21 @@
 
 **Features**
 
-- **desktop** Redesign the desktop UI with a self-drawn sidebar and five dedicated pages: home, config, modules, data, settings (4135823)
-- **desktop** Rich node cards with protocol and latency chips plus a dashboard strip, so the config page never looks empty with one node (36bdccf)
-- **desktop** System tray menu, global shortcuts, and a command palette (966635a)
+- **desktop** Config page now shows rich node cards (protocol, latency, selection ring) under a live status dashboard with quick actions, plus a guided empty state when there are no nodes (36bdccf)
+- **desktop** Tray menu, shortcuts, command palette, navigation wiring (966635a)
+- **desktop** Five desktop pages (home, config, modules, data, settings) (4135823)
+- **desktop** Shared components, value holder, proxy link serializer, module sourceUrl (eecf12f)
 
 **Bug Fixes**
 
-- **ci** Link the NDK into the SDK dir for Android unit tests (b918b04)
-- **test** Mock path_provider in the tray lifecycle test (afcc233)
+- **test** Mock path_provider in tray lifecycle test (afcc233)
+- **ci** Link NDK into SDK dir for Android unit tests (b918b04)
+- **desktop** Make ValueHolder class private (dead_file_test) (b1f4152)
+- **desktop** Drop obsolete current l10n key, regen messages (da8a0eb)
+- **desktop** Remove unused imports in desktop tests (2ff809b)
+
+<!-- changelog:frozen -->
+<!-- Entries below predate the structured pipeline. Their wording is kept as written; only the heading and list style were normalized. -->
 
 ## v0.8.98 (2026-09-14)
 
@@ -30,9 +37,6 @@
 - **android** Rework the Android VPN service and lifecycle handling (ae29f38)
 - **plugins** Rework the desktop plugins and add the Helper service and Rust bridge (adf715f)
 - **core** Rework the core IPC and process lifecycle (c6eaa0a)
-
-<!-- changelog:frozen -->
-<!-- Entries below predate the structured pipeline. Their wording is kept as written; only the heading and list style were normalized. -->
 
 ## v0.8.96 (2026-08-17)
 
