@@ -1,5 +1,6 @@
 export 'app_localizations.dart';
 export 'app_ports.dart';
+export 'app_update.dart';
 export 'ca_store.dart';
 export 'changelog.dart';
 export 'color.dart';

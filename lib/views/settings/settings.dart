@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/about.dart';
 import 'package:fl_clash/views/access.dart';
 import 'package:fl_clash/views/application_setting.dart';
@@ -136,6 +137,25 @@ class SettingsView extends ConsumerWidget {
                 icon: Icons.info_outline,
                 title: appLocalizations.about,
                 page: const AboutView(),
+              ),
+              EclipseTile(
+                icon: Icons.system_update_outlined,
+                title: appLocalizations.checkUpdate,
+                showChevron: false,
+                onTap: () {
+                  final commonAction = ref.read(commonActionProvider.notifier);
+                  unawaited(
+                    globalState.safeRun(
+                      request.checkForUpdate,
+                      title: appLocalizations.checkUpdate,
+                    ).then(
+                      (data) => commonAction.checkUpdateResultHandle(
+                        data: data,
+                        isUser: true,
+                      ),
+                    ),
+                  );
+                },
               ),
               EclipseOpenTile(
                 icon: Icons.tune_outlined,
