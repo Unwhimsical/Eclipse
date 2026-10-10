@@ -21,6 +21,7 @@ Eclipse 是一款全平台代理客户端，支持 Android、iOS、Windows 与 m
 桌面端（Windows / macOS）：
 
 ![桌面端配置页](docs/images/desktop-config.png)
+![桌面端首页](docs/images/desktop-home.png)
 
 ## 构建
 
