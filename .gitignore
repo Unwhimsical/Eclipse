@@ -46,7 +46,7 @@ app.*.map.json
 .claude/worktrees/
 
 # Documentation (generated/planning artifacts)
-docs/
+# docs/  (removed: docs/images/ holds README assets and must be tracked)
 
 
 # Android Studio will place build artifacts here
