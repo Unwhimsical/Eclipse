@@ -2,6 +2,64 @@
   "schemaVersion": 2,
   "versions": [
     {
+      "version": "0.9.1",
+      "tag": "v0.9.1",
+      "date": "2026-10-11",
+      "prerelease": false,
+      "groups": [
+        {
+          "type": "feat",
+          "entries": [
+            {
+              "id": "790e479",
+              "scope": "desktop",
+              "text": "配置页模块标签页可管理编辑模块"
+            },
+            {
+              "id": "79f6fd1",
+              "scope": "update",
+              "text": "更新对话框支持下载安装，设置页加检查更新入口"
+            },
+            {
+              "id": "4390881",
+              "scope": "update",
+              "text": "一键检查更新，支持下载安装"
+            },
+            {
+              "id": "486a74f",
+              "scope": "desktop",
+              "text": "重做配置页为三栏布局，规则标签页可编辑"
+            },
+            {
+              "id": "eaac447",
+              "scope": "icons",
+              "text": "IOS 换新图标"
+            },
+            {
+              "id": "945199c",
+              "scope": "icons",
+              "text": "MacOS/Windows/iOS 换新图标"
+            },
+            {
+              "id": "077eed7",
+              "scope": "icons",
+              "text": "Android mipmap 换新图标"
+            },
+            {
+              "id": "4ce6a41",
+              "scope": "icons",
+              "text": "换 Eclipse 日食光环新图标"
+            },
+            {
+              "id": "5fbe236",
+              "scope": "ci",
+              "text": "IOS IPA 接入发布流程，release 模板加安装说明"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "version": "0.9.0",
       "tag": "v0.9.0",
       "date": "2026-10-10",

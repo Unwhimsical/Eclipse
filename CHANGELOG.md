@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.9.1 (2026-10-11)
+
+**Features**
+
+- **desktop** 配置页模块标签页可管理编辑模块 (790e479)
+- **update** 更新对话框支持下载安装，设置页加检查更新入口 (79f6fd1)
+- **update** 一键检查更新，支持下载安装 (4390881)
+- **desktop** 重做配置页为三栏布局，规则标签页可编辑 (486a74f)
+- **icons** IOS 换新图标 (eaac447)
+- **icons** MacOS/Windows/iOS 换新图标 (945199c)
+- **icons** Android mipmap 换新图标 (077eed7)
+- **icons** 换 Eclipse 日食光环新图标 (4ce6a41)
+- **ci** IOS IPA 接入发布流程，release 模板加安装说明 (5fbe236)
+
 ## v0.9.0 (2026-10-10)
 
 **Features**
