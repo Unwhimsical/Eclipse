@@ -145,15 +145,17 @@ class SettingsView extends ConsumerWidget {
                 onTap: () {
                   final commonAction = ref.read(commonActionProvider.notifier);
                   unawaited(
-                    globalState.safeRun(
-                      request.checkForUpdate,
-                      title: appLocalizations.checkUpdate,
-                    ).then(
-                      (data) => commonAction.checkUpdateResultHandle(
-                        data: data,
-                        isUser: true,
-                      ),
-                    ),
+                    globalState
+                        .safeRun(
+                          request.checkForUpdate,
+                          title: appLocalizations.checkUpdate,
+                        )
+                        .then(
+                          (data) => commonAction.checkUpdateResultHandle(
+                            data: data,
+                            isUser: true,
+                          ),
+                        ),
                   );
                 },
               ),
