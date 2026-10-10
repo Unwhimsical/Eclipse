@@ -64,7 +64,7 @@ hooks:
     test('packages every Linux format on every architecture', () {
       expect(
         setup.createPackageTargets('linux', null),
-        'deb,rpm,pacman,appimage,zip',
+        'deb,rpm,appimage,zip',
       );
       expect(setup.createPackageTargets('linux', 'deb'), 'deb');
       expect(setup.createPackageTargets('macos', null), 'dmg');
