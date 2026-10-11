@@ -58,7 +58,7 @@
 
 ## 构建（CI）
 
-`.github/workflows/ipa.yaml`：macOS runner，Flutter 3.47.1 + Go 1.26.4，
+`.github/workflows/ipa.yaml`：macOS runner，Flutter 3.47.6 + Go 1.26.4，
 `flutter pub get` → `flutter build ios --release --no-codesign` →
 `ditto` 打包 `Payload/Runner.app` → 上传 `Eclipse-unsigned.ipa`。
 Xcode 的 Run Script 阶段会自动调用 `build_ios.dart` 编译 Go 静态库，

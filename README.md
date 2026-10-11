@@ -80,7 +80,7 @@ dart setup.dart windows -v
 dart setup.dart macos -v
 ```
 
-需要 Flutter 3.47.1，详见 `.github/workflows/`。
+需要 Flutter 3.47.6，详见 `.github/workflows/`。
 
 ## 致谢
 
