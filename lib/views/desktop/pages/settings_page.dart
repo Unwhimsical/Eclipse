@@ -700,5 +700,27 @@ List<_SettingItem> _aboutItems(BuildContext context, WidgetRef ref) {
       title: appLocalizations.appVersion,
       control: (context, ref) => SelectableText(version),
     ),
+    _SettingItem(
+      title: appLocalizations.checkUpdate,
+      control: (context, ref) => FilledButton.tonal(
+        onPressed: () {
+          final commonAction = ref.read(commonActionProvider.notifier);
+          unawaited(
+            globalState
+                .safeRun(
+                  request.checkForUpdate,
+                  title: appLocalizations.checkUpdate,
+                )
+                .then(
+                  (data) => commonAction.checkUpdateResultHandle(
+                    data: data,
+                    isUser: true,
+                  ),
+                ),
+          );
+        },
+        child: Text(appLocalizations.checkUpdate),
+      ),
+    ),
   ];
 }
