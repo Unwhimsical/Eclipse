@@ -13,6 +13,7 @@ import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/value_holder.dart';
 import 'package:fl_clash/views/test_rules/rule_matcher.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
+import 'package:flutter/services.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -121,6 +122,17 @@ class _AddProfileDialogState extends ConsumerState<_AddProfileDialog> {
                 labelText: appLocalizations.subscriptionLink,
               ),
             ),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  Navigator.of(context).pop();
+                  await _handlePasteImport(ref, context);
+                },
+                icon: const Icon(Icons.content_paste_rounded, size: 18),
+                label: Text(appLocalizations.pasteImport),
+              ),
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               spacing: 8,
@@ -150,6 +162,44 @@ class _AddProfileDialogState extends ConsumerState<_AddProfileDialog> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _handlePasteImport(WidgetRef ref, BuildContext context) async {
+    final appLocalizations = context.appLocalizations;
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text?.trim() ?? '';
+    if (text.isEmpty) {
+      dialogs.showNotifier(
+        appLocalizations.clipboardImportFailed,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    if (isSgmoduleText(text)) {
+      final info = await globalState.safeRun(
+        () => ShadowrocketImport.importModule(ref, raw: text),
+      );
+      dialogs.showNotifier(
+        info?.name ?? appLocalizations.clipboardImportFailed,
+        level: info == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
+    }
+    if (isShadowrocketConfText(text)) {
+      final label = await globalState.safeRun(
+        () => ShadowrocketImport.importConf(ref, content: text),
+      );
+      dialogs.showNotifier(
+        label ?? appLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
+    }
+    final label = await ShadowrocketImport.importShareLinks(ref, text: text);
+    dialogs.showNotifier(
+      label ?? appLocalizations.clipboardImportFailed,
+      level: label == null ? MessageLevel.warning : MessageLevel.success,
     );
   }
 }
