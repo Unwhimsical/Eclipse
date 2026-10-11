@@ -56,6 +56,16 @@
               "text": "IOS IPA 接入发布流程，release 模板加安装说明"
             }
           ]
+        },
+        {
+          "type": "fix",
+          "entries": [
+            {
+              "id": "9c5afe8",
+              "scope": "update",
+              "text": "更新对话框用Text.rich修复文本方向"
+            }
+          ]
         }
       ]
     },

@@ -14,6 +14,10 @@
 - **icons** 换 Eclipse 日食光环新图标 (4ce6a41)
 - **ci** IOS IPA 接入发布流程，release 模板加安装说明 (5fbe236)
 
+**Bug Fixes**
+
+- **update** 更新对话框用Text.rich修复文本方向 (9c5afe8)
+
 ## v0.9.0 (2026-10-10)
 
 **Features**
