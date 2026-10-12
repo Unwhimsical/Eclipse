@@ -81,8 +81,7 @@ class _RunCard extends ConsumerWidget {
     final traffics = ref.watch(trafficsProvider).list;
     final lastTraffic = traffics.isEmpty ? const Traffic() : traffics.last;
     // When not started, always show disconnected regardless of stale coreStatus.
-    final effectiveStatus =
-        isStart ? status : CoreStatus.disconnected;
+    final effectiveStatus = isStart ? status : CoreStatus.disconnected;
     final statusText = switch (effectiveStatus) {
       CoreStatus.connected => appLocalizations.connected,
       CoreStatus.connecting => appLocalizations.connecting,
