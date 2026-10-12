@@ -4,12 +4,17 @@
     {
       "version": "0.9.1",
       "tag": "v0.9.1",
-      "date": "2026-10-11",
+      "date": "2026-10-12",
       "prerelease": false,
       "groups": [
         {
           "type": "feat",
           "entries": [
+            {
+              "id": "5acf5a7",
+              "scope": "desktop",
+              "text": "添加配置对话框加从剪贴板导入"
+            },
             {
               "id": "790e479",
               "scope": "desktop",
@@ -60,6 +65,21 @@
         {
           "type": "fix",
           "entries": [
+            {
+              "id": "efcee14",
+              "scope": "core",
+              "text": "Geo资源地址变更直达Core不再等全量应用(移植上游ff23f30)"
+            },
+            {
+              "id": "51218cc",
+              "scope": "desktop",
+              "text": "仪表盘停止时状态文字与开关同步"
+            },
+            {
+              "id": "9415e25",
+              "scope": "desktop",
+              "text": "设置关于页加检查更新入口"
+            },
             {
               "id": "9c5afe8",
               "scope": "update",
