@@ -141,6 +141,7 @@
   "allowBypassDesc": "When enabled, some apps can bypass the VPN",
   "externalController": "External controller",
   "externalControllerDesc": "When enabled, the Clash core can be controlled on port 9090",
+  "externalControllerSecret": "External controller secret",
   "ipv6Desc": "When enabled, IPv6 traffic can be received",
   "app": "App",
   "general": "General",

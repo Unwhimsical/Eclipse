@@ -1120,6 +1120,16 @@ class AppLocalizations {
     );
   }
 
+  /// `External controller secret`
+  String get externalControllerSecret {
+    return Intl.message(
+      'External controller secret',
+      name: 'externalControllerSecret',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `When enabled, IPv6 traffic can be received`
   String get ipv6Desc {
     return Intl.message(

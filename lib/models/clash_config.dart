@@ -577,6 +577,7 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     @Default(ExternalControllerStatus.close)
     @JsonKey(name: 'external-controller')
     ExternalControllerStatus externalController,
+    @Default('') String secret,
     @Default({}) Map<String, String> hosts,
     @Default(false) @JsonKey(name: 'geo-auto-update') bool geoAutoUpdate,
     @Default(24) @JsonKey(name: 'geo-update-interval') int geoUpdateInterval,
@@ -594,5 +595,14 @@ abstract class PatchClashConfig with _$PatchClashConfig {
       () => PatchClashConfig.fromJson(json),
       () => defaultClashConfig,
     );
+  }
+}
+
+extension PatchClashConfigExt on PatchClashConfig {
+  PatchClashConfig ensureControllerSecret() {
+    if (externalController == ExternalControllerStatus.close) {
+      return secret.isEmpty ? this : copyWith(secret: '');
+    }
+    return secret.isEmpty ? copyWith(secret: generateRandomSecret(32)) : this;
   }
 }

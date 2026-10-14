@@ -141,6 +141,7 @@
   "allowBypassDesc": "При включении некоторые приложения смогут обходить VPN",
   "externalController": "Внешний контроллер",
   "externalControllerDesc": "При включении ядром Clash можно управлять через порт 9090",
+  "externalControllerSecret": "Секрет внешнего контроллера",
   "ipv6Desc": "При включении можно принимать трафик IPv6",
   "app": "Приложение",
   "general": "Общие",

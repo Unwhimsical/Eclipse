@@ -634,6 +634,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalControllerDesc": MessageLookupByLibrary.simpleMessage(
       "При включении ядром Clash можно управлять через порт 9090",
     ),
+    "externalControllerSecret": MessageLookupByLibrary.simpleMessage(
+      "Секрет внешнего контроллера",
+    ),
     "externalFetch": MessageLookupByLibrary.simpleMessage("Внешнее получение"),
     "externalLink": MessageLookupByLibrary.simpleMessage("Внешняя ссылка"),
     "fakeipFilter": MessageLookupByLibrary.simpleMessage("Фильтр Fake-IP"),

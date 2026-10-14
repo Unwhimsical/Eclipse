@@ -27,7 +27,7 @@ void main() {
     test('detects setuid root binary on macOS', () {
       expect(
         System.isPrivilegedStatOutput(
-          'root:wheel rwsr-xr-x',
+          'root:wheel rwsr-x---',
           ownerPrefix: 'root:',
         ),
         isTrue,
@@ -37,7 +37,7 @@ void main() {
     test('rejects non-setuid binary', () {
       expect(
         System.isPrivilegedStatOutput(
-          'root:wheel rwxr-xr-x',
+          'root:wheel rwxr-x---',
           ownerPrefix: 'root:',
         ),
         isFalse,
@@ -47,7 +47,17 @@ void main() {
     test('rejects wrong owner', () {
       expect(
         System.isPrivilegedStatOutput(
-          'user:staff rwsr-xr-x',
+          'user:staff rwsr-x---',
+          ownerPrefix: 'root:',
+        ),
+        isFalse,
+      );
+    });
+
+    test('rejects a setuid binary that others can execute', () {
+      expect(
+        System.isPrivilegedStatOutput(
+          'root:wheel rwsr-xr-x',
           ownerPrefix: 'root:',
         ),
         isFalse,
@@ -57,7 +67,7 @@ void main() {
     test('handles surrounding whitespace', () {
       expect(
         System.isPrivilegedStatOutput(
-          '  root:wheel rwsr-xr-x\n',
+          '  root:wheel rwsr-x---\n',
           ownerPrefix: 'root:',
         ),
         isTrue,
@@ -67,7 +77,7 @@ void main() {
     test('detects setuid on Linux format', () {
       expect(
         System.isPrivilegedStatOutput(
-          'root:root rwsr-xr-x',
+          'root:root -rwsr-x---',
           ownerPrefix: 'root:',
         ),
         isTrue,

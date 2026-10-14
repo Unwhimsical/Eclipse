@@ -456,6 +456,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "externalControllerDesc": MessageLookupByLibrary.simpleMessage(
       "开启后将可以通过9090端口控制Clash内核",
     ),
+    "externalControllerSecret": MessageLookupByLibrary.simpleMessage("外部控制器密钥"),
     "externalFetch": MessageLookupByLibrary.simpleMessage("外部获取"),
     "externalLink": MessageLookupByLibrary.simpleMessage("外部链接"),
     "fakeipFilter": MessageLookupByLibrary.simpleMessage("Fakeip过滤"),
