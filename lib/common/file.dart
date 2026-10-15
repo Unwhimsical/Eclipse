@@ -1,5 +1,8 @@
 import 'dart:io';
 
+const _replaceAttempts = 10;
+const _replaceRetryDelay = Duration(milliseconds: 50);
+
 extension FileExt on File {
   Future<void> safeCopy(String newPath) async {
     if (!await exists()) {
@@ -25,6 +28,31 @@ extension FileExt on File {
       await create(recursive: true);
     }
     return writeAsBytes(bytes);
+  }
+
+  /// Writes to one file must not overlap: they share the temporary sibling.
+  Future<void> writeAsStringAtomically(String content) async {
+    final temp = File('$path.$pid.tmp');
+    try {
+      await temp.parent.create(recursive: true);
+      await temp.writeAsString(content, flush: true);
+      await temp._renameRetryingWhileHeldOpen(path);
+    } catch (_) {
+      await temp.delete().then((_) {}, onError: (_) {});
+      rethrow;
+    }
+  }
+
+  Future<void> _renameRetryingWhileHeldOpen(String target) async {
+    for (var attempt = 1; ; attempt++) {
+      try {
+        await rename(target);
+        return;
+      } on FileSystemException {
+        if (attempt == _replaceAttempts) rethrow;
+        await Future<void>.delayed(_replaceRetryDelay);
+      }
+    }
   }
 }
 

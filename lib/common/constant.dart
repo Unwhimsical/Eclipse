@@ -19,6 +19,9 @@ const packageName = 'com.eclipse.clash';
 final unixSocketPath = '/tmp/EclipseSocket_${Random().nextInt(10000)}.sock';
 final windowsPipeName = '\\\\.\\pipe\\EclipseCore_${_randomPipeId()}';
 const helperPort = 47890;
+const helperPortKey =
+    'SYSTEM\\CurrentControlSet\\Services\\$appHelperService\\Runtime';
+const helperPortValue = 'Port';
 const helperSocketPath = '/run/eclipse/helper.sock';
 const helperProtocolVersionHeader = 'x-eclipse-helper-protocol';
 const helperProtocolVersion = '6';

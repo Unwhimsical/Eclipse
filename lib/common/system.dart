@@ -5,6 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ffi/ffi.dart';
 import 'package:fl_clash/common/boot_record.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/common/linux_elevation.dart';
 import 'package:fl_clash/common/system_dns.dart';
 import 'package:fl_clash/core/desktop/helper_client.dart';
 import 'package:fl_clash/enum/enum.dart';
@@ -120,7 +121,8 @@ class System {
   @visibleForTesting
   static String linuxElevationShell(String corePath) {
     final path = _shellEscape(corePath);
-    return 'group=\$(id -g "\$PKEXEC_UID") && chown "root:\$group" $path && '
+    return 'group=\$(id -g "\${PKEXEC_UID:-\$SUDO_UID}") && '
+        'chown "root:\$group" $path && '
         'chmod 4750 $path';
   }
 
@@ -262,28 +264,12 @@ class System {
       }
       return AuthorizeCode.success;
     } else if (system.isLinux) {
-      final ProcessResult result;
-      try {
-        result = await runProcess('pkexec', [
-          '/bin/sh',
-          '-c',
-          linuxElevationShell(appPath.corePath),
-        ]);
-      } on ProcessException catch (error) {
-        commonPrint.log(
-          'pkexec is unavailable: ${compactError(error)}',
-          logLevel: LogLevel.error,
-        );
-        return AuthorizeCode.error;
-      }
-      if (result.exitCode != 0) {
-        commonPrint.log(
-          'pkexec refused to elevate the Core: ${result.exitCode}',
-          logLevel: LogLevel.error,
-        );
-        return AuthorizeCode.error;
-      }
-      return AuthorizeCode.success;
+      final elevated = await linuxElevation.elevate([
+        '/bin/sh',
+        '-c',
+        linuxElevationShell(appPath.corePath),
+      ]);
+      return elevated ? AuthorizeCode.success : AuthorizeCode.error;
     }
     return AuthorizeCode.error;
   }
@@ -303,6 +289,8 @@ final system = System();
 
 class Windows {
   static Windows? _instance;
+  static const _swHide = 0;
+  static const _swShowNormal = 1;
   late DynamicLibrary _shell32;
 
   Windows._internal() {
@@ -314,7 +302,7 @@ class Windows {
     return _instance!;
   }
 
-  bool runas(String command, String arguments) {
+  bool runas(String command, String arguments, {bool showWindow = true}) {
     final commandPtr = command.toNativeUtf16();
     final argumentsPtr = arguments.toNativeUtf16();
     final operationPtr = 'runas'.toNativeUtf16();
@@ -345,7 +333,7 @@ class Windows {
       commandPtr,
       argumentsPtr,
       nullptr,
-      1,
+      showWindow ? _swShowNormal : _swHide,
     );
 
     calloc.free(commandPtr);
@@ -370,7 +358,8 @@ class Windows {
 
   Future<AuthorizeCode> registerService() {
     return registerHelperService(
-      () async => runas(appPath.helperPath, installArguments(pid)),
+      () async =>
+          runas(appPath.helperPath, installArguments(pid), showWindow: false),
     );
   }
 }
@@ -447,9 +436,6 @@ final windows = system.isWindows ? Windows() : null;
 class Linux {
   static Linux? _instance;
 
-  @visibleForTesting
-  ProcessRunner runProcess = Process.run;
-
   Linux._internal();
 
   factory Linux() {
@@ -461,31 +447,11 @@ class Linux {
     return registerHelperService(installService);
   }
 
-  /// pkexec raises the system polkit prompt and names the requesting user to
-  /// the installer, which is where the unit takes the account it grants the
-  /// Helper socket to.
+  /// pkexec and sudo both name the requesting user to the installer, which is
+  /// where the unit takes the account it grants the Helper socket to.
   @visibleForTesting
-  Future<bool> installService() async {
-    try {
-      final result = await runProcess('pkexec', [
-        appPath.helperPath,
-        'install',
-      ]);
-      if (result.exitCode == 0) {
-        return true;
-      }
-      commonPrint.log(
-        'pkexec helper install exited with ${result.exitCode}: '
-        '${result.stderr.toString().trim()}',
-        logLevel: LogLevel.error,
-      );
-    } catch (error) {
-      commonPrint.log(
-        'pkexec is unavailable: ${compactError(error)}',
-        logLevel: LogLevel.error,
-      );
-    }
-    return false;
+  Future<bool> installService() {
+    return linuxElevation.elevate([appPath.helperPath, 'install']);
   }
 }
 
