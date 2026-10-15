@@ -100,10 +100,15 @@ class System {
       return false;
     }
     final mode = trimmed.split(RegExp(r'\s+')).last;
-    return mode.length >= 10 &&
-        mode[3] == 's' &&
-        mode[9] != 'x' &&
-        mode[9] != 't';
+    // macOS `stat -f '%Sp'` omits the file-type prefix (`rwsr-x---`, 9 chars);
+    // Linux `stat -c '%A'` includes it (`-rwsr-x---`, 10 chars). A trailing
+    // `+`/`@` only marks ACLs/xattrs and carries no permission bits.
+    final stripped = mode.replaceFirst(RegExp(r'[+@]$'), '');
+    final perms = stripped.length == 10 ? stripped.substring(1) : stripped;
+    return perms.length == 9 &&
+        perms[2] == 's' &&
+        perms[8] != 'x' &&
+        perms[8] != 't';
   }
 
   @visibleForTesting
