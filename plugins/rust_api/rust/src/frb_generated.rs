@@ -24,6 +24,7 @@
     clippy::needless_borrow,
     mismatched_lifetime_syntaxes
 )]
+#![rustfmt::skip]
 
 // Section: imports
 
