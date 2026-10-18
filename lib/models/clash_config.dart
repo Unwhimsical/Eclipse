@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -298,6 +299,12 @@ extension TunExt on Tun {
   }
 }
 
+extension TunOverrideExt on Tun {
+  /// Picked keys only; `enable` always follows the app's TUN switch.
+  Map<String, Object?> overrideJson(Set<TunOverrideKey> keys) =>
+      _overrideJson(toJson(), TunOverrideKey.values, keys);
+}
+
 @freezed
 abstract class FallbackFilter with _$FallbackFilter {
   const factory FallbackFilter({
@@ -362,6 +369,102 @@ abstract class Dns with _$Dns {
       () => const Dns(),
     );
   }
+}
+
+/// Fallback DNS keys for a profile without its own DNS section.
+const baselineDnsOverrideKeys = {
+  DnsOverrideKey.enable,
+  DnsOverrideKey.enhancedMode,
+  DnsOverrideKey.nameserver,
+};
+
+const defaultTunOverrideKeys = {...TunOverrideKey.values};
+
+const _dnsOverrideKeysJsonKey = 'dns-override-keys';
+const _tunOverrideKeysJsonKey = 'tun-override-keys';
+
+Set<DnsOverrideKey> _dnsOverrideKeysFromJson(List<Object?> json) => {
+  for (final path in json)
+    ?DnsOverrideKey.values.firstWhereOrNull((key) => key.path == path),
+};
+
+Set<TunOverrideKey> _tunOverrideKeysFromJson(List<Object?> json) => {
+  for (final path in json)
+    ?TunOverrideKey.values.firstWhereOrNull((key) => key.path == path),
+};
+
+List<String> _overrideKeysToJson(Set<OverrideKey> keys) => [
+  for (final key in keys) key.path,
+];
+
+extension DnsOverrideExt on Dns {
+  // The policy servers are split the way the core reads them.
+  Map<String, Object?> get _json {
+    final json = toJson();
+    json[DnsOverrideKey.fallbackFilterSection] = fallbackFilter.toJson();
+    json[DnsOverrideKey.nameserverPolicy.path] = {
+      for (final entry in nameserverPolicy.entries)
+        entry.key: entry.value.splitByMultipleSeparators,
+    };
+    return json;
+  }
+
+  /// Picked keys only; unset values are skipped (the core refuses empties).
+  Map<String, Object?> overrideJson(Set<DnsOverrideKey> keys) =>
+      _overrideJson(_json, DnsOverrideKey.values, keys);
+}
+
+Map<String, Object?> _overrideJson<K extends OverrideKey>(
+  Map<String, Object?> json,
+  List<K> values,
+  Set<K> keys,
+) {
+  final result = <String, Object?>{};
+  for (final key in values) {
+    if (!keys.contains(key)) {
+      continue;
+    }
+    final parent = key.parent;
+    final value = parent == null
+        ? json[key.path]
+        : (json[parent] as Map)[key.field];
+    if (_isUnset(value)) {
+      continue;
+    }
+    if (parent == null) {
+      result[key.path] = value;
+    } else {
+      result[parent] ??= <String, Object?>{};
+      (result[parent] as Map<String, Object?>)[key.field] = value;
+    }
+  }
+  return result;
+}
+
+bool _isUnset(Object? value) => switch (value) {
+  String() => value.isEmpty,
+  Iterable() => value.isEmpty,
+  Map() => value.isEmpty,
+  _ => false,
+};
+
+/// Merges picked keys over a profile's DNS; `fallback-filter` merges key by key.
+Map<String, dynamic> mergeDnsOverride(
+  Map<String, dynamic> raw,
+  Map<String, Object?> override,
+) {
+  final merged = Map<String, dynamic>.from(raw);
+  for (final entry in override.entries) {
+    final current = merged[entry.key];
+    final value = entry.value;
+    merged[entry.key] =
+        entry.key == DnsOverrideKey.fallbackFilterSection &&
+            current is Map &&
+            value is Map
+        ? {...Map<String, dynamic>.from(current), ...value}
+        : value;
+  }
+  return merged;
 }
 
 @freezed
@@ -562,7 +665,21 @@ abstract class PatchClashConfig with _$PatchClashConfig {
     @Default(true) @JsonKey(name: 'unified-delay') bool unifiedDelay,
     @Default(true) @JsonKey(name: 'tcp-concurrent') bool tcpConcurrent,
     @Default(defaultTun) @JsonKey(fromJson: Tun.safeFormJson) Tun tun,
+    @Default(defaultTunOverrideKeys)
+    @JsonKey(
+      name: _tunOverrideKeysJsonKey,
+      fromJson: _tunOverrideKeysFromJson,
+      toJson: _overrideKeysToJson,
+    )
+    Set<TunOverrideKey> tunOverrideKeys,
     @Default(defaultDns) @JsonKey(fromJson: Dns.safeDnsFromJson) Dns dns,
+    @Default({})
+    @JsonKey(
+      name: _dnsOverrideKeysJsonKey,
+      fromJson: _dnsOverrideKeysFromJson,
+      toJson: _overrideKeysToJson,
+    )
+    Set<DnsOverrideKey> dnsOverrideKeys,
     @Default(defaultGeoXUrl)
     @JsonKey(
       name: 'geox-url',

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fl_clash/common/boot_record.dart';
 import 'package:fl_clash/common/constant.dart';
 import 'package:fl_clash/common/preferences.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,7 +49,6 @@ void main() {
       const config = Config(
         themeProps: defaultThemeProps,
         currentProfileId: 42,
-        overrideDns: true,
         excludeSSIDs: ['home'],
       );
 
@@ -57,8 +57,29 @@ void main() {
 
       expect(restored, isNotNull);
       expect(restored!.currentProfileId, 42);
-      expect(restored.overrideDns, isTrue);
       expect(restored.excludeSSIDs, ['home']);
+    });
+
+    test('getConfig migrates a legacy overrideDns toggle', () async {
+      final patchJson = const PatchClashConfig().toJson()
+        ..remove('dns-override-keys')
+        ..remove('tun-override-keys');
+      await store.setString(
+        configKey,
+        jsonEncode({
+          'themeProps': defaultThemeProps.toJson(),
+          'overrideDns': true,
+          'patchClashConfig': patchJson,
+        }),
+      );
+
+      final restored = await preferences.getConfig();
+
+      expect(restored, isNotNull);
+      expect(
+        restored!.patchClashConfig.dnsOverrideKeys,
+        DnsOverrideKey.values.toSet(),
+      );
     });
 
     test('getConfigMap returns null for malformed JSON', () async {

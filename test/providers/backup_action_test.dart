@@ -200,7 +200,12 @@ void main() {
       source
           .read(patchClashConfigProvider.notifier)
           .update((state) => state.copyWith(mixedPort: 7899));
-      source.read(overrideDnsProvider.notifier).value = true;
+      source
+          .read(patchClashConfigProvider.notifier)
+          .update(
+            (state) =>
+                state.copyWith(dnsOverrideKeys: {DnsOverrideKey.nameserver}),
+          );
       final configMap = configMapOf(source);
 
       final target = buildContainer();
@@ -211,7 +216,9 @@ void main() {
       expect(target.read(currentProfileIdProvider), 42);
       expect(target.read(appSettingProvider).autoLaunch, isTrue);
       expect(target.read(patchClashConfigProvider).mixedPort, 7899);
-      expect(target.read(overrideDnsProvider), isTrue);
+      expect(target.read(patchClashConfigProvider).dnsOverrideKeys, {
+        DnsOverrideKey.nameserver,
+      });
     });
 
     test('leaves the settings untouched for an onlyProfiles restore', () async {

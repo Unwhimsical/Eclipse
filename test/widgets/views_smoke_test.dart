@@ -288,27 +288,17 @@ void main() {
       DnsMode.fakeIp,
     );
 
-    final previousOverride = container.read(overrideDnsProvider);
     final previousDns = container.read(patchClashConfigProvider).dns;
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
         child: const TestApp(
           child: Scaffold(
-            body: Column(
-              children: [
-                OverrideItem(),
-                StatusItem(),
-                PreferH3Item(),
-                IPv6Item(),
-              ],
-            ),
+            body: Column(children: [StatusItem(), PreferH3Item(), IPv6Item()]),
           ),
         ),
       ),
     );
-    await tester.pump();
-    await tester.tap(find.text('Override DNS'));
     await tester.pump();
     await tester.tap(find.text('Status'));
     await tester.pump();
@@ -317,7 +307,6 @@ void main() {
     await tester.tap(find.text('IPv6'));
     await tester.pump();
 
-    expect(container.read(overrideDnsProvider), !previousOverride);
     expect(
       container.read(patchClashConfigProvider).dns.enable,
       !previousDns.enable,
@@ -330,6 +319,27 @@ void main() {
       container.read(patchClashConfigProvider).dns.ipv6,
       !previousDns.ipv6,
     );
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const TestApp(child: Scaffold(body: DnsOverrideKeysItem())),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Override DNS'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('nameserver'), findsOneWidget);
+    expect(container.read(patchClashConfigProvider).dnsOverrideKeys, isEmpty);
+    await tester.tap(find.text('nameserver'));
+    await tester.pump();
+    expect(container.read(patchClashConfigProvider).dnsOverrideKeys, {
+      DnsOverrideKey.nameserver,
+    });
+    await tester.tap(find.text('nameserver'));
+    await tester.pump();
+    expect(container.read(patchClashConfigProvider).dnsOverrideKeys, isEmpty);
     expect(tester.takeException(), null);
   });
 

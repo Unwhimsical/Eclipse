@@ -225,6 +225,8 @@
   "subscriptionInfo": "订阅信息",
   "overrideDns": "覆写DNS",
   "overrideDnsDesc": "开启后将覆盖配置中的DNS选项",
+  "overrideKeysDesc": "仅将选中的选项应用到每个配置",
+  "tunOverride": "覆盖 TUN",
   "status": "状态",
   "statusDesc": "关闭后将使用系统DNS",
   "preferH3Desc": "优先使用DOH的http/3",

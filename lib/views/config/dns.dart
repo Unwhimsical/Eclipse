@@ -63,17 +63,58 @@ ConfigListInputItem _dnsList({
   );
 }
 
-class OverrideItem extends ConsumerWidget {
-  const OverrideItem({super.key});
+class DnsOverrideKeysItem extends ConsumerWidget {
+  const DnsOverrideKeysItem({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
-    return ConfigToggleItem(
-      title: (l) => l.overrideDns,
-      subtitle: (l) => l.overrideDnsDesc,
-      selector: overrideDnsProvider,
-      onChanged: (ref, value) =>
-          ref.read(overrideDnsProvider.notifier).value = value,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final keys = ref.watch(
+      patchClashConfigProvider.select((state) => state.dnsOverrideKeys),
+    );
+    return ListItem.open(
+      title: Text(appLocalizations.overrideDns),
+      subtitle: Text(
+        keys.isEmpty
+            ? appLocalizations.overrideKeysDesc
+            : keys.map((key) => key.path).join(', '),
+      ),
+      blur: false,
+      widget: const DnsOverrideKeysPage(),
+    );
+  }
+}
+
+class DnsOverrideKeysPage extends ConsumerWidget {
+  const DnsOverrideKeysPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final keys = ref.watch(
+      patchClashConfigProvider.select((state) => state.dnsOverrideKeys),
+    );
+    return CommonScaffold(
+      title: appLocalizations.overrideDns,
+      body: ListView(
+        children: [
+          for (final key in DnsOverrideKey.values)
+            CheckboxListTile(
+              title: Text(key.path),
+              value: keys.contains(key),
+              onChanged: (_) {
+                ref
+                    .read(patchClashConfigProvider.notifier)
+                    .update(
+                      (state) => state.copyWith(
+                        dnsOverrideKeys: {...state.dnsOverrideKeys}
+                          ..addOrRemove(key),
+                      ),
+                    );
+              },
+            ),
+        ],
+      ),
     );
   }
 }
@@ -300,7 +341,7 @@ class FallbackFilterOptions extends StatelessWidget {
 }
 
 const dnsItems = <Widget>[
-  OverrideItem(),
+  DnsOverrideKeysItem(),
   DnsOptions(),
   FallbackFilterOptions(),
 ];

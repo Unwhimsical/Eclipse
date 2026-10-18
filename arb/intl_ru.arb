@@ -225,6 +225,8 @@
   "subscriptionInfo": "Информация о подписке",
   "overrideDns": "Переопределить DNS",
   "overrideDnsDesc": "При включении настройки DNS профиля переопределяются",
+  "overrideKeysDesc": "Only the selected options are applied to every profile",
+  "tunOverride": "Override TUN",
   "status": "Статус",
   "statusDesc": "При отключении используется системный DNS",
   "preferH3Desc": "Предпочитать HTTP/3 для DoH",

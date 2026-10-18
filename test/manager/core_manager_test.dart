@@ -49,7 +49,6 @@ const _nullProfileSetupState = SetupState(
   proxyGroups: [],
   addedRules: [],
   script: null,
-  overrideDns: false,
   dns: Dns(),
 );
 

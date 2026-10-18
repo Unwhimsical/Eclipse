@@ -438,9 +438,15 @@ _PatchClashConfig _$PatchClashConfigFromJson(Map<String, dynamic> json) =>
       tun: json['tun'] == null
           ? defaultTun
           : Tun.safeFormJson(json['tun'] as Map<String, Object?>?),
+      tunOverrideKeys: json['tun-override-keys'] == null
+          ? defaultTunOverrideKeys
+          : _tunOverrideKeysFromJson(json['tun-override-keys'] as List),
       dns: json['dns'] == null
           ? defaultDns
           : Dns.safeDnsFromJson(json['dns'] as Map<String, Object?>),
+      dnsOverrideKeys: json['dns-override-keys'] == null
+          ? const {}
+          : _dnsOverrideKeysFromJson(json['dns-override-keys'] as List),
       geoXUrl: json['geox-url'] == null
           ? defaultGeoXUrl
           : _geoXUrlFromJson(json['geox-url'] as Map<String, Object?>?),
@@ -483,7 +489,9 @@ Map<String, dynamic> _$PatchClashConfigToJson(_PatchClashConfig instance) =>
       'unified-delay': instance.unifiedDelay,
       'tcp-concurrent': instance.tcpConcurrent,
       'tun': instance.tun,
+      'tun-override-keys': _overrideKeysToJson(instance.tunOverrideKeys),
       'dns': instance.dns,
+      'dns-override-keys': _overrideKeysToJson(instance.dnsOverrideKeys),
       'geox-url': _geoXUrlToJson(instance.geoXUrl),
       'geodata-loader': _$GeodataLoaderEnumMap[instance.geodataLoader]!,
       'global-ua': instance.globalUa,

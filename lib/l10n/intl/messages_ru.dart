@@ -1126,6 +1126,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideDnsDesc": MessageLookupByLibrary.simpleMessage(
       "При включении настройки DNS профиля переопределяются",
     ),
+    "overrideKeysDesc": MessageLookupByLibrary.simpleMessage(
+      "Only the selected options are applied to every profile",
+    ),
     "overrideMode": MessageLookupByLibrary.simpleMessage(
       "Режим переопределения",
     ),
@@ -1822,6 +1825,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
       "CIDR-маршруты, включённые в TUN",
     ),
+    "tunOverride": MessageLookupByLibrary.simpleMessage("Override TUN"),
     "tunnel": MessageLookupByLibrary.simpleMessage("Туннель"),
     "tunnelAdd": MessageLookupByLibrary.simpleMessage("Add"),
     "tunnelAddHint": MessageLookupByLibrary.simpleMessage(

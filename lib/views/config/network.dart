@@ -302,6 +302,62 @@ class RouteAddressItem extends ConsumerWidget {
   }
 }
 
+class TunOverrideKeysItem extends ConsumerWidget {
+  const TunOverrideKeysItem({super.key});
+
+  @override
+  Widget build(BuildContext context, ref) {
+    final appLocalizations = context.appLocalizations;
+    final keys = ref.watch(
+      patchClashConfigProvider.select((state) => state.tunOverrideKeys),
+    );
+    return ListItem.open(
+      title: Text(appLocalizations.tunOverride),
+      subtitle: Text(
+        keys.isEmpty
+            ? appLocalizations.overrideKeysDesc
+            : keys.map((key) => key.path).join(', '),
+      ),
+      blur: false,
+      widget: const TunOverrideKeysPage(),
+    );
+  }
+}
+
+class TunOverrideKeysPage extends ConsumerWidget {
+  const TunOverrideKeysPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final keys = ref.watch(
+      patchClashConfigProvider.select((state) => state.tunOverrideKeys),
+    );
+    return CommonScaffold(
+      title: appLocalizations.tunOverride,
+      body: ListView(
+        children: [
+          for (final key in TunOverrideKey.values)
+            CheckboxListTile(
+              title: Text(key.path),
+              value: keys.contains(key),
+              onChanged: (_) {
+                ref
+                    .read(patchClashConfigProvider.notifier)
+                    .update(
+                      (state) => state.copyWith(
+                        tunOverrideKeys: {...state.tunOverrideKeys}
+                          ..addOrRemove(key),
+                      ),
+                    );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 List<Widget> networkOptionsItems({
   required bool isDesktop,
   required bool isMacOS,
@@ -310,6 +366,7 @@ List<Widget> networkOptionsItems({
     if (isDesktop) const TUNItem(),
     if (isMacOS) const AutoSetSystemDnsItem(),
     const TunStackItem(),
+    const TunOverrideKeysItem(),
     // mihomo's DefaultSocketHook ignores interface-name on Android
     // (core/lib.go installHooks, vendored dialer.go), so these rows only
     // apply on desktop.

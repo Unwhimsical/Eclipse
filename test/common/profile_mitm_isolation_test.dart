@@ -14,7 +14,6 @@ MakeRealProfileState _state({
     'rules': ['MATCH,PROXY'],
   },
   realPatchConfig: const PatchClashConfig(),
-  overrideDns: false,
   appendSystemDns: false,
   proxyGroups: const [],
   rules: const [],

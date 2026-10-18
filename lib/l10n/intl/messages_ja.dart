@@ -911,6 +911,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideDnsDesc": MessageLookupByLibrary.simpleMessage(
       "有効にすると、プロファイル内のDNS設定を上書きします",
     ),
+    "overrideKeysDesc": MessageLookupByLibrary.simpleMessage(
+      "Only the selected options are applied to every profile",
+    ),
     "overrideMode": MessageLookupByLibrary.simpleMessage("上書きモード"),
     "overrideRules": MessageLookupByLibrary.simpleMessage("上書き"),
     "overrideScript": MessageLookupByLibrary.simpleMessage("上書きスクリプト"),
@@ -1477,6 +1480,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
       "TUNに含めるCIDRルート",
     ),
+    "tunOverride": MessageLookupByLibrary.simpleMessage("Override TUN"),
     "tunnel": MessageLookupByLibrary.simpleMessage("トンネル"),
     "tunnelAdd": MessageLookupByLibrary.simpleMessage("Add"),
     "tunnelAddHint": MessageLookupByLibrary.simpleMessage(

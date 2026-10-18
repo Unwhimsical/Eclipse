@@ -1745,6 +1745,26 @@ class AppLocalizations {
     );
   }
 
+  /// `Only the selected options are applied to every profile`
+  String get overrideKeysDesc {
+    return Intl.message(
+      'Only the selected options are applied to every profile',
+      name: 'overrideKeysDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Override TUN`
+  String get tunOverride {
+    return Intl.message(
+      'Override TUN',
+      name: 'tunOverride',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Status`
   String get status {
     return Intl.message('Status', name: 'status', desc: '', args: []);

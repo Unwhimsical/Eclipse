@@ -406,10 +406,41 @@ void main() {
       const config = Config(themeProps: ThemeProps());
       final restored = roundTrip(() => config.toJson(), Config.fromJson);
       expect(restored.currentProfileId, null);
-      expect(restored.overrideDns, false);
       expect(restored.networkProps.systemProxy, true);
       expect(restored.vpnProps.enable, true);
       expect(restored.hotKeyActions, isEmpty);
+    });
+
+    test('legacy overrideDns toggle migrates to picked DNS keys', () {
+      // No key sets existed yet; round-trip through JSON like real storage.
+      Map<String, Object?> decode(Object? json) =>
+          jsonDecode(jsonEncode(json)) as Map<String, Object?>;
+      final patchJson = decode(const PatchClashConfig().toJson())
+        ..remove('dns-override-keys')
+        ..remove('tun-override-keys');
+      final restored = Config.fromJson({
+        'themeProps': decode(defaultThemeProps.toJson()),
+        'overrideDns': true,
+        'patchClashConfig': patchJson,
+      });
+      expect(
+        restored.patchClashConfig.dnsOverrideKeys,
+        DnsOverrideKey.values.toSet(),
+      );
+    });
+
+    test('legacy overrideDns=false keeps empty DNS key set', () {
+      Map<String, Object?> decode(Object? json) =>
+          jsonDecode(jsonEncode(json)) as Map<String, Object?>;
+      final patchJson = decode(const PatchClashConfig().toJson())
+        ..remove('dns-override-keys')
+        ..remove('tun-override-keys');
+      final restored = Config.fromJson({
+        'themeProps': decode(defaultThemeProps.toJson()),
+        'overrideDns': false,
+        'patchClashConfig': patchJson,
+      });
+      expect(restored.patchClashConfig.dnsOverrideKeys, isEmpty);
     });
 
     test('realFromJson handles null', () {
@@ -420,7 +451,6 @@ void main() {
     test('full config round-trip', () {
       const config = Config(
         currentProfileId: 42,
-        overrideDns: true,
         hotKeyActions: [],
         appSettingProps: AppSettingProps(locale: 'en', autoLaunch: true),
         networkProps: NetworkProps(systemProxy: false),
@@ -433,7 +463,6 @@ void main() {
       );
       final restored = roundTrip(() => config.toJson(), Config.fromJson);
       expect(restored.currentProfileId, 42);
-      expect(restored.overrideDns, true);
       expect(restored.appSettingProps.locale, 'en');
       expect(restored.appSettingProps.autoLaunch, true);
       expect(restored.networkProps.systemProxy, false);

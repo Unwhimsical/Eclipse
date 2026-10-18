@@ -1084,6 +1084,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "overrideDnsDesc": MessageLookupByLibrary.simpleMessage(
       "When enabled, the DNS options in the profile are overridden",
     ),
+    "overrideKeysDesc": MessageLookupByLibrary.simpleMessage(
+      "Only the selected options are applied to every profile",
+    ),
     "overrideMode": MessageLookupByLibrary.simpleMessage("Override mode"),
     "overrideRules": MessageLookupByLibrary.simpleMessage("Override"),
     "overrideScript": MessageLookupByLibrary.simpleMessage("Override script"),
@@ -1732,6 +1735,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
       "CIDR routes included in TUN",
     ),
+    "tunOverride": MessageLookupByLibrary.simpleMessage("Override TUN"),
     "tunnel": MessageLookupByLibrary.simpleMessage("Tunnel"),
     "tunnelAdd": MessageLookupByLibrary.simpleMessage("添加"),
     "tunnelAddHint": MessageLookupByLibrary.simpleMessage("例如 192.168.0.0/16"),

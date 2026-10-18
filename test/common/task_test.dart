@@ -191,7 +191,6 @@ void main() {
             ipv6: true,
             hosts: {'router.local': '192.168.1.1,192.168.1.2'},
           ),
-          overrideDns: false,
           appendSystemDns: true,
           proxyGroups: const [],
           rules: const [],
@@ -248,7 +247,6 @@ void main() {
         profileId: 7,
         rawConfig: rawConfig,
         realPatchConfig: const PatchClashConfig(),
-        overrideDns: false,
         appendSystemDns: false,
         proxyGroups: const [],
         rules: const [],
@@ -301,7 +299,6 @@ void main() {
             geoAutoUpdate: false,
             geoUpdateInterval: 48,
           ),
-          overrideDns: false,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -338,7 +335,6 @@ void main() {
           profileId: 13,
           rawConfig: rawConfig,
           realPatchConfig: const PatchClashConfig(ipv6: false),
-          overrideDns: false,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -383,7 +379,6 @@ void main() {
           profileId: 14,
           rawConfig: rawConfig,
           realPatchConfig: const PatchClashConfig(ipv6: false),
-          overrideDns: false,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -411,7 +406,6 @@ void main() {
       profileId: 12,
       rawConfig: rawConfig,
       realPatchConfig: const PatchClashConfig(),
-      overrideDns: false,
       appendSystemDns: false,
       proxyGroups: const [],
       rules: const [],
@@ -433,14 +427,58 @@ void main() {
     expect(disabledConfig['skip-auth-prefixes'], isEmpty);
   });
 
-  test('makeRealProfileTask overrides DNS and explicit custom data', () async {
+  test(
+    'makeRealProfileTask applies picked DNS keys to every profile',
+    () async {
+      final rawConfig = await decodeJSONTask<Map<String, dynamic>>(
+        await encodeJSONTask({
+          'dns': {
+            'enable': true,
+            'enhanced-mode': 'redir-host',
+            'nameserver': ['9.9.9.9'],
+            'listen': '127.0.0.1:1053',
+          },
+        }),
+      );
+      final result = await makeRealProfileTask(
+        MakeRealProfileState(
+          profilesPath: '/profiles',
+          profileId: 9,
+          rawConfig: rawConfig,
+          realPatchConfig: const PatchClashConfig(
+            dns: Dns(
+              enhancedMode: DnsMode.fakeIp,
+              nameserver: ['https://doh.pub/dns-query'],
+            ),
+            dnsOverrideKeys: {
+              DnsOverrideKey.enhancedMode,
+              DnsOverrideKey.nameserver,
+            },
+          ),
+          appendSystemDns: false,
+          proxyGroups: const [],
+          rules: const [],
+          addedRules: const [],
+          defaultUA: 'Fallback-UA',
+        ),
+      );
+      final config = loadYaml(result.yaml) as YamlMap;
+
+      // Picked keys win; unpicked keys keep the profile's own values.
+      expect(config['dns']['enhanced-mode'], 'fake-ip');
+      expect(config['dns']['nameserver'], ['https://doh.pub/dns-query']);
+      expect(config['dns']['enable'], true);
+      expect(config['dns']['listen'], '127.0.0.1:1053');
+    },
+  );
+
+  test('makeRealProfileTask falls back to baseline DNS without keys', () async {
     final result = await makeRealProfileTask(
       const MakeRealProfileState(
         profilesPath: '/profiles',
         profileId: 9,
         rawConfig: {},
         realPatchConfig: PatchClashConfig(),
-        overrideDns: true,
         appendSystemDns: false,
         proxyGroups: [
           ProxyGroup(
@@ -493,7 +531,6 @@ void main() {
         profileId: 13,
         rawConfig: rawConfig,
         realPatchConfig: const PatchClashConfig(),
-        overrideDns: false,
         appendSystemDns: false,
         proxyGroups: const [],
         rules: const [],
@@ -526,7 +563,6 @@ void main() {
           profileId: 13,
           rawConfig: rawConfig,
           realPatchConfig: realPatchConfig,
-          overrideDns: false,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],
@@ -600,7 +636,6 @@ void main() {
             },
           },
           realPatchConfig: const PatchClashConfig(),
-          overrideDns: false,
           appendSystemDns: false,
           proxyGroups: const [],
           rules: const [],

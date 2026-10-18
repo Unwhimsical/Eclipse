@@ -783,6 +783,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "override": MessageLookupByLibrary.simpleMessage("覆写"),
     "overrideDns": MessageLookupByLibrary.simpleMessage("覆写DNS"),
     "overrideDnsDesc": MessageLookupByLibrary.simpleMessage("开启后将覆盖配置中的DNS选项"),
+    "overrideKeysDesc": MessageLookupByLibrary.simpleMessage("仅将选中的选项应用到每个配置"),
     "overrideMode": MessageLookupByLibrary.simpleMessage("覆写模式"),
     "overrideRules": MessageLookupByLibrary.simpleMessage("覆写"),
     "overrideScript": MessageLookupByLibrary.simpleMessage("覆写脚本"),
@@ -1269,6 +1270,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "tunIncludedRoutesDesc": MessageLookupByLibrary.simpleMessage(
       "纳入 TUN 的 CIDR 路由",
     ),
+    "tunOverride": MessageLookupByLibrary.simpleMessage("覆盖 TUN"),
     "tunnel": MessageLookupByLibrary.simpleMessage("隧道"),
     "tunnelAdd": MessageLookupByLibrary.simpleMessage("Add"),
     "tunnelAddHint": MessageLookupByLibrary.simpleMessage(

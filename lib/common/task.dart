@@ -115,7 +115,6 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   final realPatchConfig = data.realPatchConfig;
   final profilesPath = data.profilesPath;
   final profileId = data.profileId;
-  final overrideDns = data.overrideDns;
   final addedRules = data.addedRules;
   final appendSystemDns = data.appendSystemDns;
   final defaultUA = data.defaultUA;
@@ -197,12 +196,12 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
     rawConfig['tun'] = {};
   }
   rawConfig['tun']['enable'] = realPatchConfig.tun.enable;
-  rawConfig['tun']['device'] = realPatchConfig.tun.device;
-  rawConfig['tun']['dns-hijack'] = realPatchConfig.tun.dnsHijack;
-  rawConfig['tun']['stack'] = realPatchConfig.tun.stack.name;
-  rawConfig['tun']['route-address'] = realPatchConfig.tun.routeAddress;
-  rawConfig['tun']['auto-route'] = realPatchConfig.tun.autoRoute;
-  rawConfig['tun']['udp'] = realPatchConfig.tun.udp;
+  final tunOverride = realPatchConfig.tun.overrideJson(
+    realPatchConfig.tunOverrideKeys,
+  );
+  for (final entry in tunOverride.entries) {
+    rawConfig['tun'][entry.key] = entry.value;
+  }
   applyCompatibilityMode(rawConfig['tun'], data.compatibilityMode);
   rawConfig['geodata-loader'] = realPatchConfig.geodataLoader.name;
   rawConfig['geo-auto-update'] = realPatchConfig.geoAutoUpdate;
@@ -239,18 +238,16 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   rawConfig['dns'] = rawDns;
   final isEnableDns = rawDns['enable'] == true;
   const systemDns = 'system://';
-  if (overrideDns || !isEnableDns) {
-    final dns = realPatchConfig.dns;
-    final nameserverPolicy = <String, dynamic>{};
-    for (final entry in dns.nameserverPolicy.entries) {
-      nameserverPolicy[entry.key] = entry.value.splitByMultipleSeparators;
-    }
-    // Merged, not assigned: the model only covers the keys Eclipse can edit.
-    rawConfig['dns'] = {
-      ...rawDns,
-      ...dns.toJson(),
-      'nameserver-policy': nameserverPolicy,
-    };
+  // Picked DNS keys apply to every profile. With no keys picked, a profile
+  // without its own DNS section still gets the baseline (legacy fallback).
+  final dnsOverrideKeys = realPatchConfig.dnsOverrideKeys;
+  final dnsOverride = realPatchConfig.dns.overrideJson(
+    dnsOverrideKeys.isEmpty && !isEnableDns
+        ? baselineDnsOverrideKeys
+        : dnsOverrideKeys,
+  );
+  if (dnsOverride.isNotEmpty) {
+    rawConfig['dns'] = mergeDnsOverride(rawDns, dnsOverride);
   }
   if (appendSystemDns) {
     final List<String> nameserver = List<String>.from(

@@ -225,6 +225,8 @@
   "subscriptionInfo": "サブスクリプション情報",
   "overrideDns": "DNSを上書き",
   "overrideDnsDesc": "有効にすると、プロファイル内のDNS設定を上書きします",
+  "overrideKeysDesc": "Only the selected options are applied to every profile",
+  "tunOverride": "Override TUN",
   "status": "状態",
   "statusDesc": "無効にすると、システムDNSを使用します",
   "preferH3Desc": "DoHでHTTP/3を優先します",

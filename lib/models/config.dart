@@ -260,7 +260,6 @@ abstract class ThemeProps with _$ThemeProps {
 abstract class Config with _$Config {
   const factory Config({
     int? currentProfileId,
-    @Default(false) bool overrideDns,
     @Default([]) List<HotKeyAction> hotKeyActions,
     @JsonKey(fromJson: AppSettingProps.safeFromJson)
     @Default(defaultAppSettingProps)
@@ -276,12 +275,31 @@ abstract class Config with _$Config {
     @Default(false) bool sceneModeEnabled,
   }) = _Config;
 
-  factory Config.fromJson(Map<String, Object?> json) => _$ConfigFromJson(json);
+  factory Config.fromJson(Map<String, Object?> json) =>
+      _$ConfigFromJson(_migrateLegacyDnsOverride(json));
 
   factory Config.realFromJson(Map<String, Object?>? json) {
     if (json == null) {
       return const Config(themeProps: defaultThemeProps);
     }
-    return _$ConfigFromJson(json);
+    return _$ConfigFromJson(_migrateLegacyDnsOverride(json));
+  }
+
+  /// A pre-key-set `overrideDns: true` meant the whole DNS section, which now
+  /// maps to picking every DNS key.
+  static Map<String, Object?> _migrateLegacyDnsOverride(
+    Map<String, Object?> json,
+  ) {
+    if (json['overrideDns'] != true) {
+      return json;
+    }
+    final patch = Map<String, Object?>.from(
+      (json['patchClashConfig'] as Map?)?.cast<String, Object?>() ?? {},
+    );
+    patch.putIfAbsent(
+      'dns-override-keys',
+      () => [for (final key in DnsOverrideKey.values) key.path],
+    );
+    return {...json, 'patchClashConfig': patch};
   }
 }

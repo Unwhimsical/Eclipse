@@ -225,6 +225,8 @@
   "subscriptionInfo": "Subscription info",
   "overrideDns": "Override DNS",
   "overrideDnsDesc": "When enabled, the DNS options in the profile are overridden",
+  "overrideKeysDesc": "Only the selected options are applied to every profile",
+  "tunOverride": "Override TUN",
   "status": "Status",
   "statusDesc": "When disabled, the system DNS is used",
   "preferH3Desc": "Prefer HTTP/3 for DoH",

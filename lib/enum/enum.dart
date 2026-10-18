@@ -555,3 +555,63 @@ enum ItemPosition {
     return ItemPosition.get(visualIndex, visualLength);
   }
 }
+
+/// A settable key of a config section, addressed by its core-facing path.
+/// Dotted paths address a nested section, e.g. `fallback-filter.geoip`.
+mixin OverrideKey on Enum {
+  String get path;
+
+  String? get parent {
+    final dot = path.indexOf('.');
+    return dot < 0 ? null : path.substring(0, dot);
+  }
+
+  String get field => path.substring(path.indexOf('.') + 1);
+}
+
+@JsonEnum(valueField: 'path')
+enum DnsOverrideKey with OverrideKey {
+  enable('enable'),
+  listen('listen'),
+  preferH3('prefer-h3'),
+  useHosts('use-hosts'),
+  useSystemHosts('use-system-hosts'),
+  respectRules('respect-rules'),
+  ipv6('ipv6'),
+  defaultNameserver('default-nameserver'),
+  enhancedMode('enhanced-mode'),
+  fakeIpRange('fake-ip-range'),
+  fakeIpFilter('fake-ip-filter'),
+  nameserverPolicy('nameserver-policy'),
+  nameserver('nameserver'),
+  fallback('fallback'),
+  proxyServerNameserver('proxy-server-nameserver'),
+  fallbackFilterGeoip('fallback-filter.geoip'),
+  fallbackFilterGeoipCode('fallback-filter.geoip-code'),
+  fallbackFilterGeosite('fallback-filter.geosite'),
+  fallbackFilterIpcidr('fallback-filter.ipcidr'),
+  fallbackFilterDomain('fallback-filter.domain');
+
+  const DnsOverrideKey(this.path);
+
+  @override
+  final String path;
+
+  static const fallbackFilterSection = 'fallback-filter';
+}
+
+/// `enable` is not pickable: the TUN switch must keep working.
+@JsonEnum(valueField: 'path')
+enum TunOverrideKey with OverrideKey {
+  device('device'),
+  autoRoute('auto-route'),
+  stack('stack'),
+  dnsHijack('dns-hijack'),
+  routeAddress('route-address'),
+  udp('udp');
+
+  const TunOverrideKey(this.path);
+
+  @override
+  final String path;
+}
