@@ -101,11 +101,11 @@ object Core {
     // Eclipse has no gomobile Mobile binding; these ride the existing invokeMethod channel
     // that the Go core already serves as the startListener/stopListener core methods.
     fun startListener() {
-        invokeMethod(Gson().toJson(mapOf("method" to "startListener"))) { }
+        invokeMethod(JSONObject(mapOf("method" to "startListener")).toString()) { }
     }
 
     fun stopListener() {
-        invokeMethod(Gson().toJson(mapOf("method" to "stopListener"))) { }
+        invokeMethod(JSONObject(mapOf("method" to "stopListener")).toString()) { }
     }
 
     fun updateEventListener(
