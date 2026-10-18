@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/common/permission.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/plugins/app.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/on_demand/on_demand_extras.dart';
-import 'package:fl_clash/views/profiles/overwrite/custom/widgets.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wifi_ssid/wifi_ssid.dart';
@@ -58,19 +57,23 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
       _handlePermanentlyDeniedLocationPermission();
       return;
     }
-    final permissionsNotifier = ref.read(locationPermissionsProvider.notifier);
-    final res = await wifiSsidManager.requestPermission();
-    permissionsNotifier.value = res;
-    if (!mounted) {
+    final WifiSsidPermission? res;
+    try {
+      res = await ref.read(locationPermissionsProvider.notifier).request();
+    } on PlatformException catch (e) {
+      commonPrint.log('requestPermission error $e', logLevel: LogLevel.warning);
       return;
     }
-    switch (getLocationPermissionFollowUp(res)) {
-      case LocationPermissionFollowUp.none:
+    if (res == null || !mounted) {
+      return;
+    }
+    switch (res) {
+      case WifiSsidPermission.granted:
         return;
-      case LocationPermissionFollowUp.openSettings:
+      case WifiSsidPermission.permanentlyDenied:
         _handlePermanentlyDeniedLocationPermission();
         return;
-      case LocationPermissionFollowUp.showDeniedMessage:
+      case WifiSsidPermission.denied:
         break;
     }
     final needGo = await dialogs.showMessage(
@@ -84,13 +87,11 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     unawaited(app?.openAppSettings());
   }
 
-  void _handleOpenBatteryOptimizationSettings() {
-    final isDisabled = ref.read(batteryOptimizationDisableProvider);
-    if (isDisabled) {
+  void _handleRequestIgnoreBatteryOptimization() {
+    if (ref.read(batteryOptimizationIgnoredProvider).value == true) {
       return;
     }
-    permissions.needWaitingBatteryOptimizationSettings = true;
-    app?.openBatteryOptimizationSettings();
+    unawaited(ref.read(batteryOptimizationIgnoredProvider.notifier).request());
   }
 
   Future<void> _handleAddOrUpdate([String? ssid]) async {
@@ -149,7 +150,6 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
           position: position,
           child: SelectedDecorationListItem(
             isEditing: isEditing,
-            minVerticalPadding: 8,
             title: TooltipText(
               text: Text(ssid, maxLines: 2, overflow: TextOverflow.ellipsis),
             ),
@@ -227,57 +227,31 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
 
   Widget _buildPrerequisiteItem({
     required String title,
-    required String desc,
     required Widget action,
   }) {
-    return DecorationListItem(
-      minVerticalPadding: 0,
-      title: Padding(
-        padding: const EdgeInsets.only(top: 12),
-        child: TooltipLabel(title),
-      ),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 8,
-          children: [
-            Text(desc),
-            Align(alignment: Alignment.centerRight, child: action),
-          ],
-        ),
-      ),
-    );
+    return DecorationListItem(title: TooltipLabel(title), trailing: action);
   }
 
   Widget _buildBatteryOptimizationItem() {
     final appLocalizations = context.appLocalizations;
-    final isStart = ref.watch(isStartProvider);
-    final isLoading = ref.watch(
-      loadingProvider(LoadingTag.batteryOptimization),
-    );
-    final disabled = ref.watch(batteryOptimizationDisableProvider);
+    final ignored = ref.watch(batteryOptimizationIgnoredProvider);
+    final isLoading = ignored.isLoading;
     return _buildPrerequisiteItem(
       title: appLocalizations.ignoreBatteryOptimization,
-      desc: appLocalizations.batteryOptimizationDesc,
       action: Stack(
         alignment: Alignment.centerRight,
         children: [
           Visibility(
-            visible: !isLoading && !isStart,
+            visible: !isLoading,
             maintainSize: true,
             maintainAnimation: true,
             maintainState: true,
             child: _buildAuthorizeButton(
-              authorized: disabled,
-              onPressed: _handleOpenBatteryOptimizationSettings,
+              authorized: ignored.value ?? false,
+              onPressed: _handleRequestIgnoreBatteryOptimization,
             ),
           ),
-          if (isStart)
-            InfoMessageButton(
-              message: appLocalizations.batteryOptimizationStatusTip,
-            ),
-          if (!isStart && isLoading)
+          if (isLoading)
             const SizedBox.square(dimension: 32, child: CommonCircleLoading()),
         ],
       ),
@@ -293,7 +267,6 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     );
     return _buildPrerequisiteItem(
       title: appLocalizations.locationPermission,
-      desc: appLocalizations.locationPermissionDesc,
       action: _buildAuthorizeButton(
         authorized: granted,
         onPressed: _handleRequestLocationPermission,
@@ -302,12 +275,33 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
   }
 
   Widget _buildPrerequisites() {
+    final appLocalizations = context.appLocalizations;
     return generateSectionV3(
-      title: context.appLocalizations.prerequisites,
+      title: appLocalizations.prerequisites,
       items: [
         if (_isAndroid) _buildBatteryOptimizationItem(),
         if (_isAndroid || _isMacOS) _buildLocationPermissionItem(),
       ],
+    );
+  }
+
+  Widget _buildPrerequisitesFooter() {
+    final appLocalizations = context.appLocalizations;
+    final descs = [
+      if (_isAndroid) appLocalizations.batteryOptimizationDesc,
+      if (_isAndroid || _isMacOS) appLocalizations.locationPermissionDesc,
+    ];
+    if (descs.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(top: 8),
+      child: Text(
+        descs.join('\n'),
+        style: context.textTheme.bodySmall?.copyWith(
+          color: context.colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
   }
 
@@ -316,7 +310,6 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
     final hasSelection = ref.watch(itemsProvider(key)).isNotEmpty;
     return ListHeader(
       title: appLocalizations.excludeSsids,
-      subTitle: appLocalizations.excludeSsidsDesc,
       actions: [
         const SizedBox(width: 8),
         if (hasSelection)
@@ -328,17 +321,21 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
             ),
           ),
         const SizedBox(width: 2),
-        CommonMinFilledButtonTheme(
-          child: hasSelection
-              ? FilledButton(
-                  onPressed: _handleSelectAll,
-                  child: Text(appLocalizations.selectAll),
-                )
-              : FilledButton.tonal(
-                  onPressed: _handleAddOrUpdate,
-                  child: Text(appLocalizations.add),
-                ),
-        ),
+        if (hasSelection)
+          CommonMinFilledButtonTheme(
+            child: FilledButton(
+              onPressed: _handleSelectAll,
+              child: Text(appLocalizations.selectAll),
+            ),
+          )
+        else
+          CommonMinIconButtonTheme(
+            child: IconButton.filledTonal(
+              tooltip: appLocalizations.add,
+              onPressed: _handleAddOrUpdate,
+              icon: const Icon(Icons.add),
+            ),
+          ),
       ],
     );
   }
@@ -400,13 +397,31 @@ class _OnDemandViewState extends ConsumerState<OnDemandView>
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverToBoxAdapter(child: _buildPrerequisites()),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [_buildPrerequisites(), _buildPrerequisitesFooter()],
+              ),
+            ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(child: _buildExcludeSsidsHeader()),
           ),
           _buildExcludeSsidsList(excludeSSIDs, selectedItems),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+            ).copyWith(bottom: 16),
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                context.appLocalizations.excludeSsidsDesc,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       title: context.appLocalizations.onDemand,

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/common.dart';
-import 'package:fl_clash/common/permission.dart';
 import 'package:fl_clash/common/system_dns.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -74,7 +73,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     commonPrint.log('$state');
     if (state == AppLifecycleState.resumed) {
-      permissions.check(ref.read);
+      unawaited(ref.read(locationPermissionsProvider.notifier).refresh());
       render?.resume();
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) {

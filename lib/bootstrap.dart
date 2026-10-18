@@ -7,7 +7,6 @@ import 'package:fl_clash/common/boot_record.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/common/launch.dart';
 import 'package:fl_clash/common/migration.dart';
-import 'package:fl_clash/common/permission.dart';
 import 'package:fl_clash/common/tray.dart';
 import 'package:fl_clash/common/window.dart';
 import 'package:fl_clash/database/database.dart';
@@ -169,7 +168,7 @@ class Bootstrap {
     }
     _container.read(initProvider.notifier).value = true;
     await bootGuard.markRunning();
-    permissions.check(_container.read);
+    unawaited(_container.read(locationPermissionsProvider.notifier).refresh());
   }
 
   Future<void> _showCrashRecoveryTip() async {

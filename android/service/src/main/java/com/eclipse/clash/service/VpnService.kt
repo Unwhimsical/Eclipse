@@ -92,6 +92,11 @@ class VpnService : SystemVpnService(), ManagedService {
         super.onLowMemory()
     }
 
+    override fun onTrimMemory(level: Int) {
+        trimCoreMemory(level)
+        super.onTrimMemory(level)
+    }
+
     inner class LocalBinder : Binder() {
         val service: VpnService
             get() = this@VpnService

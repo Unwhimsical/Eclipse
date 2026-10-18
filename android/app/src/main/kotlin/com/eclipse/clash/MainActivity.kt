@@ -1,6 +1,7 @@
 package com.eclipse.clash
 
 import com.eclipse.clash.plugins.AppPlugin
+import com.eclipse.clash.plugins.BatteryPlugin
 import com.eclipse.clash.plugins.ServicePlugin
 import com.eclipse.clash.plugins.TilePlugin
 import io.flutter.embedding.android.FlutterActivity
@@ -10,6 +11,7 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         flutterEngine.plugins.add(AppPlugin())
+        flutterEngine.plugins.add(BatteryPlugin())
         flutterEngine.plugins.add(ServicePlugin())
         flutterEngine.plugins.add(TilePlugin())
         ServiceState.attachFlutterEngine(flutterEngine)
