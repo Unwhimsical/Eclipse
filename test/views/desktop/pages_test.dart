@@ -221,6 +221,50 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('proxies page builds with empty groups', (tester) async {
+      await _pumpPage(
+        tester,
+        const DesktopProxiesView(),
+        overrides: _baseOverrides(),
+      );
+      await tester.pump();
+      expect(find.byType(DesktopProxiesView), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('proxies page lists groups and nodes', (tester) async {
+      final groups = [
+        Group(
+          type: GroupType.Selector,
+          name: 'PROXY',
+          now: 'Node A',
+          all: const [
+            Proxy(name: 'Node A', type: 'vmess'),
+            Proxy(name: 'Node B', type: 'trojan'),
+          ],
+        ),
+      ];
+      await _pumpPage(
+        tester,
+        const DesktopProxiesView(),
+        overrides: [
+          isStartProvider.overrideWithValue(false),
+          profilesProvider.overrideWith(() => TestProfiles(const [])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => null),
+          currentGroupsStateProvider.overrideWithValue(
+            GroupsState(value: groups),
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('PROXY'), findsOneWidget);
+      expect(find.text('Node A'), findsOneWidget);
+      expect(find.text('Node B'), findsOneWidget);
+      expect(find.text('vmess'), findsOneWidget);
+      expect(find.text('trojan'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('config page switches profile and placeholder tabs', (
       tester,
     ) async {

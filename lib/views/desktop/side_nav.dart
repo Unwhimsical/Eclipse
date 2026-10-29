@@ -31,7 +31,7 @@ bool _focusIsTextInput() {
 }
 
 /// Self-drawn desktop sidebar (§2): 68/208 dual-snap widths with a draggable
-/// divider, five destinations, digit-key switching, and a settings/version
+/// divider, six destinations, digit-key switching, and a settings/version
 /// footer. Replaces NavigationRail on desktop.
 class DesktopSideNav extends StatefulWidget {
   const DesktopSideNav({
@@ -66,6 +66,7 @@ class _DesktopSideNavState extends State<DesktopSideNav> {
     LogicalKeyboardKey.digit3,
     LogicalKeyboardKey.digit4,
     LogicalKeyboardKey.digit5,
+    LogicalKeyboardKey.digit6,
   ];
 
   double _width = DesktopSideNav.expandedWidth;

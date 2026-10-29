@@ -30,6 +30,13 @@ class Navigation implements NavigationPort {
             : const HomeView(key: GlobalObjectKey(PageLabel.dashboard)),
       ),
       NavigationItem(
+        icon: const Icon(Icons.hub_outlined),
+        label: PageLabel.proxies,
+        modes: const [NavigationItemMode.desktop],
+        builder: (_) =>
+            const DesktopProxiesView(key: GlobalObjectKey(PageLabel.proxies)),
+      ),
+      NavigationItem(
         icon: const Icon(Icons.description_outlined),
         label: PageLabel.config,
         builder: (context) => _isDesktop(context)
