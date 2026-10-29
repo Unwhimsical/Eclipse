@@ -26,6 +26,15 @@ class _TestCustomRules extends ProfileCustomRules {
   Stream<List<Rule>> build(int profileId) => Stream.value(initial);
 }
 
+class _TestProxyGroups extends ProxyGroups {
+  _TestProxyGroups(this.initial);
+
+  final List<ProxyGroup> initial;
+
+  @override
+  Stream<List<ProxyGroup>> build(int profileId) => Stream.value(initial);
+}
+
 ThemeData _desktopTheme() {
   return ThemeData(
     useMaterial3: true,
@@ -265,12 +274,18 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('config page switches profile and placeholder tabs', (
-      tester,
-    ) async {
+    testWidgets('config page switches profile and wired tabs', (tester) async {
       SharedPreferences.setMockInitialValues({});
       final profile = Profile.normal(label: 'Test profile');
       final other = Profile.normal(label: 'Other profile');
+      final groups = [
+        const ProxyGroup(
+          id: 100,
+          name: 'Group A',
+          type: GroupType.Selector,
+          proxies: ['DIRECT'],
+        ),
+      ];
       await _pumpPage(
         tester,
         const DesktopConfigView(),
@@ -280,6 +295,7 @@ void main() {
           profileCustomRulesProvider.overrideWith2(
             (_) => _TestCustomRules(const []),
           ),
+          proxyGroupsProvider.overrideWith2((_) => _TestProxyGroups(groups)),
         ],
       );
       await tester.pumpAndSettle();
@@ -289,9 +305,50 @@ void main() {
       await tester.tap(find.text('Modules'));
       await tester.pumpAndSettle();
       expect(find.text('Coming soon'), findsNothing);
+      await tester.tap(find.text('Proxy group'));
+      await tester.pumpAndSettle();
+      expect(find.text('Group A'), findsOneWidget);
+      expect(find.text('Add proxy group'), findsOneWidget);
+      expect(find.text('Coming soon'), findsNothing);
+      await tester.tap(find.text('General'));
+      await tester.pumpAndSettle();
+      expect(find.text('Port'), findsOneWidget);
+      expect(find.text('Allow LAN'), findsOneWidget);
+      expect(find.text('Coming soon'), findsNothing);
       await tester.tap(find.text('DNS'));
       await tester.pumpAndSettle();
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.text('Nameserver'), findsOneWidget);
+      expect(find.text('Fake-IP range'), findsOneWidget);
+      expect(find.text('Coming soon'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page policy group tab opens the edit dialog', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      final profile = Profile.normal(label: 'Test profile');
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          viewSizeProvider.overrideWithValue(const Size(1280, 800)),
+          profileCustomRulesProvider.overrideWith2(
+            (_) => _TestCustomRules(const []),
+          ),
+          proxyGroupsProvider.overrideWith2((_) => _TestProxyGroups(const [])),
+        ],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Proxy group'));
+      await tester.pumpAndSettle();
+      expect(find.text('Proxy group is empty'), findsOneWidget);
+      await tester.tap(find.text('Add proxy group'));
+      await tester.pumpAndSettle();
+      expect(find.text('Name'), findsWidgets);
+      expect(find.text('Proxy type'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });

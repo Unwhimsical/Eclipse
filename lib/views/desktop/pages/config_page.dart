@@ -8,6 +8,8 @@ import 'package:fl_clash/features/overwrite/rule.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
+import 'package:fl_clash/views/config/dns.dart';
+import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/value_holder.dart';
@@ -23,10 +25,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final desktopConfigTabProvider = valueHolder(0);
 
 /// Desktop config page: 260px profile list left, per-profile editor right
-/// with 规则|模块|策略组|通用|DNS|节点 tabs. The 策略组/通用/DNS tabs are
-/// still placeholders (Batch 3); the 节点 tab restores the 36bdccf rich
-/// node cards under a live status dashboard, so a single-node profile
-/// never renders as an empty page.
+/// with 规则|模块|策略组|通用|DNS|节点 tabs. The 策略组 tab edits the
+/// selected profile's custom proxy groups, while 通用 and DNS reuse the
+/// mobile general and DNS editors against the current profile's patch
+/// config; the 节点 tab restores the 36bdccf rich node cards under a
+/// live status dashboard, so a single-node profile never renders as an
+/// empty page.
 class DesktopConfigView extends ConsumerStatefulWidget {
   const DesktopConfigView({super.key});
 
@@ -563,8 +567,11 @@ class _ProfileDetail extends ConsumerWidget {
             child: switch (tabIndex) {
               0 => _RulesTab(profile: profile),
               1 => const _ModulesTab(),
+              2 => _PolicyGroupsTab(profile: profile),
+              3 => const _GeneralTab(),
+              4 => const _DnsTab(),
               5 => const _NodesTab(),
-              _ => _TabPlaceholder(index: tabIndex),
+              _ => const _GeneralTab(),
             },
           ),
         ],
@@ -2462,42 +2469,384 @@ class _DelayChip extends ConsumerWidget {
   }
 }
 
-class _TabPlaceholder extends StatelessWidget {
-  const _TabPlaceholder({required this.index});
+class _PolicyGroupsTab extends ConsumerWidget {
+  const _PolicyGroupsTab({required this.profile});
 
-  final int index;
+  final Profile profile;
 
-  static const _icons = [
-    Icons.rule_outlined,
-    Icons.extension_outlined,
-    Icons.hub_outlined,
-    Icons.tune_outlined,
-    Icons.dns_outlined,
-  ];
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appLocalizations = context.appLocalizations;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
+    final groups = ref.watch(proxyGroupsProvider(profile.id)).value ?? [];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+          child: Row(
+            spacing: 8,
+            children: [
+              Expanded(
+                child: Text(
+                  appLocalizations.proxyGroups,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              FilledButton.icon(
+                onPressed: () => _showEdit(context, ref),
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: Text(appLocalizations.addProxyGroup),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: groups.isEmpty
+              ? Center(
+                  child: Text(
+                    appLocalizations.proxyGroupEmpty,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: text3),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+                  itemCount: groups.length,
+                  itemExtent: 64,
+                  itemBuilder: (_, index) {
+                    final group = groups[index];
+                    return _PolicyGroupRow(
+                      group: group,
+                      onTap: () => _showEdit(context, ref, group: group),
+                      onDelete: () => _handleDelete(context, ref, group),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showEdit(
+    BuildContext context,
+    WidgetRef ref, {
+    ProxyGroup? group,
+  }) async {
+    final appLocalizations = context.appLocalizations;
+    final saved = await dialogs.showCommonDialog<bool>(
+      child: _EditProxyGroupDialog(profileId: profile.id, group: group),
+    );
+    if (saved != true) return;
+    dialogs.showNotifier(
+      group == null ? appLocalizations.addProxyGroup : group.name,
+      level: MessageLevel.success,
+    );
+  }
+
+  Future<void> _handleDelete(
+    BuildContext context,
+    WidgetRef ref,
+    ProxyGroup group,
+  ) async {
+    final appLocalizations = context.appLocalizations;
+    final confirmed = await showDesktopConfirm(
+      title: appLocalizations.confirmDeleteTitle,
+      message: group.name,
+      confirmLabel: appLocalizations.delete,
+      danger: true,
+    );
+    if (!confirmed) return;
+    ref.read(proxyGroupsProvider(profile.id).notifier).del(group.name);
+  }
+}
+
+class _PolicyGroupRow extends StatelessWidget {
+  const _PolicyGroupRow({
+    required this.group,
+    required this.onTap,
+    required this.onDelete,
+  });
+
+  final ProxyGroup group;
+  final VoidCallback onTap;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tokens = theme.extension<DesktopThemeTokens>();
+    final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
+    final proxies = group.proxies ?? const <String>[];
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          color: Colors.transparent,
+        ),
+        child: Row(
+          spacing: 12,
+          children: [
+            const Icon(Icons.hub_outlined, size: 20),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  Text(
+                    group.name,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    proxies.isEmpty
+                        ? group.type.name
+                        : '${group.type.name} · ${proxies.join(', ')}',
+                    style: theme.textTheme.bodySmall?.copyWith(color: text3),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              tooltip: context.appLocalizations.delete,
+              iconSize: 18,
+              onPressed: onDelete,
+              icon: const Icon(Icons.delete_outlined),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EditProxyGroupDialog extends ConsumerStatefulWidget {
+  const _EditProxyGroupDialog({required this.profileId, this.group});
+
+  final int profileId;
+  final ProxyGroup? group;
+
+  @override
+  ConsumerState<_EditProxyGroupDialog> createState() =>
+      _EditProxyGroupDialogState();
+}
+
+class _EditProxyGroupDialogState extends ConsumerState<_EditProxyGroupDialog> {
+  late final _nameController = TextEditingController(
+    text: widget.group?.name ?? '',
+  );
+  late final _proxiesController = TextEditingController(
+    text: (widget.group?.proxies ?? const <String>[]).join('\n'),
+  );
+  late final _filterController = TextEditingController(
+    text: widget.group?.filter ?? '',
+  );
+  late final _urlController = TextEditingController(
+    text: widget.group?.url ?? '',
+  );
+  late final _intervalController = TextEditingController(
+    text: widget.group?.interval?.toString() ?? '',
+  );
+  late GroupType _type = widget.group?.type ?? GroupType.Selector;
+  late bool _lazy = widget.group?.lazy ?? false;
+  late bool _hidden = widget.group?.hidden ?? false;
+  late bool _disableUDP = widget.group?.disableUDP ?? false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _proxiesController.dispose();
+    _filterController.dispose();
+    _urlController.dispose();
+    _intervalController.dispose();
+    super.dispose();
+  }
+
+  void _handleSave() {
+    final appLocalizations = context.appLocalizations;
+    final name = _nameController.text.trim();
+    if (name.isEmpty) {
+      dialogs.showNotifier(
+        appLocalizations.proxyGroupNameEmpty,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    final proxies = _proxiesController.text
+        .split('\n')
+        .map((line) => line.trim())
+        .where((line) => line.isNotEmpty)
+        .toList();
+    final interval = int.tryParse(_intervalController.text.trim());
+    final filter = _filterController.text.trim();
+    final url = _urlController.text.trim();
+    final group =
+        (widget.group?.copyWith(
+          name: name,
+          type: _type,
+          proxies: proxies,
+          filter: filter.isEmpty ? null : filter,
+          url: url.isEmpty ? null : url,
+          interval: interval,
+          lazy: _lazy,
+          hidden: _hidden,
+          disableUDP: _disableUDP,
+        ) ??
+        ProxyGroup(
+          id: snowflake.id,
+          name: name,
+          type: _type,
+          proxies: proxies,
+          filter: filter.isEmpty ? null : filter,
+          url: url.isEmpty ? null : url,
+          interval: interval,
+          lazy: _lazy,
+          hidden: _hidden,
+          disableUDP: _disableUDP,
+        ));
+    final saved = ref
+        .read(proxyGroupsProvider(widget.profileId).notifier)
+        .put(group);
+    if (!saved) {
+      dialogs.showNotifier(
+        appLocalizations.proxyGroupNameDuplicate,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    Navigator.of(context).pop(true);
+  }
 
   @override
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
-    final theme = Theme.of(context);
-    final text3 =
-        theme.extension<DesktopThemeTokens>()?.text3 ??
-        theme.colorScheme.onSurfaceVariant;
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 8,
-        children: [
-          Icon(
-            _icons[index.clamp(0, _icons.length - 1)],
-            size: 44,
-            color: text3,
-          ),
-          Text(
-            appLocalizations.comingSoon,
-            style: theme.textTheme.bodyMedium?.copyWith(color: text3),
-          ),
-        ],
+    final isNew = widget.group == null;
+    return CommonDialog(
+      title: isNew
+          ? appLocalizations.addProxyGroup
+          : appLocalizations.editProxyGroup,
+      child: SizedBox(
+        width: 380,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 12,
+          children: [
+            TextField(
+              controller: _nameController,
+              autofocus: true,
+              decoration: InputDecoration(labelText: appLocalizations.name),
+            ),
+            DropdownButtonFormField<GroupType>(
+              initialValue: _type,
+              decoration: InputDecoration(
+                labelText: appLocalizations.proxyType,
+              ),
+              items: [
+                for (final type in GroupType.values)
+                  DropdownMenuItem(value: type, child: Text(type.name)),
+              ],
+              onChanged: (value) {
+                if (value != null) setState(() => _type = value);
+              },
+            ),
+            TextField(
+              controller: _proxiesController,
+              minLines: 3,
+              maxLines: 6,
+              decoration: InputDecoration(labelText: appLocalizations.proxies),
+            ),
+            TextField(
+              controller: _filterController,
+              decoration: InputDecoration(
+                labelText: appLocalizations.proxyFilter,
+              ),
+            ),
+            TextField(
+              controller: _urlController,
+              decoration: InputDecoration(labelText: appLocalizations.testUrl),
+            ),
+            TextField(
+              controller: _intervalController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: appLocalizations.testInterval,
+                suffixText: appLocalizations.seconds,
+              ),
+            ),
+            SwitchListTile(
+              title: Text(appLocalizations.testWhenUsed),
+              value: _lazy,
+              onChanged: (value) => setState(() => _lazy = value),
+            ),
+            SwitchListTile(
+              title: Text(appLocalizations.hideFromList),
+              value: _hidden,
+              onChanged: (value) => setState(() => _hidden = value),
+            ),
+            SwitchListTile(
+              title: Text(appLocalizations.disableUDP),
+              value: _disableUDP,
+              onChanged: (value) => setState(() => _disableUDP = value),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              spacing: 8,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(appLocalizations.cancel),
+                ),
+                FilledButton(
+                  onPressed: _handleSave,
+                  child: Text(appLocalizations.confirm),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _GeneralTab extends StatelessWidget {
+  const _GeneralTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+      child: Material(
+        type: MaterialType.transparency,
+        child: GeneralListView(),
+      ),
+    );
+  }
+}
+
+class _DnsTab extends StatelessWidget {
+  const _DnsTab();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(20, 12, 20, 0),
+      child: Material(type: MaterialType.transparency, child: DnsListView()),
     );
   }
 }
