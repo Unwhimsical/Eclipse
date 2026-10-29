@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:fl_clash/core/controller.dart';
+import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/desktop/desktop.dart';
@@ -171,6 +172,52 @@ void main() {
       expect(find.text('proxy.example.com'), findsOneWidget);
       expect(find.text('REJECT'), findsOneWidget);
       expect(find.text('DIRECT'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page nodes tab shows dashboard and rich node card', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({});
+      final profile = Profile.normal(label: 'Test profile');
+      final groups = [
+        Group(
+          type: GroupType.Selector,
+          name: 'PROXY',
+          now: 'Node A',
+          all: const [
+            Proxy(name: 'Node A', type: 'vmess'),
+            Proxy(name: 'Node B', type: 'trojan'),
+          ],
+        ),
+      ];
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          currentGroupsStateProvider.overrideWithValue(
+            GroupsState(value: groups),
+          ),
+          profileCustomRulesProvider.overrideWith2(
+            (_) => _TestCustomRules(const []),
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Nodes'));
+      await tester.pumpAndSettle();
+      expect(find.text('Status'), findsOneWidget);
+      expect(find.text('Current node'), findsOneWidget);
+      expect(find.text('Upload'), findsOneWidget);
+      expect(find.text('Download'), findsOneWidget);
+      expect(find.text('PROXY'), findsOneWidget);
+      expect(find.text('Node A'), findsWidgets);
+      expect(find.text('Node B'), findsOneWidget);
+      expect(find.text('VMESS'), findsOneWidget);
+      expect(find.text('TROJAN'), findsOneWidget);
+      expect(find.text('Delay test'), findsWidgets);
       expect(tester.takeException(), isNull);
     });
 
