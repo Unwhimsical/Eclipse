@@ -897,12 +897,13 @@ void main() {
     },
   );
 
-  testWidgets('eclipse navigation exposes five desktop items in order', (
+  testWidgets('eclipse navigation exposes six desktop items in order', (
     tester,
   ) async {
     final items = navigation.getItems(openLogs: true, hasProxies: true);
     expect(items.map((item) => item.label).toList(), [
       PageLabel.dashboard,
+      PageLabel.proxies,
       PageLabel.config,
       PageLabel.modules,
       PageLabel.data,
