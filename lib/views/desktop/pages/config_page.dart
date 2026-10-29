@@ -297,6 +297,9 @@ class _ProfileRowState extends ConsumerState<_ProfileRow> {
     final theme = Theme.of(context);
     final tokens = theme.extension<DesktopThemeTokens>();
     final accent = tokens?.accent ?? theme.colorScheme.primary;
+    final isUpdating = ref.watch(
+      isUpdatingProvider(widget.profile.updatingKey),
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: MouseRegion(
@@ -355,6 +358,12 @@ class _ProfileRowState extends ConsumerState<_ProfileRow> {
                 ),
                 if (widget.isCurrent)
                   _InUseBadge(label: context.appLocalizations.inUse),
+                if (isUpdating)
+                  const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CommonCircleLoading(),
+                  ),
               ],
             ),
           ),
@@ -387,6 +396,12 @@ class _ProfileRowState extends ConsumerState<_ProfileRow> {
           icon: Icons.content_copy_outlined,
           value: () => _handleDuplicate(context),
         ),
+        if (profile.type == ProfileType.url)
+          DesktopMenuItem(
+            label: appLocalizations.update,
+            icon: Icons.sync_rounded,
+            value: () => _handleUpdateSubscription(context),
+          ),
         const DesktopMenuDivider(),
         DesktopMenuItem(
           label: appLocalizations.delete,
@@ -452,6 +467,17 @@ class _ProfileRowState extends ConsumerState<_ProfileRow> {
     if (newProfile != null) {
       ref.read(profilesActionProvider.notifier).putProfile(newProfile);
     }
+  }
+
+  Future<void> _handleUpdateSubscription(BuildContext context) async {
+    final profile = widget.profile;
+    if (profile.type != ProfileType.url) return;
+    await globalState.safeRun(
+      () => ref
+          .read(profilesActionProvider.notifier)
+          .updateProfile(profile, showLoading: true),
+      title: context.appLocalizations.update,
+    );
   }
 
   Future<void> _handleDelete(BuildContext context) async {

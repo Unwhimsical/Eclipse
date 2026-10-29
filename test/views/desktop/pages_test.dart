@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
@@ -181,6 +182,66 @@ void main() {
       expect(find.text('proxy.example.com'), findsOneWidget);
       expect(find.text('REJECT'), findsOneWidget);
       expect(find.text('DIRECT'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page profile row menu offers update for url profile', (
+      tester,
+    ) async {
+      final subscription = Profile.normal(
+        label: 'Sub profile',
+        url: 'https://example.com/sub.yaml',
+      );
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([subscription])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => subscription.id),
+          profileCustomRulesProvider.overrideWith2((_) => _TestCustomRules([])),
+        ],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('Sub profile').first,
+        buttons: kSecondaryMouseButton,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Update'), findsOneWidget);
+      expect(find.text('Set as default'), findsOneWidget);
+      expect(find.text('Rename'), findsOneWidget);
+      expect(find.text('Duplicate config'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+      await tester.tap(find.text('Update'));
+      for (var i = 0; i < 4; i++) {
+        await tester.pump(const Duration(milliseconds: 300));
+      }
+      expect(find.text('Update'), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('config page profile row menu hides update for file profile', (
+      tester,
+    ) async {
+      final local = Profile.normal(label: 'Local profile');
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([local])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => local.id),
+          profileCustomRulesProvider.overrideWith2((_) => _TestCustomRules([])),
+        ],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('Local profile').first,
+        buttons: kSecondaryMouseButton,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Update'), findsNothing);
+      expect(find.text('Set as default'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
