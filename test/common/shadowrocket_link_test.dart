@@ -1,7 +1,43 @@
 import 'dart:io';
 
 import 'package:fl_clash/common/shadowrocket_link.dart';
+import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/models/models.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+class _FakeEffects implements ShadowrocketLinkEffects {
+  final calls = <String>[];
+
+  @override
+  void startTunnel() => calls.add('start');
+
+  @override
+  void stopTunnel() => calls.add('stop');
+
+  @override
+  void toggleTunnel() => calls.add('toggle');
+
+  @override
+  void testConnectivity() => calls.add('test');
+
+  @override
+  void selectNode(String name) => calls.add('select:$name');
+
+  @override
+  void addProfile(String url) => calls.add('profile:$url');
+
+  @override
+  void updateSubscriptions() => calls.add('updateSubs');
+
+  @override
+  void addModule(String url) => calls.add('module:$url');
+
+  @override
+  void setRoute(ShadowrocketRoute route) => calls.add('route:$route');
+
+  @override
+  void unsupportedColor() => calls.add('color');
+}
 
 void main() {
   group('parseShadowrocketLink', () {
@@ -170,6 +206,125 @@ void main() {
         isNull,
       );
       expect(parseShadowrocketLink(Uri.parse('shadowrocket://color')), isNull);
+    });
+  });
+
+  group('dispatchShadowrocketLink', () {
+    test('routes every action kind to its effect', () {
+      final effects = _FakeEffects();
+      const cases = [
+        (ShadowrocketLinkAction(kind: ShadowrocketLinkKind.connect), 'start'),
+        (ShadowrocketLinkAction(kind: ShadowrocketLinkKind.disconnect), 'stop'),
+        (ShadowrocketLinkAction(kind: ShadowrocketLinkKind.toggle), 'toggle'),
+        (
+          ShadowrocketLinkAction(kind: ShadowrocketLinkKind.connectivityTest),
+          'test',
+        ),
+        (
+          ShadowrocketLinkAction(
+            kind: ShadowrocketLinkKind.select,
+            nodeName: 'NodeA',
+          ),
+          'select:NodeA',
+        ),
+        (
+          ShadowrocketLinkAction(
+            kind: ShadowrocketLinkKind.add,
+            url: 'https://example.com/sub',
+          ),
+          'profile:https://example.com/sub',
+        ),
+        (
+          ShadowrocketLinkAction(
+            kind: ShadowrocketLinkKind.configAdd,
+            url: 'https://example.com/x.conf',
+          ),
+          'profile:https://example.com/x.conf',
+        ),
+        (
+          ShadowrocketLinkAction(kind: ShadowrocketLinkKind.updateSubs),
+          'updateSubs',
+        ),
+        (
+          ShadowrocketLinkAction(
+            kind: ShadowrocketLinkKind.installModule,
+            url: 'https://example.com/m.sgmodule',
+          ),
+          'module:https://example.com/m.sgmodule',
+        ),
+        (
+          ShadowrocketLinkAction(
+            kind: ShadowrocketLinkKind.route,
+            route: ShadowrocketRoute.scene,
+          ),
+          'route:ShadowrocketRoute.scene',
+        ),
+        (ShadowrocketLinkAction(kind: ShadowrocketLinkKind.color), 'color'),
+      ];
+      for (final (action, expected) in cases) {
+        dispatchShadowrocketLink(action, effects);
+        expect(effects.calls.last, expected);
+      }
+    });
+  });
+
+  group('findSelectorGroupForNode', () {
+    const groups = [
+      Group(
+        name: 'auto',
+        type: GroupType.URLTest,
+        all: [Proxy(name: 'NodeA', type: 'ss')],
+      ),
+      Group(
+        name: 'manual',
+        type: GroupType.Selector,
+        all: [Proxy(name: 'NodeA', type: 'ss')],
+      ),
+    ];
+
+    test('skips non-selector groups and returns the selector group', () {
+      expect(findSelectorGroupForNode(groups, 'NodeA'), 'manual');
+    });
+
+    test('returns null when no selector group holds the node', () {
+      expect(findSelectorGroupForNode(groups, 'NodeZ'), isNull);
+    });
+  });
+
+  group('dedupeGroupProxies', () {
+    test('keeps the first occurrence of each proxy name', () {
+      const groups = [
+        Group(
+          name: 'g1',
+          type: GroupType.Selector,
+          all: [
+            Proxy(name: 'NodeA', type: 'ss'),
+            Proxy(name: 'NodeB', type: 'ss'),
+          ],
+        ),
+        Group(
+          name: 'g2',
+          type: GroupType.Selector,
+          all: [
+            Proxy(name: 'NodeA', type: 'ss'),
+            Proxy(name: 'NodeC', type: 'ss'),
+          ],
+        ),
+      ];
+      expect(dedupeGroupProxies(groups).map((proxy) => proxy.name), [
+        'NodeA',
+        'NodeB',
+        'NodeC',
+      ]);
+    });
+  });
+
+  group('modeForShadowrocketRoute', () {
+    test('maps proxy, config and direct; scene has no fixed mode', () {
+      expect(modeForShadowrocketRoute(ShadowrocketRoute.proxy), Mode.global);
+      expect(modeForShadowrocketRoute(ShadowrocketRoute.config), Mode.rule);
+      expect(modeForShadowrocketRoute(ShadowrocketRoute.direct), Mode.direct);
+      expect(modeForShadowrocketRoute(ShadowrocketRoute.scene), isNull);
     });
   });
 

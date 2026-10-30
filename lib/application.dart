@@ -61,7 +61,8 @@ class Application extends ConsumerStatefulWidget {
 }
 
 class ApplicationState extends ConsumerState<Application>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver
+    implements ShadowrocketLinkEffects {
   Timer? _autoUpdateProfilesTaskTimer;
   bool _preHasVpn = false;
   DateTime? _lastAlwaysOnAttempt;
@@ -172,79 +173,90 @@ class ApplicationState extends ConsumerState<Application>
 
   void _handleShadowrocketLink(ShadowrocketLinkAction action) {
     unawaited(window?.show());
-    switch (action.kind) {
-      case ShadowrocketLinkKind.connect:
-        unawaited(
-          globalState.safeRun(
-            () => ref
-                .read(setupActionProvider.notifier)
-                .setRunning(true, initialize: !ref.read(initProvider)),
-          ),
-        );
-      case ShadowrocketLinkKind.disconnect:
-        unawaited(
-          globalState.safeRun(
-            () => ref.read(setupActionProvider.notifier).setRunning(false),
-          ),
-        );
-      case ShadowrocketLinkKind.toggle:
-        ref.read(commonActionProvider.notifier).toggleRunning();
-      case ShadowrocketLinkKind.connectivityTest:
-        final groups = ref.read(currentGroupsStateProvider).value;
-        final seen = <String>{};
-        final proxies = [
-          for (final group in groups)
-            for (final proxy in group.all)
-              if (seen.add(proxy.name)) proxy,
-        ];
-        if (proxies.isNotEmpty) {
-          unawaited(
-            ref.read(proxiesActionProvider.notifier).delayTest(proxies),
-          );
-        }
-      case ShadowrocketLinkKind.select:
-        final name = action.nodeName!;
-        var found = false;
-        for (final group in ref.read(groupsProvider)) {
-          if (group.type != GroupType.Selector) continue;
-          if (!group.all.any((proxy) => proxy.name == name)) continue;
-          found = true;
-          unawaited(
-            ref
-                .read(proxiesActionProvider.notifier)
-                .changeProxy(groupName: group.name, proxyName: name),
-          );
-          break;
-        }
-        if (!found) {
-          dialogs.showNotifier(
-            currentAppLocalizations.changeProxyFailedTip,
-            level: MessageLevel.warning,
-          );
-        }
-      case ShadowrocketLinkKind.add:
-      case ShadowrocketLinkKind.configAdd:
-        unawaited(_confirmAndAddProfile(action.url!));
-      case ShadowrocketLinkKind.updateSubs:
-        unawaited(
-          ref.read(profilesActionProvider.notifier).autoUpdateProfiles(),
-        );
-      case ShadowrocketLinkKind.installModule:
-        unawaited(_confirmAndAddModule(action.url!));
-      case ShadowrocketLinkKind.route:
-        switch (action.route!) {
-          case ShadowrocketRoute.proxy:
-            ref.read(setupActionProvider.notifier).changeMode(Mode.global);
-          case ShadowrocketRoute.config:
-            ref.read(setupActionProvider.notifier).changeMode(Mode.rule);
-          case ShadowrocketRoute.direct:
-            ref.read(setupActionProvider.notifier).changeMode(Mode.direct);
-          case ShadowrocketRoute.scene:
-            ref.read(sceneModeEnabledProvider.notifier).update((_) => true);
-        }
-      case ShadowrocketLinkKind.color:
-        commonPrint.log('shadowrocket color scheme is not supported');
+    dispatchShadowrocketLink(action, this);
+  }
+
+  @override
+  void startTunnel() {
+    unawaited(
+      globalState.safeRun(
+        () => ref
+            .read(setupActionProvider.notifier)
+            .setRunning(true, initialize: !ref.read(initProvider)),
+      ),
+    );
+  }
+
+  @override
+  void stopTunnel() {
+    unawaited(
+      globalState.safeRun(
+        () => ref.read(setupActionProvider.notifier).setRunning(false),
+      ),
+    );
+  }
+
+  @override
+  void toggleTunnel() {
+    ref.read(commonActionProvider.notifier).toggleRunning();
+  }
+
+  @override
+  void testConnectivity() {
+    final proxies = dedupeGroupProxies(
+      ref.read(currentGroupsStateProvider).value,
+    );
+    if (proxies.isNotEmpty) {
+      unawaited(ref.read(proxiesActionProvider.notifier).delayTest(proxies));
     }
+  }
+
+  @override
+  void selectNode(String name) {
+    final groupName = findSelectorGroupForNode(ref.read(groupsProvider), name);
+    if (groupName == null) {
+      dialogs.showNotifier(
+        currentAppLocalizations.changeProxyFailedTip,
+        level: MessageLevel.warning,
+      );
+      return;
+    }
+    unawaited(
+      ref
+          .read(proxiesActionProvider.notifier)
+          .changeProxy(groupName: groupName, proxyName: name),
+    );
+  }
+
+  @override
+  void addProfile(String url) {
+    unawaited(_confirmAndAddProfile(url));
+  }
+
+  @override
+  void updateSubscriptions() {
+    unawaited(ref.read(profilesActionProvider.notifier).autoUpdateProfiles());
+  }
+
+  @override
+  void addModule(String url) {
+    unawaited(_confirmAndAddModule(url));
+  }
+
+  @override
+  void setRoute(ShadowrocketRoute route) {
+    if (route == ShadowrocketRoute.scene) {
+      ref.read(sceneModeEnabledProvider.notifier).update((_) => true);
+      return;
+    }
+    ref
+        .read(setupActionProvider.notifier)
+        .changeMode(modeForShadowrocketRoute(route)!);
+  }
+
+  @override
+  void unsupportedColor() {
+    commonPrint.log('shadowrocket color scheme is not supported');
   }
 
   Future<void> _confirmAndAddProfile(String url) async {

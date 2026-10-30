@@ -1,3 +1,6 @@
+import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/models/models.dart';
+
 enum ShadowrocketLinkKind {
   connect,
   disconnect,
@@ -139,6 +142,87 @@ ShadowrocketLinkAction? parseShadowrocketLink(Uri uri) {
       if (uri.query.isEmpty) return null;
       return const ShadowrocketLinkAction(kind: ShadowrocketLinkKind.color);
     default:
+      return null;
+  }
+}
+
+abstract class ShadowrocketLinkEffects {
+  void startTunnel();
+
+  void stopTunnel();
+
+  void toggleTunnel();
+
+  void testConnectivity();
+
+  void selectNode(String name);
+
+  void addProfile(String url);
+
+  void updateSubscriptions();
+
+  void addModule(String url);
+
+  void setRoute(ShadowrocketRoute route);
+
+  void unsupportedColor();
+}
+
+void dispatchShadowrocketLink(
+  ShadowrocketLinkAction action,
+  ShadowrocketLinkEffects effects,
+) {
+  switch (action.kind) {
+    case ShadowrocketLinkKind.connect:
+      effects.startTunnel();
+    case ShadowrocketLinkKind.disconnect:
+      effects.stopTunnel();
+    case ShadowrocketLinkKind.toggle:
+      effects.toggleTunnel();
+    case ShadowrocketLinkKind.connectivityTest:
+      effects.testConnectivity();
+    case ShadowrocketLinkKind.select:
+      effects.selectNode(action.nodeName!);
+    case ShadowrocketLinkKind.add:
+    case ShadowrocketLinkKind.configAdd:
+      effects.addProfile(action.url!);
+    case ShadowrocketLinkKind.updateSubs:
+      effects.updateSubscriptions();
+    case ShadowrocketLinkKind.installModule:
+      effects.addModule(action.url!);
+    case ShadowrocketLinkKind.route:
+      effects.setRoute(action.route!);
+    case ShadowrocketLinkKind.color:
+      effects.unsupportedColor();
+  }
+}
+
+String? findSelectorGroupForNode(List<Group> groups, String name) {
+  for (final group in groups) {
+    if (group.type != GroupType.Selector) continue;
+    if (group.all.any((proxy) => proxy.name == name)) return group.name;
+  }
+  return null;
+}
+
+List<Proxy> dedupeGroupProxies(List<Group> groups) {
+  final seen = <String>{};
+  return [
+    for (final group in groups)
+      for (final proxy in group.all)
+        if (seen.add(proxy.name)) proxy,
+  ];
+}
+
+Mode? modeForShadowrocketRoute(ShadowrocketRoute route) {
+  switch (route) {
+    case ShadowrocketRoute.proxy:
+      return Mode.global;
+    case ShadowrocketRoute.config:
+      return Mode.rule;
+    case ShadowrocketRoute.direct:
+      return Mode.direct;
+    case ShadowrocketRoute.scene:
       return null;
   }
 }
