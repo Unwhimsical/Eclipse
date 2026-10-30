@@ -470,6 +470,77 @@ abstract class _$ProfilesAction extends $Notifier<void> {
   }
 }
 
+/// Runs [SimpleModeAutoSelect.tick] on [autoSelectInterval] while automatic
+/// selection is enabled and the core is running. The switch itself only
+/// ever targets a selector group: url-test groups already auto-select
+/// inside the core, and switching one from here would fight it.
+
+@ProviderFor(SimpleModeAutoSelect)
+final simpleModeAutoSelectProvider = SimpleModeAutoSelectProvider._();
+
+/// Runs [SimpleModeAutoSelect.tick] on [autoSelectInterval] while automatic
+/// selection is enabled and the core is running. The switch itself only
+/// ever targets a selector group: url-test groups already auto-select
+/// inside the core, and switching one from here would fight it.
+final class SimpleModeAutoSelectProvider
+    extends $NotifierProvider<SimpleModeAutoSelect, void> {
+  /// Runs [SimpleModeAutoSelect.tick] on [autoSelectInterval] while automatic
+  /// selection is enabled and the core is running. The switch itself only
+  /// ever targets a selector group: url-test groups already auto-select
+  /// inside the core, and switching one from here would fight it.
+  SimpleModeAutoSelectProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'simpleModeAutoSelectProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$simpleModeAutoSelectHash();
+
+  @$internal
+  @override
+  SimpleModeAutoSelect create() => SimpleModeAutoSelect();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$simpleModeAutoSelectHash() =>
+    r'f9ebe0b3aeca020b775b6750acf40f83b58c90e1';
+
+/// Runs [SimpleModeAutoSelect.tick] on [autoSelectInterval] while automatic
+/// selection is enabled and the core is running. The switch itself only
+/// ever targets a selector group: url-test groups already auto-select
+/// inside the core, and switching one from here would fight it.
+
+abstract class _$SimpleModeAutoSelect extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<void, void>,
+              void,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(GeoResourceAction)
 final geoResourceActionProvider = GeoResourceActionProvider._();
 

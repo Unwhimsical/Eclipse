@@ -41,6 +41,9 @@ _AppSettingProps _$AppSettingPropsFromJson(
   delayTestMethod:
       $enumDecodeNullable(_$DelayTestMethodEnumMap, json['delayTestMethod']) ??
       DelayTestMethod.connect,
+  simpleMode: json['simpleMode'] as bool? ?? false,
+  autoSelectLowestDelay: json['autoSelectLowestDelay'] as bool? ?? false,
+  autoSelectGroup: json['autoSelectGroup'] as String?,
 );
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
@@ -72,6 +75,9 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'customUserAgent': instance.customUserAgent,
       'delayTestUrl': instance.delayTestUrl,
       'delayTestMethod': _$DelayTestMethodEnumMap[instance.delayTestMethod]!,
+      'simpleMode': instance.simpleMode,
+      'autoSelectLowestDelay': instance.autoSelectLowestDelay,
+      'autoSelectGroup': instance.autoSelectGroup,
     };
 
 const _$RestoreStrategyEnumMap = {

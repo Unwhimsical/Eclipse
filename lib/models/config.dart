@@ -91,6 +91,9 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default('') String customUserAgent,
     @Default(defaultTestUrl) String delayTestUrl,
     @Default(DelayTestMethod.connect) DelayTestMethod delayTestMethod,
+    @Default(false) bool simpleMode,
+    @Default(false) bool autoSelectLowestDelay,
+    String? autoSelectGroup,
   }) = _AppSettingProps;
 
   factory AppSettingProps.fromJson(Map<String, Object?> json) =>

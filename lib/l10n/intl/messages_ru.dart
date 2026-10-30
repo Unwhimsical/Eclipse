@@ -252,6 +252,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "Включаться автоматически при открытии приложения",
     ),
+    "autoSelectGroup": MessageLookupByLibrary.simpleMessage(
+      "Область автовыбора",
+    ),
+    "autoSelectGroupAll": MessageLookupByLibrary.simpleMessage("Все узлы"),
+    "autoSelectLowestDelay": MessageLookupByLibrary.simpleMessage(
+      "Автовыбор узла с наименьшей задержкой",
+    ),
+    "autoSelectLowestDelayDesc": MessageLookupByLibrary.simpleMessage(
+      "Проверка каждые 600 секунд, переключение при меньшей задержке",
+    ),
     "autoSetSystemDns": MessageLookupByLibrary.simpleMessage(
       "Автонастройка системного DNS",
     ),
@@ -680,6 +690,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Only HTTP and SOCKS5 nodes are listed",
     ),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Фруктовый микс"),
+    "fullMode": MessageLookupByLibrary.simpleMessage("Полный режим"),
     "general": MessageLookupByLibrary.simpleMessage("Общие"),
     "generalSection": MessageLookupByLibrary.simpleMessage("Общие"),
     "generalSettings": MessageLookupByLibrary.simpleMessage("Общие настройки"),
@@ -1654,6 +1665,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
       "Запускаться в фоновом режиме",
     ),
+    "simpleMode": MessageLookupByLibrary.simpleMessage("Простой режим"),
+    "simpleModeDesc": MessageLookupByLibrary.simpleMessage(
+      "Показывать только переключатель и текущий узел; конфигурации, правила и модули скрыты",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Размер"),
     "skipProxy": MessageLookupByLibrary.simpleMessage("Обход прокси"),
     "skipProxyDesc": MessageLookupByLibrary.simpleMessage(
@@ -1796,9 +1811,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "time": MessageLookupByLibrary.simpleMessage("Время"),
     "timeout": MessageLookupByLibrary.simpleMessage("Тайм-аут"),
     "tip": MessageLookupByLibrary.simpleMessage("Подсказка"),
+    "todayTraffic": MessageLookupByLibrary.simpleMessage("Трафик за сегодня"),
     "toggle": MessageLookupByLibrary.simpleMessage("Переключить"),
     "toggleLabel": MessageLookupByLibrary.simpleMessage("Переключить подписи"),
     "toggleRun": MessageLookupByLibrary.simpleMessage("Включить / выключить"),
+    "toggleSimpleMode": MessageLookupByLibrary.simpleMessage(
+      "Переключить простой режим",
+    ),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Тональный акцент"),
     "tools": MessageLookupByLibrary.simpleMessage("Инструменты"),
     "torch": MessageLookupByLibrary.simpleMessage("Фонарик"),

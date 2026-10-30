@@ -7,6 +7,7 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
+import 'package:fl_clash/views/desktop/pages/simple_page.dart';
 import 'package:fl_clash/views/desktop/shortcuts/shortcut.dart';
 import 'package:fl_clash/views/desktop/value_holder.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
@@ -107,6 +108,9 @@ class _DesktopSettingsViewState extends ConsumerState<DesktopSettingsView> {
   Widget build(BuildContext context) {
     final appLocalizations = context.appLocalizations;
     final groupIndex = ref.watch(desktopSettingsGroupProvider);
+    final simpleMode = ref.watch(
+      appSettingProvider.select((state) => state.simpleMode),
+    );
     final groups = _groups;
     final q = _query.trim().toLowerCase();
     return Column(
@@ -143,41 +147,61 @@ class _DesktopSettingsViewState extends ConsumerState<DesktopSettingsView> {
           ],
         ),
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 16,
-              children: [
-                SizedBox(
-                  width: 240,
-                  child: _GroupNav(
-                    groups: groups,
-                    selected: q.isEmpty ? groupIndex : -1,
-                    onSelect: (i) =>
-                        ref.read(desktopSettingsGroupProvider.notifier).value =
-                            i,
-                  ),
-                ),
-                Expanded(
+          child: simpleMode
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 640),
-                      child: q.isEmpty
-                          ? _GroupForm(
-                              group:
-                                  groups[groupIndex.clamp(
-                                    0,
-                                    groups.length - 1,
-                                  )],
-                            )
-                          : _SearchResults(query: q, groups: groups),
+                      child: _GroupForm(
+                        group: _SettingsGroup(
+                          icon: Icons.tune_rounded,
+                          title: (l) => l.simpleMode,
+                          items: _simpleModeOnlyItems,
+                        ),
+                      ),
                     ),
                   ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 16,
+                    children: [
+                      SizedBox(
+                        width: 240,
+                        child: _GroupNav(
+                          groups: groups,
+                          selected: q.isEmpty ? groupIndex : -1,
+                          onSelect: (i) =>
+                              ref
+                                      .read(
+                                        desktopSettingsGroupProvider.notifier,
+                                      )
+                                      .value =
+                                  i,
+                        ),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 640),
+                            child: q.isEmpty
+                                ? _GroupForm(
+                                    group:
+                                        groups[groupIndex.clamp(
+                                          0,
+                                          groups.length - 1,
+                                        )],
+                                  )
+                                : _SearchResults(query: q, groups: groups),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
         ),
       ],
     );
@@ -377,11 +401,30 @@ Widget _switchControl(bool value, ValueChanged<bool> onChanged) {
   return Switch(value: value, onChanged: onChanged);
 }
 
+List<_SettingItem> _simpleModeOnlyItems(BuildContext context, WidgetRef ref) {
+  return [_simpleModeSettingItem(context, ref)];
+}
+
+_SettingItem _simpleModeSettingItem(BuildContext context, WidgetRef ref) {
+  final appLocalizations = context.appLocalizations;
+  final simpleMode = ref.watch(
+    appSettingProvider.select((state) => state.simpleMode),
+  );
+  return _SettingItem(
+    title: appLocalizations.simpleMode,
+    subtitle: appLocalizations.simpleModeDesc,
+    keywords: const ['simple'],
+    control: (_, ref) =>
+        _switchControl(simpleMode, (value) => setDesktopSimpleMode(ref, value)),
+  );
+}
+
 List<_SettingItem> _appearanceItems(BuildContext context, WidgetRef ref) {
   final appLocalizations = context.appLocalizations;
   final themeMode = ref.watch(themeSettingProvider.select((s) => s.themeMode));
   final locale = ref.watch(appSettingProvider.select((s) => s.locale));
   return [
+    _simpleModeSettingItem(context, ref),
     _SettingItem(
       title: appLocalizations.themeMode,
       control: (context, ref) => DropdownButton<ThemeMode>(
@@ -469,6 +512,9 @@ List<_SettingItem> _networkItems(BuildContext context, WidgetRef ref) {
   final systemProxy = ref.watch(
     networkSettingProvider.select((s) => s.systemProxy),
   );
+  final autoSelect = ref.watch(
+    appSettingProvider.select((s) => s.autoSelectLowestDelay),
+  );
   return [
     _SettingItem(
       title: appLocalizations.tun,
@@ -482,6 +528,19 @@ List<_SettingItem> _networkItems(BuildContext context, WidgetRef ref) {
       control: (_, ref) => _switchControl(systemProxy, (_) {
         ref.read(systemActionProvider.notifier).updateSystemProxy();
       }),
+    ),
+    _SettingItem(
+      title: appLocalizations.autoSelectLowestDelay,
+      subtitle: appLocalizations.autoSelectLowestDelayDesc,
+      control: (_, ref) => _switchControl(autoSelect, (value) {
+        ref
+            .read(appSettingProvider.notifier)
+            .update((s) => s.copyWith(autoSelectLowestDelay: value));
+      }),
+    ),
+    _SettingItem(
+      title: appLocalizations.autoSelectGroup,
+      control: (_, _) => const AutoSelectScopeDropdown(),
     ),
   ];
 }

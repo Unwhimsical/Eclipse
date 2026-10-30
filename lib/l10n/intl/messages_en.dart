@@ -250,6 +250,16 @@ class MessageLookup extends MessageLookupByLibrary {
     "autoRunDesc": MessageLookupByLibrary.simpleMessage(
       "Run automatically when the app opens",
     ),
+    "autoSelectGroup": MessageLookupByLibrary.simpleMessage(
+      "Auto-select scope",
+    ),
+    "autoSelectGroupAll": MessageLookupByLibrary.simpleMessage("All nodes"),
+    "autoSelectLowestDelay": MessageLookupByLibrary.simpleMessage(
+      "Auto-select lowest-delay node",
+    ),
+    "autoSelectLowestDelayDesc": MessageLookupByLibrary.simpleMessage(
+      "Test every 600 seconds and switch when a lower delay is found",
+    ),
     "autoSetSystemDns": MessageLookupByLibrary.simpleMessage(
       "Auto-set system DNS",
     ),
@@ -656,6 +666,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Only HTTP and SOCKS5 nodes are listed",
     ),
     "fruitSaladScheme": MessageLookupByLibrary.simpleMessage("Fruit salad"),
+    "fullMode": MessageLookupByLibrary.simpleMessage("Full mode"),
     "general": MessageLookupByLibrary.simpleMessage("General"),
     "generalSection": MessageLookupByLibrary.simpleMessage("General"),
     "generalSettings": MessageLookupByLibrary.simpleMessage("General Settings"),
@@ -1574,6 +1585,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "silentLaunchDesc": MessageLookupByLibrary.simpleMessage(
       "Start in the background",
     ),
+    "simpleMode": MessageLookupByLibrary.simpleMessage("Simple mode"),
+    "simpleModeDesc": MessageLookupByLibrary.simpleMessage(
+      "Show only the power switch and current node; configs, rules and modules stay hidden",
+    ),
     "size": MessageLookupByLibrary.simpleMessage("Size"),
     "skipProxy": MessageLookupByLibrary.simpleMessage("Skip Proxy"),
     "skipProxyDesc": MessageLookupByLibrary.simpleMessage(
@@ -1706,9 +1721,13 @@ class MessageLookup extends MessageLookupByLibrary {
     "time": MessageLookupByLibrary.simpleMessage("Time"),
     "timeout": MessageLookupByLibrary.simpleMessage("Timeout"),
     "tip": MessageLookupByLibrary.simpleMessage("Tip"),
+    "todayTraffic": MessageLookupByLibrary.simpleMessage("Today\'s traffic"),
     "toggle": MessageLookupByLibrary.simpleMessage("Toggle"),
     "toggleLabel": MessageLookupByLibrary.simpleMessage("Toggle labels"),
     "toggleRun": MessageLookupByLibrary.simpleMessage("Enable / disable"),
+    "toggleSimpleMode": MessageLookupByLibrary.simpleMessage(
+      "Toggle simple mode",
+    ),
     "tonalSpotScheme": MessageLookupByLibrary.simpleMessage("Tonal spot"),
     "tools": MessageLookupByLibrary.simpleMessage("Tools"),
     "torch": MessageLookupByLibrary.simpleMessage("Flashlight"),

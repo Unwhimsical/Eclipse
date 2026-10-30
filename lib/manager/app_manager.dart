@@ -31,6 +31,7 @@ class _AppStateManagerState extends ConsumerState<AppStateManager>
         ref.read(networkDetectionProvider.notifier).startCheck();
       }
     });
+    ref.listenManual(simpleModeAutoSelectProvider, (_, _) {});
     ref.listenManual(configProvider, (prev, next) {
       if (prev != next) {
         ref.read(storeActionProvider.notifier).savePreferencesDebounce();
@@ -166,6 +167,17 @@ class AppSidebarContainer extends ConsumerWidget {
     final isRunning = ref.watch(
       coreStatusProvider.select((status) => status == CoreStatus.connected),
     );
+    final simpleMode = ref.watch(
+      appSettingProvider.select((state) => state.simpleMode),
+    );
+    if (simpleMode && !isMobileView) {
+      return DesktopShortcutScope(
+        child: Container(
+          color: context.colorScheme.surfaceContainer,
+          child: const DesktopSimpleView(),
+        ),
+      );
+    }
     return DesktopShortcutScope(
       child: Container(
         color: context.colorScheme.surfaceContainer,

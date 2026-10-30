@@ -5,10 +5,12 @@ import 'package:fl_clash/core/controller.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/desktop/components/traffic_chart.dart';
 import 'package:fl_clash/views/desktop/desktop.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -410,6 +412,110 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Name'), findsWidgets);
       expect(find.text('Proxy type'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('desktop simple mode', () {
+    List<Override> simpleOverrides({bool simpleMode = false}) {
+      const groups = [
+        Group(
+          type: GroupType.Selector,
+          name: 'PROXY',
+          now: 'Node A',
+          all: [
+            Proxy(name: 'Node A', type: 'vmess'),
+            Proxy(name: 'Node B', type: 'trojan'),
+          ],
+        ),
+      ];
+      return [
+        isStartProvider.overrideWithValue(false),
+        profilesProvider.overrideWith(() => TestProfiles(const [])),
+        currentProfileIdProvider.overrideWithBuild((_, _) => null),
+        currentGroupsStateProvider.overrideWithValue(
+          const GroupsState(value: groups),
+        ),
+        appSettingProvider.overrideWithBuild(
+          (_, _) => AppSettingProps(simpleMode: simpleMode),
+        ),
+      ];
+    }
+
+    testWidgets('home header offers the simple mode toggle', (tester) async {
+      await _pumpPage(
+        tester,
+        const DesktopHomeView(),
+        overrides: simpleOverrides(),
+      );
+      await tester.pump();
+      expect(find.text('Simple mode'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('simple view shows node, route and traffic without a chart', (
+      tester,
+    ) async {
+      await _pumpPage(
+        tester,
+        const DesktopSimpleView(),
+        overrides: simpleOverrides(),
+      );
+      await tester.pump();
+      expect(find.text('Node A'), findsOneWidget);
+      expect(find.text('Proxy'), findsOneWidget);
+      expect(find.text("Today's traffic"), findsOneWidget);
+      expect(find.text('Full mode'), findsOneWidget);
+      expect(find.text('Auto-select lowest-delay node'), findsOneWidget);
+      expect(find.byType(TrafficChart), findsNothing);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('full-mode button switches the preference back off', (
+      tester,
+    ) async {
+      await _pumpPage(
+        tester,
+        const DesktopSimpleView(),
+        overrides: simpleOverrides(simpleMode: true),
+      );
+      await tester.pump();
+      await tester.tap(find.byType(FilledButton));
+      await tester.pump();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DesktopSimpleView)),
+      );
+      expect(container.read(appSettingProvider).simpleMode, isFalse);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('settings appearance lists simple mode first', (tester) async {
+      await _pumpPage(
+        tester,
+        const DesktopSettingsView(),
+        overrides: simpleOverrides(),
+      );
+      await tester.pump();
+      expect(find.text('Simple mode'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.text('Simple mode')).dy,
+        lessThan(tester.getTopLeft(find.text('Theme mode')).dy),
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('settings shows only the simple mode switch in simple mode', (
+      tester,
+    ) async {
+      await _pumpPage(
+        tester,
+        const DesktopSettingsView(),
+        overrides: simpleOverrides(simpleMode: true),
+      );
+      await tester.pump();
+      expect(find.text('Simple mode'), findsOneWidget);
+      expect(find.text('Appearance'), findsNothing);
+      expect(find.text('Theme mode'), findsNothing);
       expect(tester.takeException(), isNull);
     });
   });

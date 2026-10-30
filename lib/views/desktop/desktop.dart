@@ -4,6 +4,7 @@ export 'pages/data_page.dart';
 export 'pages/config_page.dart';
 export 'pages/home_page.dart';
 export 'pages/proxies_page.dart';
+export 'pages/simple_page.dart';
 export 'pages/modules_page.dart';
 export 'pages/settings_page.dart';
 export 'shortcuts/shortcut.dart';

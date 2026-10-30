@@ -5,6 +5,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
+import 'package:fl_clash/views/desktop/pages/simple_page.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -25,7 +26,11 @@ class DesktopHomeView extends ConsumerWidget {
       children: [
         DesktopPageHeader(
           title: appLocalizations.dashboard,
-          actions: [_DelayTestAction(), const DesktopRunSwitch()],
+          actions: [
+            _DelayTestAction(),
+            const SimpleModeToggleButton(),
+            const DesktopRunSwitch(),
+          ],
         ),
         Expanded(
           child: SingleChildScrollView(

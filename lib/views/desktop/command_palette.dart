@@ -7,6 +7,7 @@ import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/desktop/pages/config_page.dart';
 import 'package:fl_clash/views/desktop/pages/settings_page.dart';
+import 'package:fl_clash/views/desktop/pages/simple_page.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -78,6 +79,15 @@ class _CommandPaletteDialogState extends ConsumerState<_CommandPaletteDialog> {
         group: commandsLabel,
         icon: Icons.power_settings_new_rounded,
         run: (ref) => ref.read(commonActionProvider.notifier).toggleRunning(),
+      ),
+      _Entry(
+        title: appLocalizations.toggleSimpleMode,
+        group: commandsLabel,
+        icon: Icons.tune_rounded,
+        run: (ref) {
+          final simpleMode = ref.read(appSettingProvider).simpleMode;
+          setDesktopSimpleMode(ref, !simpleMode);
+        },
       ),
       _Entry(
         title: appLocalizations.runDelayTest,

@@ -7574,6 +7574,86 @@ class AppLocalizations {
     );
   }
 
+  /// `Simple mode`
+  String get simpleMode {
+    return Intl.message('Simple mode', name: 'simpleMode', desc: '', args: []);
+  }
+
+  /// `Show only the power switch and current node; configs, rules and modules stay hidden`
+  String get simpleModeDesc {
+    return Intl.message(
+      'Show only the power switch and current node; configs, rules and modules stay hidden',
+      name: 'simpleModeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Full mode`
+  String get fullMode {
+    return Intl.message('Full mode', name: 'fullMode', desc: '', args: []);
+  }
+
+  /// `Toggle simple mode`
+  String get toggleSimpleMode {
+    return Intl.message(
+      'Toggle simple mode',
+      name: 'toggleSimpleMode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto-select lowest-delay node`
+  String get autoSelectLowestDelay {
+    return Intl.message(
+      'Auto-select lowest-delay node',
+      name: 'autoSelectLowestDelay',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Test every 600 seconds and switch when a lower delay is found`
+  String get autoSelectLowestDelayDesc {
+    return Intl.message(
+      'Test every 600 seconds and switch when a lower delay is found',
+      name: 'autoSelectLowestDelayDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auto-select scope`
+  String get autoSelectGroup {
+    return Intl.message(
+      'Auto-select scope',
+      name: 'autoSelectGroup',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All nodes`
+  String get autoSelectGroupAll {
+    return Intl.message(
+      'All nodes',
+      name: 'autoSelectGroupAll',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Today's traffic`
+  String get todayTraffic {
+    return Intl.message(
+      'Today\'s traffic',
+      name: 'todayTraffic',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Notifications & tray`
   String get settingsGroupTray {
     return Intl.message(
