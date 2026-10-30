@@ -1223,6 +1223,21 @@ class MessageLookup extends MessageLookupByLibrary {
       "Ответ приватным IP",
     ),
     "process": MessageLookupByLibrary.simpleMessage("Процесс"),
+    "processNamePathTip": MessageLookupByLibrary.simpleMessage(
+      "Имя процесса не должно содержать путь; для полного пути используйте PROCESS-PATH",
+    ),
+    "processPathTip": MessageLookupByLibrary.simpleMessage(
+      "Путь процесса должен быть полным, например C:\\Program Files\\app\\app.exe",
+    ),
+    "processRegexTip": MessageLookupByLibrary.simpleMessage(
+      "Недопустимое регулярное выражение",
+    ),
+    "processRule": MessageLookupByLibrary.simpleMessage(
+      "Правила для приложений",
+    ),
+    "processRuleDesc": MessageLookupByLibrary.simpleMessage(
+      "Маршрутизация по имени или пути процесса, вводимым вручную. В Windows укажите имя exe-файла, например chrome.exe.",
+    ),
     "profile": MessageLookupByLibrary.simpleMessage("Профиль"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("Введите корректный интервал"),

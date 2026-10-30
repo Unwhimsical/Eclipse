@@ -20,7 +20,12 @@ class TestTarget {
     this.process,
   });
 
-  static TestTarget? parse(String input, int port, String network) {
+  static TestTarget? parse(
+    String input,
+    int port,
+    String network, {
+    String? process,
+  }) {
     final text = input.trim();
     if (text.isEmpty) return null;
     String? url;
@@ -59,13 +64,14 @@ class TestTarget {
     host = host.toLowerCase();
     if (host.isEmpty) return null;
     final asIp = InternetAddress.tryParse(host);
+    final processName = process?.trim();
     return TestTarget(
       host: host,
       ip: asIp?.address,
       port: resolvedPort,
       network: network,
       url: url,
-      process: null,
+      process: processName?.isEmpty == true ? null : processName,
     );
   }
 }

@@ -1167,6 +1167,19 @@ class MessageLookup extends MessageLookupByLibrary {
       "Private IP Answer",
     ),
     "process": MessageLookupByLibrary.simpleMessage("Process"),
+    "processNamePathTip": MessageLookupByLibrary.simpleMessage(
+      "A process name must not contain a path; use PROCESS-PATH for a full path",
+    ),
+    "processPathTip": MessageLookupByLibrary.simpleMessage(
+      "A process path must be a full path, e.g. C:\\Program Files\\app\\app.exe",
+    ),
+    "processRegexTip": MessageLookupByLibrary.simpleMessage(
+      "Invalid regular expression",
+    ),
+    "processRule": MessageLookupByLibrary.simpleMessage("Per-app rules"),
+    "processRuleDesc": MessageLookupByLibrary.simpleMessage(
+      "Route traffic by process name or path, entered manually. On Windows, use the exe name, e.g. chrome.exe.",
+    ),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("Please enter a valid interval"),

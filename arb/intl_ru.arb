@@ -1011,5 +1011,10 @@
   "appVersion": "Версия",
   "noRuleItems": "Нет правил",
   "moduleDetailEmpty": "Выберите модуль для просмотра",
-  "inUse": "Активен"
+  "inUse": "Активен",
+  "processRule": "Правила для приложений",
+  "processRuleDesc": "Маршрутизация по имени или пути процесса, вводимым вручную. В Windows укажите имя exe-файла, например chrome.exe.",
+  "processNamePathTip": "Имя процесса не должно содержать путь; для полного пути используйте PROCESS-PATH",
+  "processPathTip": "Путь процесса должен быть полным, например C:\\Program Files\\app\\app.exe",
+  "processRegexTip": "Недопустимое регулярное выражение"
 }

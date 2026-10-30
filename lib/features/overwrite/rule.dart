@@ -406,6 +406,174 @@ class _AddOrEditRuleDialogState extends State<AddOrEditRuleDialog> {
   }
 }
 
+class AddProcessRuleDialog extends StatefulWidget {
+  const AddProcessRuleDialog({super.key});
+
+  @override
+  State<AddProcessRuleDialog> createState() => _AddProcessRuleDialogState();
+}
+
+class _AddProcessRuleDialogState extends State<AddProcessRuleDialog> {
+  RuleAction _ruleAction = RuleAction.PROCESS_NAME;
+  String _ruleTarget = '';
+  final _ruleTargetController = TextEditingController();
+  final _contentController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  List<DropdownMenuEntry> _targetItems = [];
+
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+    _targetItems = [
+      ...RuleTarget.values.map(
+        (item) => DropdownMenuEntry(value: item.name, label: item.name),
+      ),
+      DropdownMenuEntry(
+        value: RuleAction.MATCH.value,
+        label: context.appLocalizations.matchTarget,
+      ),
+    ];
+    if (_targetItems.isNotEmpty) {
+      _selectTarget(_targetItems.first.value);
+    }
+  }
+
+  void _selectTarget(String value) {
+    _ruleTarget = value;
+    _ruleTargetController.text =
+        _targetItems.firstWhereOrNull((item) => item.value == value)?.label ??
+        value;
+  }
+
+  @override
+  void dispose() {
+    _ruleTargetController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  String? _contentError() {
+    final appLocalizations = context.appLocalizations;
+    final content = _contentController.text;
+    if (content.isEmpty) {
+      return appLocalizations.emptyTip(appLocalizations.content);
+    }
+    return switch (validateProcessRuleContent(_ruleAction, content)) {
+      ProcessRuleContentError.nameContainsPath =>
+        appLocalizations.processNamePathTip,
+      ProcessRuleContentError.pathNotFull => appLocalizations.processPathTip,
+      ProcessRuleContentError.invalidRegex => appLocalizations.processRegexTip,
+      null => null,
+    };
+  }
+
+  void _handleSubmit() {
+    final res = _formKey.currentState?.validate();
+    if (res == false) {
+      return;
+    }
+    Navigator.of(context).pop(
+      Rule(
+        id: snowflake.id,
+        ruleAction: _ruleAction,
+        content: _contentController.text,
+        ruleTarget: _ruleTarget,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final appLocalizations = context.appLocalizations;
+    return CommonDialog(
+      title: appLocalizations.processRule,
+      actions: [
+        TextButton(
+          onPressed: _handleSubmit,
+          child: Text(appLocalizations.confirm),
+        ),
+      ],
+      child: DropdownMenuTheme(
+        data: DropdownMenuThemeData(
+          inputDecorationTheme: InputDecorationTheme(
+            border: AppShape.input,
+            labelStyle: context.textTheme.bodyLarge?.copyWith(
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                appLocalizations.processRuleDesc,
+                style: context.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.tonal(
+                onPressed: () async {
+                  _ruleAction =
+                      await dialogs.showCommonDialog<RuleAction>(
+                        filter: false,
+                        child: OptionsDialog<RuleAction>(
+                          title: appLocalizations.ruleName,
+                          options: processRuleActions,
+                          textBuilder: (item) => item.value,
+                          value: _ruleAction,
+                        ),
+                      ) ??
+                      _ruleAction;
+                  setState(() {});
+                },
+                child: Text(_ruleAction.value),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _ruleAction.getDesc(context),
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextFormField(
+                controller: _contentController,
+                keyboardType: TextInputType.text,
+                inputFormatters: TextInputLimits.limit(TextInputLimits.rule),
+                onFieldSubmitted: (_) {
+                  _handleSubmit();
+                },
+                decoration: InputDecoration(
+                  labelText: appLocalizations.content,
+                ),
+                validator: (_) => _contentError(),
+              ),
+              const SizedBox(height: 24),
+              _RuleTargetField(
+                controller: _ruleTargetController,
+                entries: _targetItems,
+                onSelected: (value) {
+                  if (value != null) {
+                    _selectTarget(value);
+                  }
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RuleContentField extends StatelessWidget {
   const _RuleContentField({
     required this.controller,

@@ -846,6 +846,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "previousMatch": MessageLookupByLibrary.simpleMessage("上一个匹配"),
     "privateIpAnswer": MessageLookupByLibrary.simpleMessage("私有 IP 应答"),
     "process": MessageLookupByLibrary.simpleMessage("进程"),
+    "processNamePathTip": MessageLookupByLibrary.simpleMessage(
+      "进程名不能包含路径，完整路径请用 PROCESS-PATH",
+    ),
+    "processPathTip": MessageLookupByLibrary.simpleMessage(
+      "进程路径须为完整路径，如 C:\\Program Files\\app\\app.exe",
+    ),
+    "processRegexTip": MessageLookupByLibrary.simpleMessage("正则表达式无效"),
+    "processRule": MessageLookupByLibrary.simpleMessage("按应用分流"),
+    "processRuleDesc": MessageLookupByLibrary.simpleMessage(
+      "按进程名或路径手动分流。Windows 下填 exe 名，如 chrome.exe。",
+    ),
     "profile": MessageLookupByLibrary.simpleMessage("配置"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("请输入有效间隔时间格式"),

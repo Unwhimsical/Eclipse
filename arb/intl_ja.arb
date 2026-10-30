@@ -1011,5 +1011,10 @@
   "appVersion": "バージョン",
   "noRuleItems": "ルールがありません",
   "moduleDetailEmpty": "モジュールを選択して詳細を表示",
-  "inUse": "使用中"
+  "inUse": "使用中",
+  "processRule": "アプリ別ルール",
+  "processRuleDesc": "プロセス名またはパスを手入力して振り分けます。Windows では chrome.exe のような exe 名を入力します。",
+  "processNamePathTip": "プロセス名にパスを含めることはできません。フルパスには PROCESS-PATH を使用してください",
+  "processPathTip": "プロセスパスはフルパスで入力してください（例：C:\\Program Files\\app\\app.exe）",
+  "processRegexTip": "正規表現が無効です"
 }

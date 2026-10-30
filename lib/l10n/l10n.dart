@@ -8293,6 +8293,56 @@ class AppLocalizations {
   String get inUse {
     return Intl.message('In use', name: 'inUse', desc: '', args: []);
   }
+
+  /// `Per-app rules`
+  String get processRule {
+    return Intl.message(
+      'Per-app rules',
+      name: 'processRule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Route traffic by process name or path, entered manually. On Windows, use the exe name, e.g. chrome.exe.`
+  String get processRuleDesc {
+    return Intl.message(
+      'Route traffic by process name or path, entered manually. On Windows, use the exe name, e.g. chrome.exe.',
+      name: 'processRuleDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A process name must not contain a path; use PROCESS-PATH for a full path`
+  String get processNamePathTip {
+    return Intl.message(
+      'A process name must not contain a path; use PROCESS-PATH for a full path',
+      name: 'processNamePathTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `A process path must be a full path, e.g. C:\Program Files\app\app.exe`
+  String get processPathTip {
+    return Intl.message(
+      'A process path must be a full path, e.g. C:\\Program Files\\app\\app.exe',
+      name: 'processPathTip',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid regular expression`
+  String get processRegexTip {
+    return Intl.message(
+      'Invalid regular expression',
+      name: 'processRegexTip',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<AppLocalizations> {

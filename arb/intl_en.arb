@@ -1011,5 +1011,10 @@
   "appVersion": "Version",
   "noRuleItems": "No rules",
   "moduleDetailEmpty": "Select a module to view details",
-  "inUse": "In use"
+  "inUse": "In use",
+  "processRule": "Per-app rules",
+  "processRuleDesc": "Route traffic by process name or path, entered manually. On Windows, use the exe name, e.g. chrome.exe.",
+  "processNamePathTip": "A process name must not contain a path; use PROCESS-PATH for a full path",
+  "processPathTip": "A process path must be a full path, e.g. C:\\Program Files\\app\\app.exe",
+  "processRegexTip": "Invalid regular expression"
 }

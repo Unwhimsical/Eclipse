@@ -109,5 +109,86 @@ void main() {
       final target = TestTarget.parse('other.org', 80, 'TCP')!;
       expect(findFirstMatch(['DOMAIN,example.com,PROXY'], target), isNull);
     });
+
+    test('carries an explicit process without lowercasing it', () {
+      final target = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: 'Chrome.EXE',
+      )!;
+      expect(target.process, 'Chrome.EXE');
+      expect(target.host, 'example.com');
+    });
+
+    test('treats a blank process as absent', () {
+      final target = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: '  ',
+      )!;
+      expect(target.process, isNull);
+    });
+
+    test('matches a process rule only when the process is given', () {
+      const rules = ['PROCESS-NAME,chrome.exe,PROXY', 'MATCH,DIRECT'];
+      final withProcess = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: 'chrome.exe',
+      )!;
+      final matched = findFirstMatch(rules, withProcess)!;
+      expect(matched.certain, isTrue);
+      expect(matched.index, 0);
+      expect(matched.target, 'PROXY');
+
+      final withoutProcess = TestTarget.parse('example.com', 443, 'TCP')!;
+      final fallenThrough = findFirstMatch(rules, withoutProcess)!;
+      expect(fallenThrough.certain, isTrue);
+      expect(fallenThrough.index, 1);
+      expect(fallenThrough.target, 'DIRECT');
+    });
+
+    test('falls through when the process does not match', () {
+      const rules = ['PROCESS-NAME,chrome.exe,PROXY', 'MATCH,DIRECT'];
+      final target = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: 'firefox.exe',
+      )!;
+      final verdict = findFirstMatch(rules, target)!;
+      expect(verdict.certain, isTrue);
+      expect(verdict.index, 1);
+      expect(verdict.target, 'DIRECT');
+    });
+
+    test('matches process path and wildcard rules', () {
+      final pathTarget = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: r'C:\Program Files\app\app.exe',
+      )!;
+      final pathVerdict = findFirstMatch([
+        r'PROCESS-PATH,C:\Program Files\app\app.exe,DIRECT',
+      ], pathTarget);
+      expect(pathVerdict?.certain, isTrue);
+      expect(pathVerdict?.target, 'DIRECT');
+
+      final wildcardTarget = TestTarget.parse(
+        'example.com',
+        443,
+        'TCP',
+        process: 'chrome.exe',
+      )!;
+      final wildcardVerdict = findFirstMatch([
+        'PROCESS-NAME-WILDCARD,*chrome*,PROXY',
+      ], wildcardTarget);
+      expect(wildcardVerdict?.certain, isTrue);
+      expect(wildcardVerdict?.target, 'PROXY');
+    });
   });
 }

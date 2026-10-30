@@ -1011,5 +1011,10 @@
   "appVersion": "版本",
   "noRuleItems": "暂无规则",
   "moduleDetailEmpty": "选择一个模块查看详情",
-  "inUse": "使用中"
+  "inUse": "使用中",
+  "processRule": "按应用分流",
+  "processRuleDesc": "按进程名或路径手动分流。Windows 下填 exe 名，如 chrome.exe。",
+  "processNamePathTip": "进程名不能包含路径，完整路径请用 PROCESS-PATH",
+  "processPathTip": "进程路径须为完整路径，如 C:\\Program Files\\app\\app.exe",
+  "processRegexTip": "正则表达式无效"
 }

@@ -187,6 +187,63 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('config page rules toolbar offers per-app entry and filter', (
+      tester,
+    ) async {
+      final profile = Profile.normal(label: 'Test profile');
+      final rules = [
+        const Rule(
+          id: 1,
+          content: 'example.com',
+          ruleTarget: 'REJECT',
+          order: 'a0',
+        ),
+        const Rule(
+          id: 2,
+          ruleAction: RuleAction.PROCESS_NAME,
+          content: 'chrome.exe',
+          ruleTarget: 'PROXY',
+          order: 'a1',
+        ),
+      ];
+      await _pumpPage(
+        tester,
+        const DesktopConfigView(),
+        overrides: [
+          profilesProvider.overrideWith(() => TestProfiles([profile])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => profile.id),
+          viewSizeProvider.overrideWithValue(const Size(1280, 800)),
+          profileCustomRulesProvider.overrideWith2(
+            (_) => _TestCustomRules(rules),
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Per-app rules'), findsOneWidget);
+      expect(find.text('Process'), findsOneWidget);
+      expect(find.text('example.com'), findsOneWidget);
+      expect(find.text('chrome.exe'), findsOneWidget);
+      await tester.tap(find.text('Process'));
+      await tester.pumpAndSettle();
+      expect(find.text('example.com'), findsNothing);
+      expect(find.text('chrome.exe'), findsOneWidget);
+      await tester.tap(find.text('Process'));
+      await tester.pumpAndSettle();
+      expect(find.text('example.com'), findsOneWidget);
+      await tester.tap(find.text('Per-app rules'));
+      await tester.pumpAndSettle();
+      expect(
+        find.text(
+          'Route traffic by process name or path, entered manually. On Windows, use the exe name, e.g. chrome.exe.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('PROCESS-NAME'), findsWidgets);
+      expect(find.text('Content'), findsOneWidget);
+      expect(find.text('Rule target'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('config page profile row menu offers update for url profile', (
       tester,
     ) async {

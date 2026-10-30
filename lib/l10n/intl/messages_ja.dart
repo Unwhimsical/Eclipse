@@ -984,6 +984,17 @@ class MessageLookup extends MessageLookupByLibrary {
     "previousMatch": MessageLookupByLibrary.simpleMessage("前の一致"),
     "privateIpAnswer": MessageLookupByLibrary.simpleMessage("プライベートIP応答"),
     "process": MessageLookupByLibrary.simpleMessage("プロセス"),
+    "processNamePathTip": MessageLookupByLibrary.simpleMessage(
+      "プロセス名にパスを含めることはできません。フルパスには PROCESS-PATH を使用してください",
+    ),
+    "processPathTip": MessageLookupByLibrary.simpleMessage(
+      "プロセスパスはフルパスで入力してください（例：C:\\Program Files\\app\\app.exe）",
+    ),
+    "processRegexTip": MessageLookupByLibrary.simpleMessage("正規表現が無効です"),
+    "processRule": MessageLookupByLibrary.simpleMessage("アプリ別ルール"),
+    "processRuleDesc": MessageLookupByLibrary.simpleMessage(
+      "プロセス名またはパスを手入力して振り分けます。Windows では chrome.exe のような exe 名を入力します。",
+    ),
     "profile": MessageLookupByLibrary.simpleMessage("プロファイル"),
     "profileAutoUpdateIntervalInvalidValidationDesc":
         MessageLookupByLibrary.simpleMessage("有効な間隔を入力してください"),

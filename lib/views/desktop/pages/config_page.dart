@@ -727,11 +727,15 @@ class _RulesTab extends ConsumerStatefulWidget {
 class _RulesTabState extends ConsumerState<_RulesTab> {
   String _query = '';
   bool _textMode = false;
+  bool _processOnly = false;
 
   List<Rule> _filtered(List<Rule> rules) {
-    if (_query.isEmpty) return rules;
+    final scoped = _processOnly
+        ? rules.where((r) => isProcessRuleAction(r.ruleAction)).toList()
+        : rules;
+    if (_query.isEmpty) return scoped;
     final q = _query.toLowerCase();
-    return rules.where((r) => r.rawValue.toLowerCase().contains(q)).toList();
+    return scoped.where((r) => r.rawValue.toLowerCase().contains(q)).toList();
   }
 
   @override
@@ -747,47 +751,72 @@ class _RulesTabState extends ConsumerState<_RulesTab> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 8,
             children: [
-              Expanded(
-                child: SizedBox(
-                  height: 36,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: appLocalizations.searchRules,
-                      prefixIcon: const Icon(Icons.search_rounded, size: 16),
-                      isDense: true,
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 36,
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: appLocalizations.searchRules,
+                          prefixIcon: const Icon(
+                            Icons.search_rounded,
+                            size: 16,
+                          ),
+                          isDense: true,
+                        ),
+                        onChanged: (v) => setState(() => _query = v),
+                      ),
                     ),
-                    onChanged: (v) => setState(() => _query = v),
                   ),
-                ),
-              ),
-              SegmentedButton<bool>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(
-                    value: false,
-                    icon: Icon(Icons.view_list_rounded, size: 18),
+                  FilterChip(
+                    label: Text(appLocalizations.process),
+                    selected: _processOnly,
+                    onSelected: (value) => setState(() => _processOnly = value),
                   ),
-                  ButtonSegment(
-                    value: true,
-                    icon: Icon(Icons.description_outlined, size: 18),
+                  SegmentedButton<bool>(
+                    showSelectedIcon: false,
+                    segments: const [
+                      ButtonSegment(
+                        value: false,
+                        icon: Icon(Icons.view_list_rounded, size: 18),
+                      ),
+                      ButtonSegment(
+                        value: true,
+                        icon: Icon(Icons.description_outlined, size: 18),
+                      ),
+                    ],
+                    selected: {_textMode},
+                    onSelectionChanged: (selection) =>
+                        setState(() => _textMode = selection.first),
                   ),
                 ],
-                selected: {_textMode},
-                onSelectionChanged: (selection) =>
-                    setState(() => _textMode = selection.first),
               ),
-              OutlinedButton.icon(
-                onPressed: () => _handleTest(filtered),
-                icon: const Icon(Icons.science_outlined, size: 18),
-                label: Text(appLocalizations.testRules),
-              ),
-              FilledButton.icon(
-                onPressed: _handleAdd,
-                icon: const Icon(Icons.add_rounded, size: 18),
-                label: Text(appLocalizations.addRule),
+              Row(
+                spacing: 8,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  OutlinedButton.icon(
+                    onPressed: () => _handleTest(filtered),
+                    icon: const Icon(Icons.science_outlined, size: 18),
+                    label: Text(appLocalizations.testRules),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: _handleAddProcess,
+                    icon: const Icon(Icons.apps_rounded, size: 18),
+                    label: Text(appLocalizations.processRule),
+                  ),
+                  FilledButton.icon(
+                    onPressed: _handleAdd,
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: Text(appLocalizations.addRule),
+                  ),
+                ],
               ),
             ],
           ),
@@ -828,6 +857,14 @@ class _RulesTabState extends ConsumerState<_RulesTab> {
   Future<void> _handleAdd() async {
     final res = await dialogs.showCommonDialog<Rule>(
       child: const AddOrEditRuleDialog(),
+    );
+    if (res == null) return;
+    ref.read(profileCustomRulesProvider(widget.profile.id).notifier).put(res);
+  }
+
+  Future<void> _handleAddProcess() async {
+    final res = await dialogs.showCommonDialog<Rule>(
+      child: const AddProcessRuleDialog(),
     );
     if (res == null) return;
     ref.read(profileCustomRulesProvider(widget.profile.id).notifier).put(res);
@@ -1026,6 +1063,7 @@ class _TestRulesDialog extends StatefulWidget {
 
 class _TestRulesDialogState extends State<_TestRulesDialog> {
   final _inputController = TextEditingController();
+  final _processController = TextEditingController();
   final _portController = TextEditingController(text: '443');
   String _network = 'TCP';
   RuleMatchVerdict? _verdict;
@@ -1035,6 +1073,7 @@ class _TestRulesDialogState extends State<_TestRulesDialog> {
   @override
   void dispose() {
     _inputController.dispose();
+    _processController.dispose();
     _portController.dispose();
     super.dispose();
   }
@@ -1042,10 +1081,12 @@ class _TestRulesDialogState extends State<_TestRulesDialog> {
   void _handleTest() {
     final appLocalizations = context.appLocalizations;
     final input = _inputController.text.trim();
+    final process = _processController.text.trim();
     final target = TestTarget.parse(
       input,
       int.tryParse(_portController.text.trim()) ?? 443,
       _network,
+      process: process.isEmpty ? null : process,
     );
     if (input.isEmpty || target == null) {
       setState(() {
@@ -1087,6 +1128,11 @@ class _TestRulesDialogState extends State<_TestRulesDialog> {
                 hintText: appLocalizations.testRulesInputHint,
                 errorText: _error,
               ),
+              onSubmitted: (_) => _handleTest(),
+            ),
+            TextField(
+              controller: _processController,
+              decoration: InputDecoration(labelText: appLocalizations.process),
               onSubmitted: (_) => _handleTest(),
             ),
             Row(
