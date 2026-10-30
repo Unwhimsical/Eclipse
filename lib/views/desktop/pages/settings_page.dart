@@ -10,6 +10,7 @@ import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/pages/simple_page.dart';
 import 'package:fl_clash/views/desktop/shortcuts/shortcut.dart';
 import 'package:fl_clash/views/desktop/value_holder.dart';
+import 'package:fl_clash/views/tailscale/tailscale.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:flutter/services.dart';
@@ -509,6 +510,9 @@ Future<void> _pickLocale(BuildContext context, WidgetRef ref) async {
 List<_SettingItem> _networkItems(BuildContext context, WidgetRef ref) {
   final appLocalizations = context.appLocalizations;
   final tun = ref.watch(patchClashConfigProvider.select((s) => s.tun.enable));
+  final tailscaleEnabled = ref.watch(
+    appSettingProvider.select((s) => s.tailscaleEnabled),
+  );
   final systemProxy = ref.watch(
     networkSettingProvider.select((s) => s.systemProxy),
   );
@@ -522,6 +526,27 @@ List<_SettingItem> _networkItems(BuildContext context, WidgetRef ref) {
       control: (_, ref) => _switchControl(tun, (_) {
         ref.read(systemActionProvider.notifier).updateTun();
       }),
+    ),
+    _SettingItem(
+      title: appLocalizations.tailscale,
+      subtitle: appLocalizations.tailscaleDesc,
+      keywords: const ['tailscale'],
+      control: (context, ref) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OutlinedButton(
+            onPressed: () =>
+                showExtend(context, builder: (_) => const TailscaleView()),
+            child: Text(appLocalizations.edit),
+          ),
+          _switchControl(tailscaleEnabled, (value) {
+            ref
+                .read(appSettingProvider.notifier)
+                .update((s) => s.copyWith(tailscaleEnabled: value));
+            ref.read(setupActionProvider.notifier).applyProfileDebounce();
+          }),
+        ],
+      ),
     ),
     _SettingItem(
       title: appLocalizations.systemProxy,

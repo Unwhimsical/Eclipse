@@ -1672,6 +1672,31 @@ class MessageLookup extends MessageLookupByLibrary {
       "Only effective in mobile view",
     ),
     "tableAction": MessageLookupByLibrary.simpleMessage("Action"),
+    "tailscale": MessageLookupByLibrary.simpleMessage("Tailscale"),
+    "tailscaleAcceptRoutes": MessageLookupByLibrary.simpleMessage(
+      "Use Tailscale subnets",
+    ),
+    "tailscaleAcceptRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "Accept subnet routes advertised by other tailnet devices.",
+    ),
+    "tailscaleAuthKey": MessageLookupByLibrary.simpleMessage("Auth key"),
+    "tailscaleAuthKeyDesc": MessageLookupByLibrary.simpleMessage(
+      "Reusable or ephemeral key from the Tailscale admin console. Required for the first login; a logged-in node keeps its saved state.",
+    ),
+    "tailscaleControlUrl": MessageLookupByLibrary.simpleMessage(
+      "Control server URL",
+    ),
+    "tailscaleDesc": MessageLookupByLibrary.simpleMessage(
+      "Route tailnet traffic through an embedded Tailscale node",
+    ),
+    "tailscaleExitNode": MessageLookupByLibrary.simpleMessage("Exit node"),
+    "tailscaleExitNodeDesc": MessageLookupByLibrary.simpleMessage(
+      "Optional. Only affects traffic sent through the Tailscale proxy; empty means tailnet traffic only.",
+    ),
+    "tailscaleHostname": MessageLookupByLibrary.simpleMessage("Hostname"),
+    "tailscaleStatusHint": MessageLookupByLibrary.simpleMessage(
+      "After enabling, the Tailscale proxy appears on the proxies page; use its delay test to check the tailnet connection. Low-power mode and always-DERP are not supported by the core.",
+    ),
     "tapToAuthorize": MessageLookupByLibrary.simpleMessage("Tap to authorize"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP concurrent"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(

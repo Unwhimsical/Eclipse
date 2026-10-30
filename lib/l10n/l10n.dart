@@ -7634,6 +7634,111 @@ class AppLocalizations {
     );
   }
 
+  /// `Tailscale`
+  String get tailscale {
+    return Intl.message('Tailscale', name: 'tailscale', desc: '', args: []);
+  }
+
+  /// `Route tailnet traffic through an embedded Tailscale node`
+  String get tailscaleDesc {
+    return Intl.message(
+      'Route tailnet traffic through an embedded Tailscale node',
+      name: 'tailscaleDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Auth key`
+  String get tailscaleAuthKey {
+    return Intl.message(
+      'Auth key',
+      name: 'tailscaleAuthKey',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reusable or ephemeral key from the Tailscale admin console. Required for the first login; a logged-in node keeps its saved state.`
+  String get tailscaleAuthKeyDesc {
+    return Intl.message(
+      'Reusable or ephemeral key from the Tailscale admin console. Required for the first login; a logged-in node keeps its saved state.',
+      name: 'tailscaleAuthKeyDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Control server URL`
+  String get tailscaleControlUrl {
+    return Intl.message(
+      'Control server URL',
+      name: 'tailscaleControlUrl',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Hostname`
+  String get tailscaleHostname {
+    return Intl.message(
+      'Hostname',
+      name: 'tailscaleHostname',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Exit node`
+  String get tailscaleExitNode {
+    return Intl.message(
+      'Exit node',
+      name: 'tailscaleExitNode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Optional. Only affects traffic sent through the Tailscale proxy; empty means tailnet traffic only.`
+  String get tailscaleExitNodeDesc {
+    return Intl.message(
+      'Optional. Only affects traffic sent through the Tailscale proxy; empty means tailnet traffic only.',
+      name: 'tailscaleExitNodeDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Use Tailscale subnets`
+  String get tailscaleAcceptRoutes {
+    return Intl.message(
+      'Use Tailscale subnets',
+      name: 'tailscaleAcceptRoutes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Accept subnet routes advertised by other tailnet devices.`
+  String get tailscaleAcceptRoutesDesc {
+    return Intl.message(
+      'Accept subnet routes advertised by other tailnet devices.',
+      name: 'tailscaleAcceptRoutesDesc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `After enabling, the Tailscale proxy appears on the proxies page; use its delay test to check the tailnet connection. Low-power mode and always-DERP are not supported by the core.`
+  String get tailscaleStatusHint {
+    return Intl.message(
+      'After enabling, the Tailscale proxy appears on the proxies page; use its delay test to check the tailnet connection. Low-power mode and always-DERP are not supported by the core.',
+      name: 'tailscaleStatusHint',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `All nodes`
   String get autoSelectGroupAll {
     return Intl.message(

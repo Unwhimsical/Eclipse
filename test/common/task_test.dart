@@ -751,4 +751,99 @@ void main() {
     applyCompatibilityMode(tun, false);
     expect(tun['auto-route'], isTrue);
   });
+
+  test('applyTailscaleProxy injects a tailscale proxy and tailnet rules', () {
+    final rawConfig = <String, dynamic>{
+      'proxies': [
+        {'name': 'proxy1', 'type': 'ss'},
+      ],
+    };
+    final rules = <String>['MATCH,DIRECT'];
+    applyTailscaleProxy(
+      rawConfig,
+      rules,
+      enabled: true,
+      authKey: 'tskey-auth-test',
+      controlUrl: 'https://control.example',
+      hostname: 'eclipse-node',
+      exitNode: '100.64.0.2',
+      acceptRoutes: true,
+    );
+    final proxies = rawConfig['proxies'] as List;
+    expect(proxies, hasLength(2));
+    final injected = proxies.last as Map;
+    expect(injected['name'], 'Tailscale');
+    expect(injected['type'], 'tailscale');
+    expect(injected['auth-key'], 'tskey-auth-test');
+    expect(injected['control-url'], 'https://control.example');
+    expect(injected['hostname'], 'eclipse-node');
+    expect(injected['exit-node'], '100.64.0.2');
+    expect(injected['accept-routes'], isTrue);
+    expect(injected['udp'], isTrue);
+    expect(rules, [
+      'DOMAIN-SUFFIX,ts.net,Tailscale',
+      'IP-CIDR,100.64.0.0/10,Tailscale,no-resolve',
+      'MATCH,DIRECT',
+    ]);
+  });
+
+  test('applyTailscaleProxy omits empty optional fields', () {
+    final rawConfig = <String, dynamic>{};
+    final rules = <String>[];
+    applyTailscaleProxy(
+      rawConfig,
+      rules,
+      enabled: true,
+      authKey: '',
+      controlUrl: '',
+      hostname: '',
+      exitNode: '',
+      acceptRoutes: false,
+    );
+    final injected = (rawConfig['proxies'] as List).single as Map;
+    expect(injected.containsKey('auth-key'), isFalse);
+    expect(injected.containsKey('control-url'), isFalse);
+    expect(injected.containsKey('hostname'), isFalse);
+    expect(injected.containsKey('exit-node'), isFalse);
+    expect(injected['accept-routes'], isFalse);
+    expect(rules, hasLength(2));
+  });
+
+  test('applyTailscaleProxy leaves config untouched when disabled', () {
+    final rawConfig = <String, dynamic>{'proxies': []};
+    final rules = <String>['MATCH,DIRECT'];
+    applyTailscaleProxy(
+      rawConfig,
+      rules,
+      enabled: false,
+      authKey: 'tskey-auth-test',
+      controlUrl: '',
+      hostname: '',
+      exitNode: '',
+      acceptRoutes: false,
+    );
+    expect(rawConfig['proxies'], isEmpty);
+    expect(rules, ['MATCH,DIRECT']);
+  });
+
+  test('applyTailscaleProxy skips injection on a Tailscale name clash', () {
+    final rawConfig = <String, dynamic>{
+      'proxies': [
+        {'name': 'Tailscale', 'type': 'tailscale', 'auth-key': 'own-key'},
+      ],
+    };
+    final rules = <String>['MATCH,DIRECT'];
+    applyTailscaleProxy(
+      rawConfig,
+      rules,
+      enabled: true,
+      authKey: 'tskey-auth-test',
+      controlUrl: '',
+      hostname: '',
+      exitNode: '',
+      acceptRoutes: false,
+    );
+    expect((rawConfig['proxies'] as List), hasLength(1));
+    expect(rules, ['MATCH,DIRECT']);
+  });
 }

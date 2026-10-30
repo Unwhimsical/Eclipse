@@ -1219,6 +1219,29 @@ class MessageLookup extends MessageLookupByLibrary {
     "tabAnimation": MessageLookupByLibrary.simpleMessage("选项卡动画"),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("仅在移动视图中有效"),
     "tableAction": MessageLookupByLibrary.simpleMessage("操作"),
+    "tailscale": MessageLookupByLibrary.simpleMessage("Tailscale"),
+    "tailscaleAcceptRoutes": MessageLookupByLibrary.simpleMessage(
+      "使用 Tailscale 子网",
+    ),
+    "tailscaleAcceptRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "接受 tailnet 中其他设备广播的子网路由。",
+    ),
+    "tailscaleAuthKey": MessageLookupByLibrary.simpleMessage("认证密钥"),
+    "tailscaleAuthKeyDesc": MessageLookupByLibrary.simpleMessage(
+      "来自 Tailscale 管理控制台的可复用或临时密钥。首次登录需要；已登录节点沿用已保存状态。",
+    ),
+    "tailscaleControlUrl": MessageLookupByLibrary.simpleMessage("控制服务器地址"),
+    "tailscaleDesc": MessageLookupByLibrary.simpleMessage(
+      "通过内置 Tailscale 节点转发 tailnet 流量",
+    ),
+    "tailscaleExitNode": MessageLookupByLibrary.simpleMessage("出口节点"),
+    "tailscaleExitNodeDesc": MessageLookupByLibrary.simpleMessage(
+      "可选。仅影响经 Tailscale 节点转发的流量；留空则只处理 tailnet 流量。",
+    ),
+    "tailscaleHostname": MessageLookupByLibrary.simpleMessage("节点名称"),
+    "tailscaleStatusHint": MessageLookupByLibrary.simpleMessage(
+      "开启后，节点页会出现 Tailscale 节点，可用其延迟测试检查 tailnet 连接。核心不支持低电量模式与始终使用 DERP。",
+    ),
     "tapToAuthorize": MessageLookupByLibrary.simpleMessage("点击授权"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP并发"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage("开启后允许TCP并发"),

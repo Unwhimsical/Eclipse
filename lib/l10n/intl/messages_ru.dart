@@ -1756,6 +1756,33 @@ class MessageLookup extends MessageLookupByLibrary {
       "Действует только в мобильном виде",
     ),
     "tableAction": MessageLookupByLibrary.simpleMessage("Действие"),
+    "tailscale": MessageLookupByLibrary.simpleMessage("Tailscale"),
+    "tailscaleAcceptRoutes": MessageLookupByLibrary.simpleMessage(
+      "Использовать подсети Tailscale",
+    ),
+    "tailscaleAcceptRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "Принимать маршруты подсетей, анонсируемые другими устройствами tailnet.",
+    ),
+    "tailscaleAuthKey": MessageLookupByLibrary.simpleMessage(
+      "Ключ авторизации",
+    ),
+    "tailscaleAuthKeyDesc": MessageLookupByLibrary.simpleMessage(
+      "Многоразовый или временный ключ из консоли администратора Tailscale. Нужен для первого входа; вошедший узел продолжает использовать сохранённое состояние.",
+    ),
+    "tailscaleControlUrl": MessageLookupByLibrary.simpleMessage(
+      "URL сервера управления",
+    ),
+    "tailscaleDesc": MessageLookupByLibrary.simpleMessage(
+      "Маршрутизировать трафик tailnet через встроенный узел Tailscale",
+    ),
+    "tailscaleExitNode": MessageLookupByLibrary.simpleMessage("Выходной узел"),
+    "tailscaleExitNodeDesc": MessageLookupByLibrary.simpleMessage(
+      "Необязательно. Влияет только на трафик через прокси Tailscale; пустое значение означает только трафик tailnet.",
+    ),
+    "tailscaleHostname": MessageLookupByLibrary.simpleMessage("Имя узла"),
+    "tailscaleStatusHint": MessageLookupByLibrary.simpleMessage(
+      "После включения прокси Tailscale появится на странице прокси; проверьте подключение к tailnet с помощью теста задержки. Ядро не поддерживает режим пониженного энергопотребления и постоянное использование DERP.",
+    ),
     "tapToAuthorize": MessageLookupByLibrary.simpleMessage(
       "Нажмите, чтобы разрешить",
     ),

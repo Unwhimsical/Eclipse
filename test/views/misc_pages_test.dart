@@ -2,6 +2,7 @@ import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/clipboard_watcher/clipboard_watcher.dart';
 import 'package:fl_clash/views/delay_test/delay_test.dart';
 import 'package:fl_clash/views/permissions/permissions.dart';
+import 'package:fl_clash/views/tailscale/tailscale.dart';
 import 'package:fl_clash/views/tunnel/tunnel.dart';
 import 'package:fl_clash/views/tunnel/udp_stun.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -61,6 +62,18 @@ void main() {
     await tester.pump();
     expect(find.byType(UdpStunView), findsOneWidget);
     expect(find.byType(Switch), findsWidgets);
+  });
+
+  testWidgets('TailscaleView renders enable switch and fields', (tester) async {
+    await tester.pumpWidget(
+      const TestApp(wrapInProviderScope: true, child: TailscaleView()),
+    );
+    await tester.pump();
+    expect(find.byType(TailscaleView), findsOneWidget);
+    expect(find.byType(Switch), findsNWidgets(2));
+    expect(find.text('Auth key'), findsOneWidget);
+    expect(find.text('Control server URL'), findsOneWidget);
+    expect(find.text('Exit node'), findsOneWidget);
   });
 
   testWidgets('DelayTestView renders form', (tester) async {

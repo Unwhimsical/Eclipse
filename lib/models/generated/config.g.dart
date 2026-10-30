@@ -44,6 +44,12 @@ _AppSettingProps _$AppSettingPropsFromJson(
   simpleMode: json['simpleMode'] as bool? ?? false,
   autoSelectLowestDelay: json['autoSelectLowestDelay'] as bool? ?? false,
   autoSelectGroup: json['autoSelectGroup'] as String?,
+  tailscaleEnabled: json['tailscaleEnabled'] as bool? ?? false,
+  tailscaleAuthKey: json['tailscaleAuthKey'] as String? ?? '',
+  tailscaleControlUrl: json['tailscaleControlUrl'] as String? ?? '',
+  tailscaleHostname: json['tailscaleHostname'] as String? ?? '',
+  tailscaleExitNode: json['tailscaleExitNode'] as String? ?? '',
+  tailscaleAcceptRoutes: json['tailscaleAcceptRoutes'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
@@ -78,6 +84,12 @@ Map<String, dynamic> _$AppSettingPropsToJson(_AppSettingProps instance) =>
       'simpleMode': instance.simpleMode,
       'autoSelectLowestDelay': instance.autoSelectLowestDelay,
       'autoSelectGroup': instance.autoSelectGroup,
+      'tailscaleEnabled': instance.tailscaleEnabled,
+      'tailscaleAuthKey': instance.tailscaleAuthKey,
+      'tailscaleControlUrl': instance.tailscaleControlUrl,
+      'tailscaleHostname': instance.tailscaleHostname,
+      'tailscaleExitNode': instance.tailscaleExitNode,
+      'tailscaleAcceptRoutes': instance.tailscaleAcceptRoutes,
     };
 
 const _$RestoreStrategyEnumMap = {

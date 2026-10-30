@@ -1423,6 +1423,31 @@ class MessageLookup extends MessageLookupByLibrary {
     "tabAnimation": MessageLookupByLibrary.simpleMessage("タブアニメーション"),
     "tabAnimationDesc": MessageLookupByLibrary.simpleMessage("モバイル表示でのみ有効です"),
     "tableAction": MessageLookupByLibrary.simpleMessage("操作"),
+    "tailscale": MessageLookupByLibrary.simpleMessage("Tailscale"),
+    "tailscaleAcceptRoutes": MessageLookupByLibrary.simpleMessage(
+      "Tailscale サブネットを使用",
+    ),
+    "tailscaleAcceptRoutesDesc": MessageLookupByLibrary.simpleMessage(
+      "他の tailnet デバイスが広告するサブネットルートを受け入れる。",
+    ),
+    "tailscaleAuthKey": MessageLookupByLibrary.simpleMessage("認証キー"),
+    "tailscaleAuthKeyDesc": MessageLookupByLibrary.simpleMessage(
+      "Tailscale 管理コンソールの再利用可能または一時的なキー。初回ログインに必要。ログイン済みノードは保存された状態を使い続ける。",
+    ),
+    "tailscaleControlUrl": MessageLookupByLibrary.simpleMessage(
+      "コントロールサーバー URL",
+    ),
+    "tailscaleDesc": MessageLookupByLibrary.simpleMessage(
+      "組み込み Tailscale ノード経由で tailnet トラフィックを転送",
+    ),
+    "tailscaleExitNode": MessageLookupByLibrary.simpleMessage("出口ノード"),
+    "tailscaleExitNodeDesc": MessageLookupByLibrary.simpleMessage(
+      "任意。Tailscale プロキシ経由のトラフィックにのみ影響する。空の場合は tailnet トラフィックのみ。",
+    ),
+    "tailscaleHostname": MessageLookupByLibrary.simpleMessage("ホスト名"),
+    "tailscaleStatusHint": MessageLookupByLibrary.simpleMessage(
+      "有効化後、プロキシページに Tailscale ノードが表示される。遅延テストで tailnet 接続を確認できる。コアは低電力モードと常時 DERP に対応していない。",
+    ),
     "tapToAuthorize": MessageLookupByLibrary.simpleMessage("タップして許可"),
     "tcpConcurrent": MessageLookupByLibrary.simpleMessage("TCP同時接続"),
     "tcpConcurrentDesc": MessageLookupByLibrary.simpleMessage(

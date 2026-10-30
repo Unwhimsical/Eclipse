@@ -366,6 +366,12 @@ abstract class MakeRealProfileState with _$MakeRealProfileState {
     String? frontProxyId,
     @Default(false) bool compatibilityMode,
     @Default(false) bool disableStun,
+    @Default(false) bool tailscaleEnabled,
+    @Default('') String tailscaleAuthKey,
+    @Default('') String tailscaleControlUrl,
+    @Default('') String tailscaleHostname,
+    @Default('') String tailscaleExitNode,
+    @Default(false) bool tailscaleAcceptRoutes,
   }) = _MakeRealProfileState;
 }
 

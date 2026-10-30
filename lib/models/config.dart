@@ -94,6 +94,12 @@ abstract class AppSettingProps with _$AppSettingProps {
     @Default(false) bool simpleMode,
     @Default(false) bool autoSelectLowestDelay,
     String? autoSelectGroup,
+    @Default(false) bool tailscaleEnabled,
+    @Default('') String tailscaleAuthKey,
+    @Default('') String tailscaleControlUrl,
+    @Default('') String tailscaleHostname,
+    @Default('') String tailscaleExitNode,
+    @Default(false) bool tailscaleAcceptRoutes,
   }) = _AppSettingProps;
 
   factory AppSettingProps.fromJson(Map<String, Object?> json) =>

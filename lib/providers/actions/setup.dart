@@ -330,6 +330,7 @@ class SetupAction extends _$SetupAction {
     );
     final appendSystemDns = networkSetting.appendSystemDns;
     final routeMode = networkSetting.routeMode;
+    final tailscale = ref.read(appSettingProvider);
     final configMap = await _core.getConfig(profileId);
     String? scriptContent;
     final List<Rule> addedRules = [];
@@ -372,6 +373,12 @@ class SetupAction extends _$SetupAction {
         generalSettings: setupState.generalSettings,
         proxyChains: setupState.proxyChains,
         matchTarget: setupState.matchTarget,
+        tailscaleEnabled: tailscale.tailscaleEnabled,
+        tailscaleAuthKey: tailscale.tailscaleAuthKey,
+        tailscaleControlUrl: tailscale.tailscaleControlUrl,
+        tailscaleHostname: tailscale.tailscaleHostname,
+        tailscaleExitNode: tailscale.tailscaleExitNode,
+        tailscaleAcceptRoutes: tailscale.tailscaleAcceptRoutes,
       ),
     );
     return res;

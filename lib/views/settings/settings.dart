@@ -20,6 +20,7 @@ import 'package:fl_clash/views/hotkey.dart';
 import 'package:fl_clash/views/permissions/permissions.dart';
 import 'package:fl_clash/views/proxy_share/proxy_share.dart';
 import 'package:fl_clash/views/scene/scene_page.dart';
+import 'package:fl_clash/views/tailscale/tailscale.dart';
 import 'package:fl_clash/views/theme.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/views/tunnel/tunnel.dart';
@@ -106,6 +107,12 @@ class SettingsView extends ConsumerWidget {
                 icon: Icons.bolt_outlined,
                 title: appLocalizations.udpForwardStun,
                 page: const UdpStunView(),
+              ),
+              EclipseOpenTile(
+                icon: Icons.hub_outlined,
+                title: appLocalizations.tailscale,
+                subtitle: appLocalizations.tailscaleDesc,
+                page: const TailscaleView(),
               ),
               EclipseOpenTile(
                 icon: Icons.auto_mode_outlined,

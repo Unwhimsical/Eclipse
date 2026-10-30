@@ -334,6 +334,17 @@ Future<({String yaml, String md5})> _makeRealProfileTask(
   final parsedModules = await _parseEnabledModules();
   await _orderRulesByModules(rules, parsedModules);
   _injectModuleRuleProviders(rawConfig, rules, profilesPath);
+  // Runs before the MITM injection so MITM rules stay first.
+  applyTailscaleProxy(
+    rawConfig,
+    rules,
+    enabled: data.tailscaleEnabled,
+    authKey: data.tailscaleAuthKey,
+    controlUrl: data.tailscaleControlUrl,
+    hostname: data.tailscaleHostname,
+    exitNode: data.tailscaleExitNode,
+    acceptRoutes: data.tailscaleAcceptRoutes,
+  );
   await _injectMitmProxy(
     rawConfig,
     rules,
@@ -507,6 +518,46 @@ Future<void> _injectMitmProxy(
 }
 
 @visibleForTesting
+void applyTailscaleProxy(
+  Map rawConfig,
+  List<String> rules, {
+  required bool enabled,
+  required String authKey,
+  required String controlUrl,
+  required String hostname,
+  required String exitNode,
+  required bool acceptRoutes,
+}) {
+  if (!enabled) return;
+  try {
+    final proxies = rawConfig['proxies'] is List
+        ? List<Map<String, dynamic>>.from(
+            (rawConfig['proxies'] as List).map(
+              (e) => Map<String, dynamic>.from(e as Map),
+            ),
+          )
+        : <Map<String, dynamic>>[];
+    const tailscaleProxyName = 'Tailscale';
+    if (proxies.any((p) => p['name'] == tailscaleProxyName)) return;
+    final proxy = <String, dynamic>{
+      'name': tailscaleProxyName,
+      'type': 'tailscale',
+      'udp': true,
+      'accept-routes': acceptRoutes,
+    };
+    if (authKey.isNotEmpty) proxy['auth-key'] = authKey;
+    if (controlUrl.isNotEmpty) proxy['control-url'] = controlUrl;
+    if (hostname.isNotEmpty) proxy['hostname'] = hostname;
+    if (exitNode.isNotEmpty) proxy['exit-node'] = exitNode;
+    proxies.add(proxy);
+    rawConfig['proxies'] = proxies;
+    rules.insertAll(0, const [
+      'DOMAIN-SUFFIX,ts.net,Tailscale',
+      'IP-CIDR,100.64.0.0/10,Tailscale,no-resolve',
+    ]);
+  } catch (_) {}
+}
+
 @visibleForTesting
 void applyDisableStun(List<String> rules, bool disableStun) {
   // STUN must be rejected before every other rule (including module rules)
