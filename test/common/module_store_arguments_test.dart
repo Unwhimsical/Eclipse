@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fl_clash/common/module_store.dart';
 import 'package:fl_clash/common/path.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,8 +38,14 @@ void main() {
     await tmp.delete(recursive: true);
   });
 
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    final modulesDir = Directory(p.join(await appPath.homeDirPath, 'modules'));
+    if (await modulesDir.exists()) {
+      await for (final entity in modulesDir.list()) {
+        await entity.delete(recursive: true);
+      }
+    }
   });
 
   group('ModuleStore argument values', () {

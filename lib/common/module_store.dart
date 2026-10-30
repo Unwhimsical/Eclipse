@@ -106,17 +106,104 @@ class ModuleStore {
   Future<List<ModuleInfo>> list() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_modulesIndexKey);
-    if (raw == null || raw.isEmpty) return [];
+    List<ModuleInfo>? indexed;
     try {
-      final list = json.decode(raw);
-      if (list is! List) return [];
-      return list
-          .whereType<Map<String, Object?>>()
-          .map(ModuleInfo.fromJson)
-          .toList();
+      if (raw != null && raw.isNotEmpty) {
+        final decoded = json.decode(raw);
+        if (decoded is List) {
+          indexed = decoded
+              .whereType<Map<String, Object?>>()
+              .map(ModuleInfo.fromJson)
+              .toList();
+        }
+      }
+    } catch (_) {
+      indexed = null;
+    }
+    if (indexed != null && indexed.isNotEmpty) return indexed;
+    final recovered = await _recoverSafely();
+    if (recovered.isEmpty) return [];
+    await _saveIndex(recovered);
+    return recovered;
+  }
+
+  Future<List<ModuleInfo>> _recoverSafely() async {
+    try {
+      return await _recoverFromFiles();
     } catch (_) {
       return [];
     }
+  }
+
+  Future<List<ModuleInfo>> _recoverFromFiles() async {
+    if (!appPath.dataDir.isCompleted) return [];
+    final dir = Directory(await _modulesDir());
+    if (!await dir.exists()) return [];
+    final files = <File>[];
+    await for (final entity in dir.list()) {
+      if (entity is File && basename(entity.path).endsWith('.sgmodule')) {
+        files.add(entity);
+      }
+    }
+    if (files.isEmpty) return [];
+    final stats = <File, DateTime>{};
+    for (final file in files) {
+      try {
+        stats[file] = (await file.stat()).modified;
+      } catch (_) {
+        stats[file] = DateTime.fromMillisecondsSinceEpoch(0);
+      }
+    }
+    files.sort((a, b) {
+      final byTime = stats[a]!.compareTo(stats[b]!);
+      return byTime != 0 ? byTime : a.path.compareTo(b.path);
+    });
+    final recovered = <ModuleInfo>[];
+    for (final file in files) {
+      try {
+        final raw = await file.readAsString();
+        final parsed = await parseSgmoduleWithArgumentsBackground(
+          raw,
+          const {},
+        );
+        final id = basenameWithoutExtension(file.path);
+        recovered.add(
+          ModuleInfo(
+            id: id,
+            name: parsed.name.isEmpty ? id : parsed.name,
+            desc: parsed.desc,
+            author: parsed.author,
+            ruleCount: parsed.rules.length,
+            hostCount: parsed.hosts.length,
+            rewriteCount: parsed.urlRewrites.length,
+            scriptCount: parsed.scripts.length,
+            needsMitm: parsed.needsMitm,
+            importDate: stats[file]!,
+            ruleSetRules: await _scanRuleSetRules(id),
+            rulesAppend: parsed.rulesAppend,
+          ),
+        );
+      } catch (_) {
+        continue;
+      }
+    }
+    return recovered;
+  }
+
+  Future<List<String>> _scanRuleSetRules(String id) async {
+    final dir = Directory(await _modulesDir());
+    if (!await dir.exists()) return [];
+    final rules = <String>[];
+    await for (final entity in dir.list()) {
+      if (entity is! File) continue;
+      final base = basename(entity.path);
+      if (!base.startsWith('${id}_') || !base.endsWith('.yaml')) continue;
+      final policy = base.substring(id.length + 1, base.length - 5);
+      if (policy.isEmpty || policy == 'INLINE') continue;
+      rules.add('RULE-SET,${id}_$policy,$policy');
+    }
+    rules.sort();
+    return rules;
   }
 
   Future<void> _saveIndex(List<ModuleInfo> modules) async {
@@ -155,6 +242,7 @@ class ModuleStore {
     final name = parsed.name.isEmpty
         ? (fileName?.replaceAll('.sgmodule', '') ?? 'Module $id')
         : parsed.name;
+    final modules = await list();
     final filePath = await moduleFilePath(id);
     await File(filePath).writeAsString(raw);
     List<String> ruleSetRules = const [];
@@ -176,7 +264,6 @@ class ModuleStore {
       rulesAppend: parsed.rulesAppend,
       sourceUrl: sourceUrl,
     );
-    final modules = await list();
     modules.add(info);
     await _saveIndex(modules);
     return info;
