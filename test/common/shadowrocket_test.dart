@@ -457,6 +457,48 @@ hostname = %APPEND%,example.com,*.example.org
       expect(module.mitmHostnames.any((h) => h.startsWith('%')), isFalse);
     });
 
+    test('ignores non-hostname mitm keys', () {
+      const certModule = '''
+#!name=Cert
+[MITM]
+enable = true
+h2 = true
+ca-passphrase = Shadowrocket
+ca-p12 = MIIJqQIBAzCCCX8GCSqGSIb3DQEHAaCCCX
+hostname = %APPEND%example.com, *.example.org
+''';
+      final module = parseSgmodule(certModule);
+      expect(module.mitmHostnames, ['example.com', '*.example.org']);
+    });
+
+    test('parses direction-first header rewrite lines', () {
+      final del = parseHeaderRewriteLine(
+        'http-request ^https://example.com/ header-del User-Agent',
+      );
+      expect(del, isNotNull);
+      expect(del!.pattern, '^https://example.com/');
+      expect(del.action, 'header-del');
+      expect(del.args, ['User-Agent']);
+
+      final replace = parseHeaderRewriteLine(
+        'http-response ^https://example.com/ header-replace User-Agent '
+        '"Custom Agent"',
+      );
+      expect(replace, isNotNull);
+      expect(replace!.action, 'response-header-replace');
+      expect(replace.args, ['User-Agent: Custom Agent']);
+
+      final regex = parseHeaderRewriteLine(
+        'http-response ^https://example.com/ header-replace-regex Referer '
+        '^https?://a https://b',
+      );
+      expect(regex, isNotNull);
+      expect(regex!.action, 'response-header-replace-regex');
+      expect(regex.args, ['Referer', '^https?://a', 'https://b']);
+
+      expect(parseHeaderRewriteLine('http-request garbage line'), isNull);
+    });
+
     test('empty module is empty', () {
       expect(parseSgmodule('').isEmpty, isTrue);
     });

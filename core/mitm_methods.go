@@ -66,7 +66,17 @@ func mitmConfigFromArgs(args map[string]interface{}) (mitm.Config, error) {
 			}
 			if action == "" {
 				action = "redirect"
-				if target == "-" || strings.HasPrefix(strings.ToLower(target), "reject") {
+				if target == "-" || target == "_" {
+					// `- reject-200` / `_ reject`: the variant lives in
+					// the third token, which arrives as the status field.
+					statusStr, _ := m["status"].(string)
+					if strings.HasPrefix(strings.ToLower(strings.TrimSpace(statusStr)), "reject") {
+						action = mitm.RejectActionForTarget(statusStr)
+					} else {
+						action = "reject"
+					}
+					target = ""
+				} else if strings.HasPrefix(strings.ToLower(target), "reject") {
 					action = mitm.RejectActionForTarget(target)
 					target = ""
 				}

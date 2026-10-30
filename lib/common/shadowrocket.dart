@@ -28,7 +28,8 @@ final _granularRejectWord = RegExp(
   caseSensitive: false,
 );
 final _headerRewriteLinePattern = RegExp(
-  r'^(\S+)\s+(header-del|header-add|header-replace|header-replace-regex)\s+(.+)$',
+  r'^(?:(http-request|http-response)\s+)?(\S+)\s+(header-del|header-add|header-replace|header-replace-regex|response-header-del|response-header-add|response-header-replace|response-header-regex)\s+(.+)$',
+  caseSensitive: false,
 );
 final _quotedArgPattern = RegExp(r'"([^"]*)"');
 final _bodyRewriteLinePattern = RegExp(r'^(\S+)\s+(\S+)\s+(.+)$');
@@ -1068,12 +1069,21 @@ Sgmodule parseSgmodule(String content) {
       case 'script':
         scripts.add(line);
       case 'mitm':
+        // Only `hostname` lines are hostnames; other [MITM] keys are not.
         final eq = line.indexOf('=');
-        final value = eq > 0 ? line.substring(eq + 1) : line;
-        for (final host in value.split(_mitmHostSeparator)) {
-          final h = host.trim();
-          if (h.isEmpty || h.startsWith('%')) continue;
-          mitmHostnames.add(h);
+        if (eq > 0 &&
+            line.substring(0, eq).trim().toLowerCase() == 'hostname') {
+          final value = line.substring(eq + 1);
+          for (final host in value.split(_mitmHostSeparator)) {
+            var h = host.trim();
+            if (h.isEmpty) continue;
+            if (h.startsWith('%')) {
+              if (!h.toUpperCase().startsWith('%APPEND%')) continue;
+              h = h.substring('%APPEND%'.length);
+              if (h.isEmpty) continue;
+            }
+            mitmHostnames.add(h);
+          }
         }
     }
   }
@@ -1219,18 +1229,45 @@ Future<Sgmodule> parseSgmoduleWithArgumentsBackground(
 ({String pattern, String action, List<String> args})? parseHeaderRewriteLine(
   String line,
 ) {
-  // Match: pattern followed by action and quoted args
-  // e.g.: ^https?://example.com/ header-del "X-Header"
   final match = _headerRewriteLinePattern.firstMatch(line.trim());
   if (match == null) return null;
-  final pattern = match.group(1)!;
-  final action = match.group(2)!;
-  final argsStr = match.group(3)!;
-  // Extract quoted strings
+  final direction = match.group(1)?.toLowerCase();
+  final pattern = match.group(2)!;
+  var action = match.group(3)!.toLowerCase();
+  if (direction == 'http-response' && !action.startsWith('response-header-')) {
+    action = 'response-header-${action.substring('header-'.length)}';
+  }
+  final argsStr = match.group(4)!;
   final args = <String>[];
-  final quoted = _quotedArgPattern.allMatches(argsStr);
-  for (final m in quoted) {
-    args.add(m.group(1)!);
+  if (argsStr.trimLeft().startsWith('"')) {
+    for (final m in _quotedArgPattern.allMatches(argsStr)) {
+      args.add(m.group(1)!);
+    }
+  } else {
+    final tokens = _splitQuoted(
+      argsStr,
+    ).map(_unquote).where((t) => t.isNotEmpty).toList();
+    if (tokens.isEmpty) return null;
+    final base = action.startsWith('response-header-')
+        ? 'header-${action.substring('response-header-'.length)}'
+        : action;
+    switch (base) {
+      case 'header-del':
+        args.add(tokens.first);
+      case 'header-add':
+      case 'header-replace':
+        args.add(
+          tokens.length >= 2
+              ? '${tokens.first}: ${tokens.skip(1).join(' ')}'
+              : tokens.first,
+        );
+      case 'header-replace-regex':
+        if (tokens.length >= 3) {
+          args.addAll([tokens[0], tokens[1], tokens.skip(2).join(' ')]);
+        } else {
+          args.addAll(tokens);
+        }
+    }
   }
   if (args.isEmpty) return null;
   return (pattern: pattern, action: action, args: args);

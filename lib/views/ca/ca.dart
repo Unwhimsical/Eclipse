@@ -104,6 +104,14 @@ class _CaViewState extends ConsumerState<CaView> {
         'Android 7+ 应用默认不信任用户证书，解密仅对目标应用生效需配合 VPN 抓包',
       ];
     }
+    if (system.isWindows) {
+      return [
+        '点击下方「导出证书」，保存 Eclipse-CA.crt',
+        '以管理员身份打开 PowerShell，运行 certutil -addstore Root Eclipse-CA.crt 装入本地计算机存储（仅当前用户可用 certutil -addstore -user Root Eclipse-CA.crt）',
+        '在弹出的安全警告中确认安装到“受信任的根证书颁发机构”',
+        '安装后重启核心，MITM 解密即对走 Eclipse 代理的流量生效',
+      ];
+    }
     if (system.isIOS) {
       return [
         '点击下方「导出证书」，通过隔空投送/文件发送到 iPhone',

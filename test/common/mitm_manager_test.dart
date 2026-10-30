@@ -328,4 +328,39 @@ void main() {
       expect(parseHeaderRewriteRules([]), isEmpty);
     });
   });
+
+  group('parseUrlRewriteLine', () {
+    test('parses redirect lines with default 302', () {
+      final redirect = parseUrlRewriteLine(
+        r'^https://a.com/(.*) https://b.com/$1 302',
+      );
+      expect(redirect, isNotNull);
+      expect(redirect!['pattern'], r'^https://a.com/(.*)');
+      expect(redirect['target'], r'https://b.com/$1');
+      expect(redirect['status'], '302');
+
+      final bare = parseUrlRewriteLine('^https://a.com https://b.com');
+      expect(bare!['status'], '302');
+    });
+
+    test('passes reject placeholders to the Go layer', () {
+      expect(parseUrlRewriteLine('^https://a.com/ad - reject')!['target'], '-');
+      expect(
+        parseUrlRewriteLine('^https://a.com/ad _ reject-200')!['status'],
+        'reject-200',
+      );
+      expect(
+        parseUrlRewriteLine('^https://a.com/ad reject')!['target'],
+        'reject',
+      );
+    });
+
+    test('fails open on bare policy and numeric targets', () {
+      expect(parseUrlRewriteLine('^https://a.com DIRECT'), isNull);
+      expect(parseUrlRewriteLine('^https://a.com PROXY'), isNull);
+      expect(parseUrlRewriteLine('^https://a.com HEADER'), isNull);
+      expect(parseUrlRewriteLine('^https://a.com 302'), isNull);
+      expect(parseUrlRewriteLine('^https://a.com'), isNull);
+    });
+  });
 }

@@ -87,13 +87,8 @@ class MitmManager {
 
     // Profile rewrites come first (they're part of the config).
     for (final line in profileUrlRewrites) {
-      final parts = line.trim().split(_whitespacePattern);
-      if (parts.length < 2) continue;
-      rewrites.add({
-        'pattern': parts[0],
-        'target': parts[1],
-        'status': parts.length >= 3 ? parts[2] : '302',
-      });
+      final parsed = parseUrlRewriteLine(line);
+      if (parsed != null) rewrites.add(parsed);
     }
 
     // Profile MITM hostnames join the same host set as module hostnames.
@@ -108,13 +103,8 @@ class MitmManager {
 
         // URL rewrites: parse "pattern target status".
         for (final line in sg.urlRewrites) {
-          final parts = line.trim().split(_whitespacePattern);
-          if (parts.length < 2) continue;
-          rewrites.add({
-            'pattern': parts[0],
-            'target': parts[1],
-            'status': parts.length >= 3 ? parts[2] : '302',
-          });
+          final parsed = parseUrlRewriteLine(line);
+          if (parsed != null) rewrites.add(parsed);
         }
 
         headerRewriteLines.addAll(sg.headerRewrites);
@@ -344,6 +334,27 @@ class MitmManager {
       return await cache.getStale(url) ?? '';
     }
   }
+}
+
+@visibleForTesting
+Map<String, String>? parseUrlRewriteLine(String line) {
+  final parts = line.trim().split(_whitespacePattern);
+  if (parts.length < 2) return null;
+  final target = parts[1];
+  // Bare policy targets are not redirect destinations; fail open.
+  final lower = target.toLowerCase();
+  if (lower == 'direct' ||
+      lower == 'proxy' ||
+      lower == 'header' ||
+      lower == 'final' ||
+      int.tryParse(target) != null) {
+    return null;
+  }
+  return {
+    'pattern': parts[0],
+    'target': target,
+    'status': parts.length >= 3 ? parts[2] : '302',
+  };
 }
 
 @visibleForTesting
