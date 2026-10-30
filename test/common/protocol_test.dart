@@ -37,7 +37,8 @@ void main() {
         'NoDisplay=true\n'
         'Exec="/home/me/Apps/FlClash.AppImage" %u\n'
         'MimeType=x-scheme-handler/clash;x-scheme-handler/clashmeta;'
-        'x-scheme-handler/flclash;x-scheme-handler/eclipse;\n',
+        'x-scheme-handler/flclash;x-scheme-handler/eclipse;'
+        'x-scheme-handler/shadowrocket;\n',
       );
     });
 
@@ -49,6 +50,7 @@ void main() {
         'x-scheme-handler/clashmeta',
         'x-scheme-handler/flclash',
         'x-scheme-handler/eclipse',
+        'x-scheme-handler/shadowrocket',
       ]);
     });
 

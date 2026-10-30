@@ -138,32 +138,131 @@ class ApplicationState extends ConsumerState<Application>
   void _initLink() {
     linkManager.initAppLinksListen((url) async {
       unawaited(window?.show());
-      final message = currentAppLocalizations.createProfileFromUrlTip(url);
-      final parts = message.split(url);
-      final res = await dialogs.showMessage(
-        title: currentAppLocalizations.addProfile,
-        message: TextSpan(
-          children: [
-            TextSpan(text: parts.first),
-            TextSpan(
-              text: url,
-              style: TextStyle(
-                color: context.colorScheme.primary,
-                decoration: TextDecoration.underline,
-                decorationColor: context.colorScheme.primary,
-              ),
-            ),
-            if (parts.length > 1) TextSpan(text: parts.last),
-          ],
-        ),
-      );
-      if (res != true) return;
+      if (!await _confirmImportUrl(url)) return;
       unawaited(
         ref
             .read(profilesActionProvider.notifier)
             .addProfileFormURL(url, widgetRef: ref),
       );
-    });
+    }, onShadowrocketLink: _handleShadowrocketLink);
+  }
+
+  Future<bool> _confirmImportUrl(String url) async {
+    final message = currentAppLocalizations.createProfileFromUrlTip(url);
+    final parts = message.split(url);
+    final res = await dialogs.showMessage(
+      title: currentAppLocalizations.addProfile,
+      message: TextSpan(
+        children: [
+          TextSpan(text: parts.first),
+          TextSpan(
+            text: url,
+            style: TextStyle(
+              color: context.colorScheme.primary,
+              decoration: TextDecoration.underline,
+              decorationColor: context.colorScheme.primary,
+            ),
+          ),
+          if (parts.length > 1) TextSpan(text: parts.last),
+        ],
+      ),
+    );
+    return res == true;
+  }
+
+  void _handleShadowrocketLink(ShadowrocketLinkAction action) {
+    unawaited(window?.show());
+    switch (action.kind) {
+      case ShadowrocketLinkKind.connect:
+        unawaited(
+          globalState.safeRun(
+            () => ref
+                .read(setupActionProvider.notifier)
+                .setRunning(true, initialize: !ref.read(initProvider)),
+          ),
+        );
+      case ShadowrocketLinkKind.disconnect:
+        unawaited(
+          globalState.safeRun(
+            () => ref.read(setupActionProvider.notifier).setRunning(false),
+          ),
+        );
+      case ShadowrocketLinkKind.toggle:
+        ref.read(commonActionProvider.notifier).toggleRunning();
+      case ShadowrocketLinkKind.connectivityTest:
+        final groups = ref.read(currentGroupsStateProvider).value;
+        final seen = <String>{};
+        final proxies = [
+          for (final group in groups)
+            for (final proxy in group.all)
+              if (seen.add(proxy.name)) proxy,
+        ];
+        if (proxies.isNotEmpty) {
+          unawaited(
+            ref.read(proxiesActionProvider.notifier).delayTest(proxies),
+          );
+        }
+      case ShadowrocketLinkKind.select:
+        final name = action.nodeName!;
+        var found = false;
+        for (final group in ref.read(groupsProvider)) {
+          if (group.type != GroupType.Selector) continue;
+          if (!group.all.any((proxy) => proxy.name == name)) continue;
+          found = true;
+          unawaited(
+            ref
+                .read(proxiesActionProvider.notifier)
+                .changeProxy(groupName: group.name, proxyName: name),
+          );
+          break;
+        }
+        if (!found) {
+          dialogs.showNotifier(
+            currentAppLocalizations.changeProxyFailedTip,
+            level: MessageLevel.warning,
+          );
+        }
+      case ShadowrocketLinkKind.add:
+      case ShadowrocketLinkKind.configAdd:
+        unawaited(_confirmAndAddProfile(action.url!));
+      case ShadowrocketLinkKind.updateSubs:
+        unawaited(
+          ref.read(profilesActionProvider.notifier).autoUpdateProfiles(),
+        );
+      case ShadowrocketLinkKind.installModule:
+        unawaited(_confirmAndAddModule(action.url!));
+      case ShadowrocketLinkKind.route:
+        switch (action.route!) {
+          case ShadowrocketRoute.proxy:
+            ref.read(setupActionProvider.notifier).changeMode(Mode.global);
+          case ShadowrocketRoute.config:
+            ref.read(setupActionProvider.notifier).changeMode(Mode.rule);
+          case ShadowrocketRoute.direct:
+            ref.read(setupActionProvider.notifier).changeMode(Mode.direct);
+          case ShadowrocketRoute.scene:
+            ref.read(sceneModeEnabledProvider.notifier).update((_) => true);
+        }
+      case ShadowrocketLinkKind.color:
+        commonPrint.log('shadowrocket color scheme is not supported');
+    }
+  }
+
+  Future<void> _confirmAndAddProfile(String url) async {
+    if (!await _confirmImportUrl(url)) return;
+    unawaited(
+      ref
+          .read(profilesActionProvider.notifier)
+          .addProfileFormURL(url, widgetRef: ref),
+    );
+  }
+
+  Future<void> _confirmAndAddModule(String url) async {
+    if (!await _confirmImportUrl(url)) return;
+    final info = await ShadowrocketImport.importModuleFromUrl(ref, url: url);
+    dialogs.showNotifier(
+      info?.name ?? currentAppLocalizations.clipboardImportFailed,
+      level: info == null ? MessageLevel.warning : MessageLevel.success,
+    );
   }
 
   void _autoUpdateProfilesTask() {

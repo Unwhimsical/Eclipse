@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'print.dart';
 import 'protocol.dart';
+import 'shadowrocket_link.dart';
 
 typedef InstallConfigCallBack = void Function(String url);
 
@@ -30,22 +31,34 @@ class LinkManager {
   }
 
   Future<void> initAppLinksListen(
-    Function(String url) installConfigCallBack,
-  ) async {
+    Function(String url) installConfigCallBack, {
+    void Function(ShadowrocketLinkAction action)? onShadowrocketLink,
+  }) async {
     commonPrint.log('initAppLinksListen');
     destroy();
     subscription = uriLinkStream().listen((uri) {
-      _handle(uri, installConfigCallBack);
+      _handle(uri, installConfigCallBack, onShadowrocketLink);
     });
     final pending = _pendingUri;
     _pendingUri = null;
     if (pending != null) {
-      _handle(pending, installConfigCallBack);
+      _handle(pending, installConfigCallBack, onShadowrocketLink);
     }
   }
 
-  void _handle(Uri uri, Function(String url) installConfigCallBack) {
+  void _handle(
+    Uri uri,
+    Function(String url) installConfigCallBack,
+    void Function(ShadowrocketLinkAction action)? onShadowrocketLink,
+  ) {
     commonPrint.log('onAppLink: $uri');
+    if (uri.scheme == 'shadowrocket') {
+      final action = parseShadowrocketLink(uri);
+      if (action != null) {
+        onShadowrocketLink?.call(action);
+      }
+      return;
+    }
     if (uri.host == 'install-config') {
       final parameters = uri.queryParameters;
       final url = parameters['url'];

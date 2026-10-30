@@ -1,15 +1,18 @@
 import 'dart:async';
 
 import 'package:fl_clash/common/link.dart';
+import 'package:fl_clash/common/shadowrocket_link.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late StreamController<Uri> links;
   late List<String> received;
+  late List<ShadowrocketLinkAction> shadowrocketReceived;
 
   setUp(() {
     links = StreamController<Uri>.broadcast();
     received = [];
+    shadowrocketReceived = [];
     linkManager.uriLinkStream = () => links.stream;
   });
 
@@ -19,7 +22,10 @@ void main() {
   });
 
   Future<void> listen() async {
-    await linkManager.initAppLinksListen(received.add);
+    await linkManager.initAppLinksListen(
+      received.add,
+      onShadowrocketLink: shadowrocketReceived.add,
+    );
   }
 
   Future<void> emit(String uri) async {
@@ -94,6 +100,43 @@ void main() {
     await listen();
 
     expect(received, isEmpty);
+  });
+
+  test(
+    'a shadowrocket link is delivered to the shadowrocket handler',
+    () async {
+      await listen();
+
+      await emit('shadowrocket://toggle');
+      await emit('shadowrocket://select?s=NodeA');
+
+      expect(received, isEmpty);
+      expect(shadowrocketReceived.map((action) => action.kind), [
+        ShadowrocketLinkKind.toggle,
+        ShadowrocketLinkKind.select,
+      ]);
+      expect(shadowrocketReceived.last.nodeName, 'NodeA');
+    },
+  );
+
+  test('an invalid shadowrocket link is dropped', () async {
+    await listen();
+
+    await emit('shadowrocket://fly');
+    await emit('shadowrocket://select');
+
+    expect(received, isEmpty);
+    expect(shadowrocketReceived, isEmpty);
+  });
+
+  test('a seeded shadowrocket launch argument reaches the handler', () async {
+    linkManager.seedInitialLink(['shadowrocket://connect']);
+
+    await listen();
+
+    expect(shadowrocketReceived.map((action) => action.kind), [
+      ShadowrocketLinkKind.connect,
+    ]);
   });
 
   test('destroy stops delivery and is safe to repeat', () async {

@@ -47,6 +47,7 @@ export 'render.dart';
 export 'request.dart';
 export 'scroll.dart';
 export 'shadowrocket.dart';
+export 'shadowrocket_link.dart';
 export 'shape.dart';
 export 'snowflake.dart';
 export 'sr_import.dart';
