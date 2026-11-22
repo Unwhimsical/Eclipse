@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_connect">Eclipse</string>
+    <string name="widget_connect_desc">Toggle the proxy</string>
+    <string name="widget_on">Connected</string>
+    <string name="widget_off">Tap to connect</string>
+</resources>

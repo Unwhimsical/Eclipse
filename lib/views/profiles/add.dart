@@ -27,7 +27,7 @@ class AddProfileView extends ConsumerWidget {
   Future<void> _toScan(WidgetRef ref) async {
     final profilesAction = ref.read(profilesActionProvider.notifier);
     if (system.isDesktop) {
-      unawaited(profilesAction.addProfileFormQrCode());
+      unawaited(profilesAction.addProfileFormQrCode(widgetRef: ref));
       return;
     }
     final url = await BaseNavigator.push(context, const ScanPage());

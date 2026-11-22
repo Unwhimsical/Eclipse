@@ -690,7 +690,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "geoipCode": MessageLookupByLibrary.simpleMessage("GeoIP code"),
     "global": MessageLookupByLibrary.simpleMessage("Global"),
-    "globalRoute": MessageLookupByLibrary.simpleMessage("Global routing"),
+    "globalRoute": MessageLookupByLibrary.simpleMessage("Route"),
     "go": MessageLookupByLibrary.simpleMessage("Go"),
     "goAddNode": MessageLookupByLibrary.simpleMessage("Add nodes"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Download"),
@@ -778,9 +778,10 @@ class MessageLookup extends MessageLookupByLibrary {
     "inputRuleContent": MessageLookupByLibrary.simpleMessage(
       "Enter the rule content",
     ),
-    "installedAppsPermissionDeniedMessage": MessageLookupByLibrary.simpleMessage(
-      "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
-    ),
+    "installedAppsPermissionDeniedMessage":
+        MessageLookupByLibrary.simpleMessage(
+          "The app list permission was denied, so installed apps cannot be listed. Please grant it manually in system settings.",
+        ),
     "installedAppsPermissionDesc": MessageLookupByLibrary.simpleMessage(
       "This system hides the installed app list until the permission is granted. Authorize it to configure the per-app proxy.",
     ),
@@ -1345,7 +1346,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
       "Configure the listened route addresses",
     ),
-    "routeConfig": MessageLookupByLibrary.simpleMessage("Config"),
+    "routeConfig": MessageLookupByLibrary.simpleMessage("Rule"),
     "routeDirect": MessageLookupByLibrary.simpleMessage("Direct"),
     "routeEmpty": MessageLookupByLibrary.simpleMessage("Empty"),
     "routeExcluded": MessageLookupByLibrary.simpleMessage("Excluded routes"),
@@ -1365,7 +1366,7 @@ class MessageLookup extends MessageLookupByLibrary {
       "Bypass private addresses",
     ),
     "routeModeConfig": MessageLookupByLibrary.simpleMessage("Use config"),
-    "routeProxy": MessageLookupByLibrary.simpleMessage("Proxy"),
+    "routeProxy": MessageLookupByLibrary.simpleMessage("Global"),
     "routeScene": MessageLookupByLibrary.simpleMessage("Scene"),
     "ru": MessageLookupByLibrary.simpleMessage("Russian"),
     "rule": MessageLookupByLibrary.simpleMessage("Rule"),

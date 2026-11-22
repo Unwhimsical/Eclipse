@@ -11,7 +11,7 @@ class EclipseSection extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.divided = true,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.only(bottom: 20),
     required this.children,
   });
 
@@ -31,7 +31,10 @@ class EclipseSection extends StatelessWidget {
     // pixel-identical.
     final titleStyle =
         Theme.of(context).extension<DesktopThemeTokens>()?.groupTitleStyle ??
-        textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600);
+        textTheme.labelLarge?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: colorScheme.onSurfaceVariant,
+        );
     final separated = <Widget>[];
     for (var i = 0; i < children.length; i++) {
       if (i > 0 && divided) {
@@ -39,22 +42,22 @@ class EclipseSection extends StatelessWidget {
           Divider(
             height: 1,
             thickness: 1,
-            color: colorScheme.onSurfaceVariant.opacity12,
+            indent: 16,
+            color: colorScheme.outlineVariant.withValues(alpha: 0.45),
           ),
         );
       }
       separated.add(children[i]);
     }
-    return CommonCard(
-      radius: AppCorner.md,
+    return Padding(
       padding: padding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (title != null || trailing != null)
+          if (title != null || trailing != null || subtitle != null)
             Padding(
-              padding: const EdgeInsets.only(bottom: 4),
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 6),
               child: Row(
                 children: [
                   Expanded(
@@ -80,7 +83,15 @@ class EclipseSection extends StatelessWidget {
                 ],
               ),
             ),
-          ...separated,
+          CommonCard(
+            radius: AppCorner.xl,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: separated,
+            ),
+          ),
         ],
       ),
     );
@@ -112,7 +123,7 @@ class EclipseTile extends StatelessWidget {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
     final content = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
           if (icon != null)

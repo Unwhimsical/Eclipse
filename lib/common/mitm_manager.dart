@@ -46,6 +46,7 @@ class MitmManager {
     List<String> profileMitmHostnames = const [],
     List<String> profileMapLocal = const [],
     List<String> profileBodyRewrites = const [],
+    List<String> profileScripts = const [],
     bool refreshScripts = false,
   }) async {
     final modules = await _moduleStore.list();
@@ -56,7 +57,8 @@ class MitmManager {
         profileHeaderRewrites.isEmpty &&
         profileMitmHostnames.isEmpty &&
         profileMapLocal.isEmpty &&
-        profileBodyRewrites.isEmpty) {
+        profileBodyRewrites.isEmpty &&
+        profileScripts.isEmpty) {
       await stop();
       return false;
     }
@@ -93,6 +95,11 @@ class MitmManager {
 
     // Profile MITM hostnames join the same host set as module hostnames.
     addHosts(profileMitmHostnames);
+    await _collectScripts(
+      profileScripts,
+      scripts,
+      refreshScripts: refreshScripts,
+    );
 
     for (final module in enabled) {
       try {
@@ -126,43 +133,11 @@ class MitmManager {
         }
 
         // Fetch each unique script URL once: a module can list the same URL hundreds of times.
-        final parsedScripts = <Map<String, dynamic>>[];
-        final scriptPaths = <String>{};
-        for (final line in sg.scripts) {
-          final parsed = parseScriptLine(line);
-          if (parsed == null) continue;
-          final scriptPath = parsed['scriptPath'] as String?;
-          if (scriptPath != null && scriptPath.isNotEmpty) {
-            scriptPaths.add(scriptPath);
-          }
-          parsedScripts.add(parsed);
-        }
-        final scriptContents = <String, String>{};
-        await Future.wait(
-          scriptPaths.map(
-            (path) async => scriptContents[path] = await _downloadScript(
-              path,
-              forceRefresh: refreshScripts,
-            ),
-          ),
+        await _collectScripts(
+          sg.scripts,
+          scripts,
+          refreshScripts: refreshScripts,
         );
-        for (final parsed in parsedScripts) {
-          final scriptPath = parsed['scriptPath'] as String?;
-          scripts.add({
-            'name': parsed['name'],
-            'type': parsed['type'],
-            'pattern': parsed['pattern'],
-            'requiresBody': parsed['requiresBody'],
-            'binaryBody': parsed['binaryBody'],
-            'timeout': parsed['timeout'],
-            'maxSize': parsed['maxSize'],
-            'argument': parsed['argument'],
-            'scriptPath': scriptPath,
-            'content': scriptPath == null
-                ? ''
-                : (scriptContents[scriptPath] ?? ''),
-          });
-        }
       } catch (_) {
         // Skip modules that fail to parse.
         continue;
@@ -230,6 +205,48 @@ class MitmManager {
     try {
       await _controller.mitmStop();
     } catch (_) {}
+  }
+
+  Future<void> _collectScripts(
+    List<String> lines,
+    List<Map<String, dynamic>> scripts, {
+    required bool refreshScripts,
+  }) async {
+    final parsedScripts = <Map<String, dynamic>>[];
+    final scriptPaths = <String>{};
+    for (final line in lines) {
+      final parsed = parseScriptLine(line);
+      if (parsed == null) continue;
+      final scriptPath = parsed['scriptPath'] as String?;
+      if (scriptPath != null && scriptPath.isNotEmpty) {
+        scriptPaths.add(scriptPath);
+      }
+      parsedScripts.add(parsed);
+    }
+    final scriptContents = <String, String>{};
+    await Future.wait(
+      scriptPaths.map(
+        (path) async => scriptContents[path] = await _downloadScript(
+          path,
+          forceRefresh: refreshScripts,
+        ),
+      ),
+    );
+    for (final parsed in parsedScripts) {
+      final scriptPath = parsed['scriptPath'] as String?;
+      scripts.add({
+        'name': parsed['name'],
+        'type': parsed['type'],
+        'pattern': parsed['pattern'],
+        'requiresBody': parsed['requiresBody'],
+        'binaryBody': parsed['binaryBody'],
+        'timeout': parsed['timeout'],
+        'maxSize': parsed['maxSize'],
+        'argument': parsed['argument'],
+        'scriptPath': scriptPath,
+        'content': scriptPath == null ? '' : (scriptContents[scriptPath] ?? ''),
+      });
+    }
   }
 
   /// Parse a [Script] line into a map.

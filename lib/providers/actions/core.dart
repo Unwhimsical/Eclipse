@@ -84,6 +84,7 @@ class CoreAction extends _$CoreAction {
             : [],
         profileMapLocal: profile?.mapLocal ?? [],
         profileBodyRewrites: profile?.bodyRewrites ?? [],
+        profileScripts: profile?.generalSettings.scripts ?? [],
       );
     } catch (_) {}
   }

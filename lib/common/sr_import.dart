@@ -385,6 +385,7 @@ class ShadowrocketImport {
       preferIpv6: triBool('prefer-ipv6'),
       privateIpAnswer: triBool('private-ip-answer'),
       alwaysRealIp: triBool('always-real-ip'),
+      scripts: conf.scripts,
     );
   }
 

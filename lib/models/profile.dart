@@ -56,6 +56,7 @@ abstract class GeneralSettings with _$GeneralSettings {
     bool? privateIpAnswer,
     bool? alwaysRealIp,
     String? include,
+    @Default([]) List<String> scripts,
   }) = _GeneralSettings;
 
   factory GeneralSettings.fromJson(Map<String, Object?> json) =>

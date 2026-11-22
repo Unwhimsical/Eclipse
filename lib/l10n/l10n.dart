@@ -6460,24 +6460,19 @@ class AppLocalizations {
     return Intl.message('Data', name: 'data', desc: '', args: []);
   }
 
-  /// `Global routing`
+  /// `Route`
   String get globalRoute {
-    return Intl.message(
-      'Global routing',
-      name: 'globalRoute',
-      desc: '',
-      args: [],
-    );
+    return Intl.message('Route', name: 'globalRoute', desc: '', args: []);
   }
 
-  /// `Config`
+  /// `Rule`
   String get routeConfig {
-    return Intl.message('Config', name: 'routeConfig', desc: '', args: []);
+    return Intl.message('Rule', name: 'routeConfig', desc: '', args: []);
   }
 
-  /// `Proxy`
+  /// `Global`
   String get routeProxy {
-    return Intl.message('Proxy', name: 'routeProxy', desc: '', args: []);
+    return Intl.message('Global', name: 'routeProxy', desc: '', args: []);
   }
 
   /// `Direct`

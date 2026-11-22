@@ -378,6 +378,7 @@ class ConfData {
   final List<String> mapLocal;
   final List<String> bodyRewrites;
   final Map<String, String> mitm;
+  final List<String> scripts;
 
   const ConfData({
     this.proxies = const [],
@@ -390,6 +391,7 @@ class ConfData {
     this.mapLocal = const [],
     this.bodyRewrites = const [],
     this.mitm = const {},
+    this.scripts = const [],
   });
 
   bool get isEmpty =>
@@ -402,7 +404,8 @@ class ConfData {
       headerRewrites.isEmpty &&
       mapLocal.isEmpty &&
       bodyRewrites.isEmpty &&
-      mitm.isEmpty;
+      mitm.isEmpty &&
+      scripts.isEmpty;
 
   /// DNS servers from `[General]` `dns-server` / `fallback-dns-server`.
   List<String> get dnsServers {
@@ -523,6 +526,7 @@ ConfData parseConf(String content) {
   final mapLocal = <String>[];
   final bodyRewrites = <String>[];
   final mitm = <String, String>{};
+  final scripts = <String>[];
   var section = '';
   for (final rawLine in const LineSplitter().convert(content)) {
     final line = rawLine.trim();
@@ -564,6 +568,8 @@ ConfData parseConf(String content) {
         mapLocal.add(line);
       case 'body rewrite':
         bodyRewrites.add(line);
+      case 'script':
+        scripts.add(line);
       case 'mitm':
         final eq = line.indexOf('=');
         if (eq > 0) {
@@ -584,6 +590,7 @@ ConfData parseConf(String content) {
     mapLocal: mapLocal,
     bodyRewrites: bodyRewrites,
     mitm: mitm,
+    scripts: scripts,
   );
 }
 

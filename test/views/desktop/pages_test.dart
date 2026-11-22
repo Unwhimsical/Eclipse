@@ -558,7 +558,7 @@ void main() {
       );
       await tester.pump();
       expect(find.text('Node A'), findsWidgets);
-      expect(find.text('Proxy'), findsOneWidget);
+      expect(find.text('Global'), findsOneWidget);
       expect(find.text("Today's traffic"), findsOneWidget);
       expect(find.text('Full mode'), findsOneWidget);
       expect(find.text('Auto-select lowest-delay node'), findsOneWidget);

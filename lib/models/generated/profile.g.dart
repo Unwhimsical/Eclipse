@@ -22,44 +22,46 @@ Map<String, dynamic> _$SubscriptionInfoToJson(_SubscriptionInfo instance) =>
       'expire': instance.expire,
     };
 
-_GeneralSettings _$GeneralSettingsFromJson(Map<String, dynamic> json) =>
-    _GeneralSettings(
-      dnsServers:
-          (json['dnsServers'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      fallbackDnsServers:
-          (json['fallbackDnsServers'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      directDnsServers:
-          (json['directDnsServers'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      skipProxy:
-          (json['skipProxy'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      tunExcludedRoutes:
-          (json['tunExcludedRoutes'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      tunIncludedRoutes:
-          (json['tunIncludedRoutes'] as List<dynamic>?)
-              ?.map((e) => e as String)
-              .toList() ??
-          const [],
-      ipv6: json['ipv6'] as bool?,
-      preferIpv6: json['preferIpv6'] as bool?,
-      privateIpAnswer: json['privateIpAnswer'] as bool?,
-      alwaysRealIp: json['alwaysRealIp'] as bool?,
-      include: json['include'] as String?,
-    );
+_GeneralSettings _$GeneralSettingsFromJson(
+  Map<String, dynamic> json,
+) => _GeneralSettings(
+  dnsServers:
+      (json['dnsServers'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  fallbackDnsServers:
+      (json['fallbackDnsServers'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  directDnsServers:
+      (json['directDnsServers'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  skipProxy:
+      (json['skipProxy'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  tunExcludedRoutes:
+      (json['tunExcludedRoutes'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  tunIncludedRoutes:
+      (json['tunIncludedRoutes'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  ipv6: json['ipv6'] as bool?,
+  preferIpv6: json['preferIpv6'] as bool?,
+  privateIpAnswer: json['privateIpAnswer'] as bool?,
+  alwaysRealIp: json['alwaysRealIp'] as bool?,
+  include: json['include'] as String?,
+  scripts:
+      (json['scripts'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+);
 
 Map<String, dynamic> _$GeneralSettingsToJson(_GeneralSettings instance) =>
     <String, dynamic>{
@@ -74,6 +76,7 @@ Map<String, dynamic> _$GeneralSettingsToJson(_GeneralSettings instance) =>
       'privateIpAnswer': instance.privateIpAnswer,
       'alwaysRealIp': instance.alwaysRealIp,
       'include': instance.include,
+      'scripts': instance.scripts,
     };
 
 _Profile _$ProfileFromJson(Map<String, dynamic> json) => _Profile(
