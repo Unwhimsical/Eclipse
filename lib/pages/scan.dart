@@ -154,9 +154,13 @@ class _ScanPageState extends ConsumerState<ScanPage>
               ),
               padding: const EdgeInsets.all(16),
               iconSize: 32.0,
-              onPressed: ref
-                  .read(profilesActionProvider.notifier)
-                  .addProfileFormQrCode,
+              onPressed: () {
+                unawaited(
+                  ref
+                      .read(profilesActionProvider.notifier)
+                      .addProfileFormQrCode(widgetRef: ref),
+                );
+              },
               icon: const Icon(Icons.photo_camera_back),
             ),
           ),

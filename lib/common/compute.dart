@@ -95,6 +95,29 @@ String delayTestKey(String testUrl, String proxyName) {
   return '$testUrl\u0000$proxyName';
 }
 
+DelayTestMethod? delayMethodArgument(DelayTestMethod method) {
+  if (method == DelayTestMethod.connect) return null;
+  return method;
+}
+
+String preferSelectedName(String? selected, String? now) {
+  if (selected != null && selected.isNotEmpty) return selected;
+  return now ?? '';
+}
+
+({Group group, String name})? firstNamedNode(
+  List<Group> groups,
+  String Function(Group group) nameOf,
+) {
+  for (final group in groups) {
+    final name = nameOf(group);
+    if (name.isNotEmpty) {
+      return (group: group, name: name);
+    }
+  }
+  return null;
+}
+
 DelayState computeProxyDelayState({
   required String proxyName,
   required String testUrl,

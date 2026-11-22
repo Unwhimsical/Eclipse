@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/desktop/command_palette.dart';
@@ -147,9 +147,14 @@ class _DesktopShortcutScopeState extends ConsumerState<DesktopShortcutScope> {
 
   void _runDelayTest() {
     final groups = ref.read(currentGroupsStateProvider).value;
-    final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-    if (group == null) return;
-    ref.read(proxiesActionProvider.notifier).delayTest(group.all);
+    if (groups.isEmpty) return;
+    final active = firstResolvedNode(ref, groups, listen: false);
+    final proxies = active == null
+        ? [for (final group in groups) ...group.all]
+        : active.group.all;
+    ref
+        .read(proxiesActionProvider.notifier)
+        .delayTest(proxies, active?.group.testUrl);
   }
 
   @override

@@ -303,7 +303,11 @@ class ProxiesAction extends _$ProxiesAction {
       return;
     }
     try {
-      final delay = await _core.getDelay(target.testUrl, target.proxyName);
+      final delay = await _core.getDelay(
+        target.testUrl,
+        target.proxyName,
+        delayMethodArgument(ref.read(appSettingProvider).delayTestMethod),
+      );
       if (delay != null && !job.cancelled) {
         setDelay(delay);
       }

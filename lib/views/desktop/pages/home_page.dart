@@ -1,20 +1,19 @@
-import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/home/node_list.dart';
+import 'package:fl_clash/views/home/route_mode_bar.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
+import 'package:fl_clash/views/proxies/sort_button.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/pages/simple_page.dart';
-import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum _RouteOption { config, proxy, direct, scene }
-
-/// §2 desktop home: 320px run-status card left, traffic chart + current
-/// node card right, [delay test][run switch] in the header.
+/// Desktop home: status column on the left, the node list filling the rest.
 class DesktopHomeView extends ConsumerWidget {
   const DesktopHomeView({super.key});
 
@@ -27,25 +26,21 @@ class DesktopHomeView extends ConsumerWidget {
         DesktopPageHeader(
           title: appLocalizations.dashboard,
           actions: [
-            _DelayTestAction(),
+            const ProxySortButton(),
+            const _DelayTestAction(),
             const SimpleModeToggleButton(),
             const DesktopRunSwitch(),
           ],
         ),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        const Expanded(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               spacing: 16,
               children: [
-                const SizedBox(width: 320, child: _RunCard()),
-                Expanded(
-                  child: Column(
-                    spacing: 16,
-                    children: [const _TrafficCard(), const _CurrentNodeCard()],
-                  ),
-                ),
+                SizedBox(width: 340, child: _SideColumn()),
+                Expanded(child: _NodePane()),
               ],
             ),
           ),
@@ -56,15 +51,22 @@ class DesktopHomeView extends ConsumerWidget {
 }
 
 class _DelayTestAction extends ConsumerWidget {
+  const _DelayTestAction();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     return OutlinedButton.icon(
       onPressed: () {
         final groups = ref.read(currentGroupsStateProvider).value;
-        final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-        if (group == null) return;
-        ref.read(proxiesActionProvider.notifier).delayTest(group.all);
+        if (groups.isEmpty) return;
+        final active = firstResolvedNode(ref, groups, listen: false);
+        final proxies = active == null
+            ? [for (final group in groups) ...group.all]
+            : active.group.all;
+        ref
+            .read(proxiesActionProvider.notifier)
+            .delayTest(proxies, active?.group.testUrl);
       },
       icon: const Icon(Icons.speed_rounded, size: 18),
       label: Text(appLocalizations.delayTest),
@@ -102,7 +104,7 @@ class _RunCard extends ConsumerWidget {
             children: [
               _PowerButton(
                 isStart: isStart,
-                connecting: status == CoreStatus.connecting,
+                connecting: isStart && status == CoreStatus.connecting,
               ),
               Expanded(
                 child: Column(
@@ -172,7 +174,11 @@ class _RunCard extends ConsumerWidget {
               ),
             ],
           ),
-          const _RouteModeSegment(),
+          Text(
+            appLocalizations.routeMode,
+            style: theme.textTheme.labelSmall?.copyWith(color: text2),
+          ),
+          const RouteModeBar(),
         ],
       ),
     );
@@ -180,7 +186,7 @@ class _RunCard extends ConsumerWidget {
 
   String _currentNodeName(WidgetRef ref) {
     final groups = ref.watch(currentGroupsStateProvider).value;
-    return groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty)?.now ?? '';
+    return firstResolvedNode(ref, groups)?.name ?? '';
   }
 }
 
@@ -239,11 +245,12 @@ class _PowerButton extends ConsumerWidget {
     final theme = Theme.of(context);
     final tokens = theme.extension<DesktopThemeTokens>();
     final accent = tokens?.accent ?? theme.colorScheme.primary;
+    final engaged = isStart || connecting;
     return SizedBox(
-      width: 72,
-      height: 72,
+      width: 84,
+      height: 84,
       child: Material(
-        color: isStart ? accent : Colors.white.withValues(alpha: 0.06),
+        color: engaged ? accent : Colors.white.withValues(alpha: 0.06),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -254,17 +261,17 @@ class _PowerButton extends ConsumerWidget {
                 },
           child: Center(
             child: connecting
-                ? SizedBox(
+                ? const SizedBox(
                     width: 30,
                     height: 30,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: theme.colorScheme.onPrimary,
+                      color: Colors.white,
                     ),
                   )
                 : Icon(
                     Icons.power_settings_new_rounded,
-                    size: 34,
+                    size: 36,
                     color: isStart
                         ? Colors.white
                         : (tokens?.text2 ?? theme.colorScheme.onSurfaceVariant),
@@ -276,75 +283,28 @@ class _PowerButton extends ConsumerWidget {
   }
 }
 
-class _RouteModeSegment extends ConsumerWidget {
-  const _RouteModeSegment();
-
-  void _handleChange(_RouteOption option, WidgetRef ref) {
-    final sceneEnabled = ref.read(sceneModeEnabledProvider);
-    if (option == _RouteOption.scene) {
-      if (!sceneEnabled) {
-        ref.read(sceneModeEnabledProvider.notifier).update((_) => true);
-      }
-      return;
-    }
-    if (sceneEnabled) {
-      ref.read(sceneModeEnabledProvider.notifier).update((_) => false);
-    }
-    ref.read(setupActionProvider.notifier).changeMode(switch (option) {
-      _RouteOption.config => Mode.rule,
-      _RouteOption.proxy => Mode.global,
-      _RouteOption.direct => Mode.direct,
-      _RouteOption.scene => Mode.rule,
-    });
-  }
+class _SideColumn extends StatelessWidget {
+  const _SideColumn();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
-    final mode = ref.watch(patchClashConfigProvider.select((s) => s.mode));
-    final sceneEnabled = ref.watch(sceneModeEnabledProvider);
-    final groupValue = sceneEnabled
-        ? _RouteOption.scene
-        : switch (mode) {
-            Mode.global => _RouteOption.proxy,
-            Mode.direct => _RouteOption.direct,
-            _ => _RouteOption.config,
-          };
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8,
-      children: [
-        Text(
-          appLocalizations.routeMode,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color:
-                Theme.of(context).extension<DesktopThemeTokens>()?.text2 ??
-                Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
-        ),
-        EclipseSegmented<_RouteOption>(
-          groupValue: groupValue,
-          onChanged: (option) => _handleChange(option, ref),
-          options: [
-            EclipseSegmentOption(
-              value: _RouteOption.config,
-              label: appLocalizations.routeConfig,
-            ),
-            EclipseSegmentOption(
-              value: _RouteOption.proxy,
-              label: appLocalizations.routeProxy,
-            ),
-            EclipseSegmentOption(
-              value: _RouteOption.direct,
-              label: appLocalizations.routeDirect,
-            ),
-            EclipseSegmentOption(
-              value: _RouteOption.scene,
-              label: appLocalizations.sceneMode,
-            ),
-          ],
-        ),
-      ],
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [_RunCard(), _TrafficCard()],
+      ),
+    );
+  }
+}
+
+class _NodePane extends StatelessWidget {
+  const _NodePane();
+
+  @override
+  Widget build(BuildContext context) {
+    return const DesktopCard(
+      padding: EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: NodeGroupList(),
     );
   }
 }
@@ -356,106 +316,24 @@ class _TrafficCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     final samples = ref.watch(trafficsProvider.select((s) => s.list));
-    return DesktopCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
-        children: [
-          Text(
-            appLocalizations.trafficTrend,
-            style: Theme.of(
-              context,
-            ).extension<DesktopThemeTokens>()?.groupTitleStyle,
-          ),
-          TrafficChart(samples: samples),
-        ],
+    if (samples.length < 2) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: DesktopCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8,
+          children: [
+            Text(
+              appLocalizations.trafficTrend,
+              style: Theme.of(
+                context,
+              ).extension<DesktopThemeTokens>()?.groupTitleStyle,
+            ),
+            TrafficChart(samples: samples),
+          ],
+        ),
       ),
     );
-  }
-}
-
-class _CurrentNodeCard extends ConsumerWidget {
-  const _CurrentNodeCard();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appLocalizations = context.appLocalizations;
-    final theme = Theme.of(context);
-    final tokens = theme.extension<DesktopThemeTokens>();
-    final groups = ref.watch(currentGroupsStateProvider).value;
-    final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-    final nodeName = group?.now ?? '';
-    final proxy = group?.all.firstWhereOrNull((p) => p.name == nodeName);
-    return DesktopCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 12,
-        children: [
-          Text(appLocalizations.currentNode, style: tokens?.groupTitleStyle),
-          if (nodeName.isEmpty)
-            Text(
-              appLocalizations.noNodes,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
-              ),
-            )
-          else
-            Row(
-              spacing: 12,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 4,
-                    children: [
-                      Text(
-                        nodeName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${group?.name ?? ''} · ${_delayText(ref, nodeName, group?.testUrl)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color:
-                              tokens?.text2 ??
-                              theme.colorScheme.onSurfaceVariant,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                OutlinedButton(
-                  onPressed: () {
-                    ref
-                        .read(currentPageLabelProvider.notifier)
-                        .toPage(PageLabel.proxies);
-                  },
-                  child: Text(appLocalizations.switchNode),
-                ),
-              ],
-            ),
-          if (proxy != null)
-            Text(
-              proxy.name,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  String _delayText(WidgetRef ref, String proxyName, String? testUrl) {
-    final delay = ref.watch(
-      delayProvider(proxyName: proxyName, testUrl: testUrl),
-    );
-    if (delay == null) return '';
-    return delay > 0 ? '$delay ms' : 'Timeout';
   }
 }

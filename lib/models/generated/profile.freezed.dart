@@ -295,7 +295,7 @@ as int,
 /// @nodoc
 mixin _$GeneralSettings {
 
- List<String> get dnsServers; List<String> get fallbackDnsServers; List<String> get directDnsServers; List<String> get skipProxy; List<String> get tunExcludedRoutes; List<String> get tunIncludedRoutes; bool? get ipv6; bool? get preferIpv6; bool? get privateIpAnswer; bool? get alwaysRealIp; String? get include;
+ List<String> get dnsServers; List<String> get fallbackDnsServers; List<String> get directDnsServers; List<String> get skipProxy; List<String> get tunExcludedRoutes; List<String> get tunIncludedRoutes; bool? get ipv6; bool? get preferIpv6; bool? get privateIpAnswer; bool? get alwaysRealIp; String? get include; List<String> get scripts;
 /// Create a copy of GeneralSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -309,20 +309,20 @@ $GeneralSettingsCopyWith<GeneralSettings> get copyWith => _$GeneralSettingsCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as GeneralSettings;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeneralSettings&&const DeepCollectionEquality().equals(other.dnsServers, _this.dnsServers)&&const DeepCollectionEquality().equals(other.fallbackDnsServers, _this.fallbackDnsServers)&&const DeepCollectionEquality().equals(other.directDnsServers, _this.directDnsServers)&&const DeepCollectionEquality().equals(other.skipProxy, _this.skipProxy)&&const DeepCollectionEquality().equals(other.tunExcludedRoutes, _this.tunExcludedRoutes)&&const DeepCollectionEquality().equals(other.tunIncludedRoutes, _this.tunIncludedRoutes)&&(identical(other.ipv6, _this.ipv6) || other.ipv6 == _this.ipv6)&&(identical(other.preferIpv6, _this.preferIpv6) || other.preferIpv6 == _this.preferIpv6)&&(identical(other.privateIpAnswer, _this.privateIpAnswer) || other.privateIpAnswer == _this.privateIpAnswer)&&(identical(other.alwaysRealIp, _this.alwaysRealIp) || other.alwaysRealIp == _this.alwaysRealIp)&&(identical(other.include, _this.include) || other.include == _this.include));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GeneralSettings&&const DeepCollectionEquality().equals(other.dnsServers, _this.dnsServers)&&const DeepCollectionEquality().equals(other.fallbackDnsServers, _this.fallbackDnsServers)&&const DeepCollectionEquality().equals(other.directDnsServers, _this.directDnsServers)&&const DeepCollectionEquality().equals(other.skipProxy, _this.skipProxy)&&const DeepCollectionEquality().equals(other.tunExcludedRoutes, _this.tunExcludedRoutes)&&const DeepCollectionEquality().equals(other.tunIncludedRoutes, _this.tunIncludedRoutes)&&(identical(other.ipv6, _this.ipv6) || other.ipv6 == _this.ipv6)&&(identical(other.preferIpv6, _this.preferIpv6) || other.preferIpv6 == _this.preferIpv6)&&(identical(other.privateIpAnswer, _this.privateIpAnswer) || other.privateIpAnswer == _this.privateIpAnswer)&&(identical(other.alwaysRealIp, _this.alwaysRealIp) || other.alwaysRealIp == _this.alwaysRealIp)&&(identical(other.include, _this.include) || other.include == _this.include)&&const DeepCollectionEquality().equals(other.scripts, _this.scripts));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as GeneralSettings;
-  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.dnsServers),const DeepCollectionEquality().hash(_this.fallbackDnsServers),const DeepCollectionEquality().hash(_this.directDnsServers),const DeepCollectionEquality().hash(_this.skipProxy),const DeepCollectionEquality().hash(_this.tunExcludedRoutes),const DeepCollectionEquality().hash(_this.tunIncludedRoutes),_this.ipv6,_this.preferIpv6,_this.privateIpAnswer,_this.alwaysRealIp,_this.include);
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.dnsServers),const DeepCollectionEquality().hash(_this.fallbackDnsServers),const DeepCollectionEquality().hash(_this.directDnsServers),const DeepCollectionEquality().hash(_this.skipProxy),const DeepCollectionEquality().hash(_this.tunExcludedRoutes),const DeepCollectionEquality().hash(_this.tunIncludedRoutes),_this.ipv6,_this.preferIpv6,_this.privateIpAnswer,_this.alwaysRealIp,_this.include,const DeepCollectionEquality().hash(_this.scripts));
 }
 
 @override
 String toString() {
   final _this = this as GeneralSettings;
-  return 'GeneralSettings(dnsServers: ${_this.dnsServers}, fallbackDnsServers: ${_this.fallbackDnsServers}, directDnsServers: ${_this.directDnsServers}, skipProxy: ${_this.skipProxy}, tunExcludedRoutes: ${_this.tunExcludedRoutes}, tunIncludedRoutes: ${_this.tunIncludedRoutes}, ipv6: ${_this.ipv6}, preferIpv6: ${_this.preferIpv6}, privateIpAnswer: ${_this.privateIpAnswer}, alwaysRealIp: ${_this.alwaysRealIp}, include: ${_this.include})';
+  return 'GeneralSettings(dnsServers: ${_this.dnsServers}, fallbackDnsServers: ${_this.fallbackDnsServers}, directDnsServers: ${_this.directDnsServers}, skipProxy: ${_this.skipProxy}, tunExcludedRoutes: ${_this.tunExcludedRoutes}, tunIncludedRoutes: ${_this.tunIncludedRoutes}, ipv6: ${_this.ipv6}, preferIpv6: ${_this.preferIpv6}, privateIpAnswer: ${_this.privateIpAnswer}, alwaysRealIp: ${_this.alwaysRealIp}, include: ${_this.include}, scripts: ${_this.scripts})';
 }
 
 
@@ -333,7 +333,7 @@ abstract mixin class $GeneralSettingsCopyWith<$Res>  {
   factory $GeneralSettingsCopyWith(GeneralSettings value, $Res Function(GeneralSettings) _then) = _$GeneralSettingsCopyWithImpl;
 @useResult
 $Res call({
- List<String> dnsServers, List<String> fallbackDnsServers, List<String> directDnsServers, List<String> skipProxy, List<String> tunExcludedRoutes, List<String> tunIncludedRoutes, bool? ipv6, bool? preferIpv6, bool? privateIpAnswer, bool? alwaysRealIp, String? include
+ List<String> dnsServers, List<String> fallbackDnsServers, List<String> directDnsServers, List<String> skipProxy, List<String> tunExcludedRoutes, List<String> tunIncludedRoutes, bool? ipv6, bool? preferIpv6, bool? privateIpAnswer, bool? alwaysRealIp, String? include, List<String> scripts
 });
 
 
@@ -350,7 +350,7 @@ class _$GeneralSettingsCopyWithImpl<$Res>
 
 /// Create a copy of GeneralSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? dnsServers = null,Object? fallbackDnsServers = null,Object? directDnsServers = null,Object? skipProxy = null,Object? tunExcludedRoutes = null,Object? tunIncludedRoutes = null,Object? ipv6 = freezed,Object? preferIpv6 = freezed,Object? privateIpAnswer = freezed,Object? alwaysRealIp = freezed,Object? include = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? dnsServers = null,Object? fallbackDnsServers = null,Object? directDnsServers = null,Object? skipProxy = null,Object? tunExcludedRoutes = null,Object? tunIncludedRoutes = null,Object? ipv6 = freezed,Object? preferIpv6 = freezed,Object? privateIpAnswer = freezed,Object? alwaysRealIp = freezed,Object? include = freezed,Object? scripts = null,}) {
   return _then(GeneralSettings(
 dnsServers: null == dnsServers ? _self.dnsServers : dnsServers // ignore: cast_nullable_to_non_nullable
 as List<String>,fallbackDnsServers: null == fallbackDnsServers ? _self.fallbackDnsServers : fallbackDnsServers // ignore: cast_nullable_to_non_nullable
@@ -363,7 +363,8 @@ as bool?,preferIpv6: freezed == preferIpv6 ? _self.preferIpv6 : preferIpv6 // ig
 as bool?,privateIpAnswer: freezed == privateIpAnswer ? _self.privateIpAnswer : privateIpAnswer // ignore: cast_nullable_to_non_nullable
 as bool?,alwaysRealIp: freezed == alwaysRealIp ? _self.alwaysRealIp : alwaysRealIp // ignore: cast_nullable_to_non_nullable
 as bool?,include: freezed == include ? _self.include : include // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,scripts: null == scripts ? _self.scripts : scripts // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 
@@ -448,10 +449,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include,  List<String> scripts)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GeneralSettings() when $default != null:
-return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include);case _:
+return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include,_that.scripts);case _:
   return orElse();
 
 }
@@ -469,10 +470,10 @@ return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include,  List<String> scripts)  $default,) {final _that = this;
 switch (_that) {
 case _GeneralSettings():
-return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include);case _:
+return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include,_that.scripts);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -489,10 +490,10 @@ return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<String> dnsServers,  List<String> fallbackDnsServers,  List<String> directDnsServers,  List<String> skipProxy,  List<String> tunExcludedRoutes,  List<String> tunIncludedRoutes,  bool? ipv6,  bool? preferIpv6,  bool? privateIpAnswer,  bool? alwaysRealIp,  String? include,  List<String> scripts)?  $default,) {final _that = this;
 switch (_that) {
 case _GeneralSettings() when $default != null:
-return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include);case _:
+return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers,_that.skipProxy,_that.tunExcludedRoutes,_that.tunIncludedRoutes,_that.ipv6,_that.preferIpv6,_that.privateIpAnswer,_that.alwaysRealIp,_that.include,_that.scripts);case _:
   return null;
 
 }
@@ -504,7 +505,7 @@ return $default(_that.dnsServers,_that.fallbackDnsServers,_that.directDnsServers
 @JsonSerializable()
 
 class _GeneralSettings implements GeneralSettings {
-  const _GeneralSettings({ List<String> dnsServers = const [],  List<String> fallbackDnsServers = const [],  List<String> directDnsServers = const [],  List<String> skipProxy = const [],  List<String> tunExcludedRoutes = const [],  List<String> tunIncludedRoutes = const [], this.ipv6, this.preferIpv6, this.privateIpAnswer, this.alwaysRealIp, this.include}): _dnsServers = dnsServers,_fallbackDnsServers = fallbackDnsServers,_directDnsServers = directDnsServers,_skipProxy = skipProxy,_tunExcludedRoutes = tunExcludedRoutes,_tunIncludedRoutes = tunIncludedRoutes;
+  const _GeneralSettings({ List<String> dnsServers = const [],  List<String> fallbackDnsServers = const [],  List<String> directDnsServers = const [],  List<String> skipProxy = const [],  List<String> tunExcludedRoutes = const [],  List<String> tunIncludedRoutes = const [], this.ipv6, this.preferIpv6, this.privateIpAnswer, this.alwaysRealIp, this.include,  List<String> scripts = const []}): _dnsServers = dnsServers,_fallbackDnsServers = fallbackDnsServers,_directDnsServers = directDnsServers,_skipProxy = skipProxy,_tunExcludedRoutes = tunExcludedRoutes,_tunIncludedRoutes = tunIncludedRoutes,_scripts = scripts;
   factory _GeneralSettings.fromJson(Map<String, dynamic> json) => _$GeneralSettingsFromJson(json);
 
  final  List<String> _dnsServers;
@@ -554,6 +555,13 @@ class _GeneralSettings implements GeneralSettings {
 @override final  bool? privateIpAnswer;
 @override final  bool? alwaysRealIp;
 @override final  String? include;
+ final  List<String> _scripts;
+@override@JsonKey() List<String> get scripts {
+  if (_scripts is EqualUnmodifiableListView) return _scripts;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_scripts);
+}
+
 
 /// Create a copy of GeneralSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -568,18 +576,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _GeneralSettings&&const DeepCollectionEquality().equals(other.dnsServers, _dnsServers)&&const DeepCollectionEquality().equals(other.fallbackDnsServers, _fallbackDnsServers)&&const DeepCollectionEquality().equals(other.directDnsServers, _directDnsServers)&&const DeepCollectionEquality().equals(other.skipProxy, _skipProxy)&&const DeepCollectionEquality().equals(other.tunExcludedRoutes, _tunExcludedRoutes)&&const DeepCollectionEquality().equals(other.tunIncludedRoutes, _tunIncludedRoutes)&&(identical(other.ipv6, ipv6) || other.ipv6 == ipv6)&&(identical(other.preferIpv6, preferIpv6) || other.preferIpv6 == preferIpv6)&&(identical(other.privateIpAnswer, privateIpAnswer) || other.privateIpAnswer == privateIpAnswer)&&(identical(other.alwaysRealIp, alwaysRealIp) || other.alwaysRealIp == alwaysRealIp)&&(identical(other.include, include) || other.include == include));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _GeneralSettings&&const DeepCollectionEquality().equals(other.dnsServers, _dnsServers)&&const DeepCollectionEquality().equals(other.fallbackDnsServers, _fallbackDnsServers)&&const DeepCollectionEquality().equals(other.directDnsServers, _directDnsServers)&&const DeepCollectionEquality().equals(other.skipProxy, _skipProxy)&&const DeepCollectionEquality().equals(other.tunExcludedRoutes, _tunExcludedRoutes)&&const DeepCollectionEquality().equals(other.tunIncludedRoutes, _tunIncludedRoutes)&&(identical(other.ipv6, ipv6) || other.ipv6 == ipv6)&&(identical(other.preferIpv6, preferIpv6) || other.preferIpv6 == preferIpv6)&&(identical(other.privateIpAnswer, privateIpAnswer) || other.privateIpAnswer == privateIpAnswer)&&(identical(other.alwaysRealIp, alwaysRealIp) || other.alwaysRealIp == alwaysRealIp)&&(identical(other.include, include) || other.include == include)&&const DeepCollectionEquality().equals(other.scripts, _scripts));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_dnsServers),const DeepCollectionEquality().hash(_fallbackDnsServers),const DeepCollectionEquality().hash(_directDnsServers),const DeepCollectionEquality().hash(_skipProxy),const DeepCollectionEquality().hash(_tunExcludedRoutes),const DeepCollectionEquality().hash(_tunIncludedRoutes),ipv6,preferIpv6,privateIpAnswer,alwaysRealIp,include);
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_dnsServers),const DeepCollectionEquality().hash(_fallbackDnsServers),const DeepCollectionEquality().hash(_directDnsServers),const DeepCollectionEquality().hash(_skipProxy),const DeepCollectionEquality().hash(_tunExcludedRoutes),const DeepCollectionEquality().hash(_tunIncludedRoutes),ipv6,preferIpv6,privateIpAnswer,alwaysRealIp,include,const DeepCollectionEquality().hash(_scripts));
 }
 
 @override
 String toString() {
-    return 'GeneralSettings(dnsServers: $dnsServers, fallbackDnsServers: $fallbackDnsServers, directDnsServers: $directDnsServers, skipProxy: $skipProxy, tunExcludedRoutes: $tunExcludedRoutes, tunIncludedRoutes: $tunIncludedRoutes, ipv6: $ipv6, preferIpv6: $preferIpv6, privateIpAnswer: $privateIpAnswer, alwaysRealIp: $alwaysRealIp, include: $include)';
+    return 'GeneralSettings(dnsServers: $dnsServers, fallbackDnsServers: $fallbackDnsServers, directDnsServers: $directDnsServers, skipProxy: $skipProxy, tunExcludedRoutes: $tunExcludedRoutes, tunIncludedRoutes: $tunIncludedRoutes, ipv6: $ipv6, preferIpv6: $preferIpv6, privateIpAnswer: $privateIpAnswer, alwaysRealIp: $alwaysRealIp, include: $include, scripts: $scripts)';
 }
 
 
@@ -590,7 +598,7 @@ abstract mixin class _$GeneralSettingsCopyWith<$Res> implements $GeneralSettings
   factory _$GeneralSettingsCopyWith(_GeneralSettings value, $Res Function(_GeneralSettings) _then) = __$GeneralSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- List<String> dnsServers, List<String> fallbackDnsServers, List<String> directDnsServers, List<String> skipProxy, List<String> tunExcludedRoutes, List<String> tunIncludedRoutes, bool? ipv6, bool? preferIpv6, bool? privateIpAnswer, bool? alwaysRealIp, String? include
+ List<String> dnsServers, List<String> fallbackDnsServers, List<String> directDnsServers, List<String> skipProxy, List<String> tunExcludedRoutes, List<String> tunIncludedRoutes, bool? ipv6, bool? preferIpv6, bool? privateIpAnswer, bool? alwaysRealIp, String? include, List<String> scripts
 });
 
 
@@ -607,7 +615,7 @@ class __$GeneralSettingsCopyWithImpl<$Res>
 
 /// Create a copy of GeneralSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? dnsServers = null,Object? fallbackDnsServers = null,Object? directDnsServers = null,Object? skipProxy = null,Object? tunExcludedRoutes = null,Object? tunIncludedRoutes = null,Object? ipv6 = freezed,Object? preferIpv6 = freezed,Object? privateIpAnswer = freezed,Object? alwaysRealIp = freezed,Object? include = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? dnsServers = null,Object? fallbackDnsServers = null,Object? directDnsServers = null,Object? skipProxy = null,Object? tunExcludedRoutes = null,Object? tunIncludedRoutes = null,Object? ipv6 = freezed,Object? preferIpv6 = freezed,Object? privateIpAnswer = freezed,Object? alwaysRealIp = freezed,Object? include = freezed,Object? scripts = null,}) {
   return _then(_GeneralSettings(
 dnsServers: null == dnsServers ? _self._dnsServers : dnsServers // ignore: cast_nullable_to_non_nullable
 as List<String>,fallbackDnsServers: null == fallbackDnsServers ? _self._fallbackDnsServers : fallbackDnsServers // ignore: cast_nullable_to_non_nullable
@@ -620,7 +628,8 @@ as bool?,preferIpv6: freezed == preferIpv6 ? _self.preferIpv6 : preferIpv6 // ig
 as bool?,privateIpAnswer: freezed == privateIpAnswer ? _self.privateIpAnswer : privateIpAnswer // ignore: cast_nullable_to_non_nullable
 as bool?,alwaysRealIp: freezed == alwaysRealIp ? _self.alwaysRealIp : alwaysRealIp // ignore: cast_nullable_to_non_nullable
 as bool?,include: freezed == include ? _self.include : include // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,scripts: null == scripts ? _self._scripts : scripts // ignore: cast_nullable_to_non_nullable
+as List<String>,
   ));
 }
 

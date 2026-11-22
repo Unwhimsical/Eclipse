@@ -714,9 +714,7 @@ class MessageLookup extends MessageLookupByLibrary {
     ),
     "geoipCode": MessageLookupByLibrary.simpleMessage("Код GeoIP"),
     "global": MessageLookupByLibrary.simpleMessage("Глобальный"),
-    "globalRoute": MessageLookupByLibrary.simpleMessage(
-      "Глобальная маршрутизация",
-    ),
+    "globalRoute": MessageLookupByLibrary.simpleMessage("Маршрут"),
     "go": MessageLookupByLibrary.simpleMessage("Перейти"),
     "goAddNode": MessageLookupByLibrary.simpleMessage("Добавить узлы"),
     "goDownload": MessageLookupByLibrary.simpleMessage("Скачать"),
@@ -1413,7 +1411,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeAddressDesc": MessageLookupByLibrary.simpleMessage(
       "Настроить прослушиваемые адреса маршрутов",
     ),
-    "routeConfig": MessageLookupByLibrary.simpleMessage("Конфиг"),
+    "routeConfig": MessageLookupByLibrary.simpleMessage("Правила"),
     "routeDirect": MessageLookupByLibrary.simpleMessage("Напрямую"),
     "routeEmpty": MessageLookupByLibrary.simpleMessage("Empty"),
     "routeExcluded": MessageLookupByLibrary.simpleMessage("Excluded routes"),
@@ -1435,8 +1433,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "routeModeConfig": MessageLookupByLibrary.simpleMessage(
       "Использовать конфигурацию",
     ),
-    "routeProxy": MessageLookupByLibrary.simpleMessage("Прокси"),
-    "routeScene": MessageLookupByLibrary.simpleMessage("Сценарий"),
+    "routeProxy": MessageLookupByLibrary.simpleMessage("Глобально"),
+    "routeScene": MessageLookupByLibrary.simpleMessage("Сцена"),
     "ru": MessageLookupByLibrary.simpleMessage("Русский"),
     "rule": MessageLookupByLibrary.simpleMessage("Правило"),
     "ruleActionAndDesc": MessageLookupByLibrary.simpleMessage(

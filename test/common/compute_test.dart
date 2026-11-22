@@ -338,4 +338,36 @@ void main() {
       expect(group.getCurrentSelectedName(''), '');
     });
   });
+
+  group('selected node resolution', () {
+    const proxy = Group(
+      type: GroupType.Selector,
+      name: 'PROXY',
+      now: 'Node A',
+      all: [Proxy(name: 'Node A', type: 'vmess')],
+    );
+
+    test('profile selection wins over runtime now', () {
+      expect(preferSelectedName('Node B', 'Node A'), 'Node B');
+      expect(preferSelectedName('', 'Node A'), 'Node A');
+      expect(preferSelectedName(null, null), '');
+    });
+
+    test('first named node skips groups with no selection', () {
+      const direct = Group(type: GroupType.Selector, name: 'DIRECT');
+      final node = firstNamedNode([
+        direct,
+        proxy,
+      ], (group) => group.name == 'PROXY' ? 'Node A' : '');
+      expect(node?.group.name, 'PROXY');
+      expect(node?.name, 'Node A');
+      expect(firstNamedNode(const [], (_) => 'x'), isNull);
+    });
+
+    test('connect delay tests omit the method argument', () {
+      expect(delayMethodArgument(DelayTestMethod.connect), isNull);
+      expect(delayMethodArgument(DelayTestMethod.tcp), DelayTestMethod.tcp);
+      expect(delayMethodArgument(DelayTestMethod.icmp), DelayTestMethod.icmp);
+    });
+  });
 }

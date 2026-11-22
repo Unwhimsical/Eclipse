@@ -108,6 +108,18 @@
         </service>
 
         <receiver
+            android:name=".ConnectWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_connect">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/connect_widget_info" />
+        </receiver>
+
+        <receiver
             android:name=".ServiceBroadcastReceiver"
             android:enabled="true"
             android:exported="true"

@@ -114,9 +114,10 @@ extension ColorSchemeExtension on ColorScheme {
 
 Color? getDelayColor(int? delay) {
   if (delay == null) return null;
-  if (delay < 0) return EclipseSemantic.error;
-  if (delay < 600) return EclipseSemantic.success;
-  return EclipseSemantic.warning;
+  if (delay <= 0) return EclipseSemantic.error;
+  if (delay < 200) return EclipseSemantic.success;
+  if (delay < 500) return EclipseSemantic.warning;
+  return EclipseSemantic.error;
 }
 
 abstract final class EclipseSemantic {

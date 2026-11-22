@@ -61,6 +61,7 @@ type TestDelayParams struct {
 	ProxyName string `json:"proxy-name"`
 	TestUrl   string `json:"test-url"`
 	Timeout   int64  `json:"timeout"`
+	Method    string `json:"method,omitempty"`
 }
 
 type Traffic struct {

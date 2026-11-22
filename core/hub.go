@@ -296,6 +296,15 @@ func handleTestDelay(params *TestDelayParams) *Delay {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	switch params.Method {
+	case "tcp":
+		delayData.Value = probeTCP(proxy.Addr(), timeout)
+		return delayData
+	case "icmp":
+		delayData.Value = probeICMP(proxy.Addr(), timeout)
+		return delayData
+	}
+
 	delay, err := proxy.URLTest(ctx, url, anyDelayTestStatus)
 	if err != nil {
 		return delayData

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:fl_clash/common/shadowrocket.dart';
+import 'package:fl_clash/common/sr_import.dart';
+import 'package:fl_clash/models/profile.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:yaml/yaml.dart' as yaml;
 
@@ -832,6 +834,38 @@ proxies:
         isFalse,
       );
       expect(isSgmoduleText('just some text\nwith [brackets]'), isFalse);
+    });
+  });
+
+  group('conf script section reaches general settings', () {
+    test('keeps [Script] lines and stores them on the profile settings', () {
+      const content = '''
+[General]
+dns-server = 1.1.1.1
+
+[Script]
+ad = type=http-response,pattern=^https://example.com,script-path=https://example.com/a.js
+
+[MITM]
+hostname = example.com
+''';
+      final conf = parseConf(content);
+      expect(conf.scripts, hasLength(1));
+      expect(conf.isEmpty, isFalse);
+      final settings = ShadowrocketImport.generalSettingsFromConf(conf);
+      expect(settings.scripts, conf.scripts);
+      expect(settings.dnsServers, ['1.1.1.1']);
+      final roundTrip = settings.toJson();
+      expect(
+        GeneralSettings.fromJson(roundTrip).scripts.single,
+        contains('script-path='),
+      );
+    });
+
+    test('hy2 alias parses as hysteria2', () {
+      final proxy = parseShareLink('hy2://secret@example.com:443#alias');
+      expect(proxy?['type'], 'hysteria2');
+      expect(proxy?['name'], 'alias');
     });
   });
 }

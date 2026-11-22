@@ -187,6 +187,18 @@ class ProfilesAction extends _$ProfilesAction {
 
   /// Downloads [url] once, then routes Shadowrocket formats to importers.
   Future<void> _importFromUrl(String url, WidgetRef? widgetRef) async {
+    final trimmed = url.trim();
+    if (widgetRef != null && parseShareLink(trimmed) != null) {
+      final label = await ShadowrocketImport.importShareLinks(
+        widgetRef,
+        text: trimmed,
+      );
+      dialogs.showNotifier(
+        label ?? currentAppLocalizations.clipboardImportFailed,
+        level: label == null ? MessageLevel.warning : MessageLevel.success,
+      );
+      return;
+    }
     final response = await request.getFileResponseForUrl(url);
     final bytes = response.data ?? Uint8List.fromList([]);
     final text = _tryDecodeText(bytes);
@@ -233,10 +245,10 @@ class ProfilesAction extends _$ProfilesAction {
     }
   }
 
-  Future<void> addProfileFormQrCode() async {
+  Future<void> addProfileFormQrCode({WidgetRef? widgetRef}) async {
     final url = await globalState.safeRun(picker.pickerConfigQRCode);
     if (url == null) return;
-    unawaited(addProfileFormURL(url));
+    unawaited(addProfileFormURL(url, widgetRef: widgetRef));
   }
 
   void reorder(List<Profile> profiles) {
