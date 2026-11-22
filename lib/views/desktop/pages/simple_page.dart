@@ -1,8 +1,9 @@
-import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/theme/components.dart';
@@ -159,8 +160,9 @@ class _SimpleRunCard extends ConsumerWidget {
     final isStart = ref.watch(isStartProvider);
     final status = ref.watch(coreStatusProvider);
     final groups = ref.watch(currentGroupsStateProvider).value;
-    final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-    final nodeName = group?.now ?? '';
+    final active = firstResolvedNode(ref, groups);
+    final group = active?.group ?? (groups.isEmpty ? null : groups.first);
+    final nodeName = active?.name ?? '';
     final effectiveStatus = isStart ? status : CoreStatus.disconnected;
     final statusText = switch (effectiveStatus) {
       CoreStatus.connected => appLocalizations.connected,
@@ -198,9 +200,16 @@ class _SimpleRunCard extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      nodeName.isEmpty
-                          ? appLocalizations.noNodes
-                          : '$nodeName · ${_delayText(ref, nodeName, group?.testUrl)}',
+                      _nodeLabel(
+                        appLocalizations,
+                        nodeName,
+                        _delayText(
+                          appLocalizations,
+                          ref,
+                          nodeName,
+                          group?.testUrl,
+                        ),
+                      ),
                       style: theme.textTheme.bodySmall?.copyWith(color: text2),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -227,7 +236,7 @@ class _SimpleRunCard extends ConsumerWidget {
               if (group != null)
                 Expanded(
                   child: DropdownButton<String>(
-                    value: nodeName,
+                    value: nodeName.isEmpty ? null : nodeName,
                     isExpanded: true,
                     underline: const SizedBox.shrink(),
                     items: [
@@ -256,12 +265,26 @@ class _SimpleRunCard extends ConsumerWidget {
     );
   }
 
-  String _delayText(WidgetRef ref, String proxyName, String? testUrl) {
+  String _nodeLabel(
+    AppLocalizations appLocalizations,
+    String nodeName,
+    String delayText,
+  ) {
+    if (nodeName.isEmpty) return appLocalizations.noNodes;
+    if (delayText.isEmpty) return nodeName;
+    return '$nodeName · $delayText';
+  }
+
+  String _delayText(
+    AppLocalizations appLocalizations,
+    WidgetRef ref,
+    String proxyName,
+    String? testUrl,
+  ) {
     final delay = ref.watch(
       delayProvider(proxyName: proxyName, testUrl: testUrl),
     );
-    if (delay == null) return '';
-    return delay > 0 ? '$delay ms' : 'Timeout';
+    return formatDelay(appLocalizations, delay);
   }
 }
 

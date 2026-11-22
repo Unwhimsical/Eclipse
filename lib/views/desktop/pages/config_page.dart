@@ -11,6 +11,8 @@ import 'package:fl_clash/state.dart';
 import 'package:fl_clash/views/config/dns.dart';
 import 'package:fl_clash/views/config/general.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
+import 'package:fl_clash/views/proxies/sort_button.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/value_holder.dart';
 import 'package:fl_clash/views/test_rules/rule_matcher.dart';
@@ -1953,9 +1955,9 @@ class _NodesDashboard extends ConsumerWidget {
     final lastTraffic = ref.watch(
       trafficsProvider.select((s) => s.list.safeLast(const Traffic())),
     );
-    final currentName =
-        groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty)?.now ?? '';
-    final statusText = switch (status) {
+    final currentName = firstResolvedNode(ref, groups)?.name ?? '';
+    final effective = isStart ? status : CoreStatus.disconnected;
+    final statusText = switch (effective) {
       CoreStatus.connected => appLocalizations.connected,
       CoreStatus.connecting => appLocalizations.connecting,
       CoreStatus.disconnected => appLocalizations.disconnected,
@@ -1978,9 +1980,14 @@ class _NodesDashboard extends ConsumerWidget {
               _DashStat(
                 label: appLocalizations.runStatus,
                 value: statusText,
-                dot: isStart
-                    ? (tokens?.success ?? theme.colorScheme.primary)
-                    : (tokens?.text3 ?? theme.colorScheme.onSurfaceVariant),
+                dot: switch (effective) {
+                  CoreStatus.connected =>
+                    tokens?.success ?? theme.colorScheme.primary,
+                  CoreStatus.connecting =>
+                    tokens?.warning ?? theme.colorScheme.primary,
+                  CoreStatus.disconnected =>
+                    tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
+                },
               ),
               Container(
                 width: 1,
@@ -2014,6 +2021,7 @@ class _NodesDashboard extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             spacing: 8,
             children: [
+              const ProxySortButton(),
               OutlinedButton.icon(
                 onPressed: () => _testAll(ref),
                 icon: const Icon(Icons.speed_rounded, size: 18),
@@ -2332,7 +2340,8 @@ class _ProxyCardState extends ConsumerState<_ProxyCard> {
     final accent = tokens?.accent ?? theme.colorScheme.primary;
     final text1 = tokens?.text1 ?? theme.colorScheme.onSurface;
     final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
-    final selected = widget.group.now == widget.proxy.name;
+    final selected =
+        resolvedSelectedName(ref, widget.group) == widget.proxy.name;
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
       onExit: (_) => setState(() => _hover = false),
@@ -2488,20 +2497,10 @@ class _DelayChip extends ConsumerWidget {
     final delay = ref.watch(
       delayProvider(proxyName: proxy.name, testUrl: testUrl),
     );
-    final color = delay == null
-        ? text3
-        : delay <= 0
-        ? (tokens?.danger ?? theme.colorScheme.error)
-        : delay <= 200
-        ? (tokens?.success ?? theme.colorScheme.primary)
-        : delay <= 600
-        ? (tokens?.warning ?? theme.colorScheme.primary)
-        : (tokens?.danger ?? theme.colorScheme.error);
+    final color = getDelayColor(delay) ?? text3;
     final label = delay == null
         ? '—'
-        : delay <= 0
-        ? 'Timeout'
-        : '$delay ms';
+        : formatDelay(context.appLocalizations, delay);
     return Tooltip(
       message: context.appLocalizations.delayTest,
       child: GestureDetector(

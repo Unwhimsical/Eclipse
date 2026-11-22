@@ -254,9 +254,7 @@ class _DelayRow extends ConsumerWidget {
                       child: Text(
                         delay == null
                             ? appLocalizations.delayTest
-                            : delay > 0
-                            ? '$delay ms'
-                            : 'Timeout',
+                            : formatDelay(appLocalizations, delay),
                         style: textTheme.bodyLarge?.copyWith(
                           color: getDelayColor(delay) ?? colorScheme.primary,
                         ),

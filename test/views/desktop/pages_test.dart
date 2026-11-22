@@ -78,6 +78,44 @@ List<Override> _baseOverrides() {
 
 void main() {
   group('desktop pages smoke', () {
+    testWidgets('home shows the selected node when runtime now is cleared', (
+      tester,
+    ) async {
+      await _pumpPage(
+        tester,
+        const DesktopHomeView(),
+        overrides: [
+          isStartProvider.overrideWithValue(false),
+          profilesProvider.overrideWith(() => TestProfiles(const [])),
+          currentProfileIdProvider.overrideWithBuild((_, _) => null),
+        ],
+      );
+      await tester.pump();
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(DesktopHomeView)),
+      );
+      container.read(groupsProvider.notifier).value = const [
+        Group(
+          type: GroupType.Selector,
+          name: 'PROXY',
+          now: 'Node A',
+          hidden: false,
+          all: [
+            Proxy(name: 'Node A', type: 'vmess'),
+            Proxy(name: 'Node B', type: 'trojan'),
+          ],
+        ),
+      ];
+      await tester.pump();
+
+      expect(
+        container.read(currentGroupsStateProvider).value.single.now,
+        isEmpty,
+      );
+      expect(find.text('Node A'), findsWidgets);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('home page builds', (tester) async {
       await _pumpPage(
         tester,
@@ -519,7 +557,7 @@ void main() {
         overrides: simpleOverrides(),
       );
       await tester.pump();
-      expect(find.text('Node A'), findsOneWidget);
+      expect(find.text('Node A'), findsWidgets);
       expect(find.text('Proxy'), findsOneWidget);
       expect(find.text("Today's traffic"), findsOneWidget);
       expect(find.text('Full mode'), findsOneWidget);

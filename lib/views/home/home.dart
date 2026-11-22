@@ -1,9 +1,10 @@
-import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
 import 'package:fl_clash/views/home/node_detail.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
+import 'package:fl_clash/views/proxies/sort_button.dart';
 import 'package:fl_clash/views/theme/components.dart';
 import 'package:fl_clash/widgets/widgets.dart';
 import 'package:material_ui/material_ui.dart';
@@ -45,13 +46,8 @@ class _HeroCard extends ConsumerWidget {
     final textTheme = context.textTheme;
     final isStart = ref.watch(isStartProvider);
     final status = ref.watch(coreStatusProvider);
-    final current = ref.watch(
-      currentGroupsStateProvider.select(
-        (state) => state.value.firstWhereOrNull(
-          (group) => (group.now ?? '').isNotEmpty,
-        ),
-      ),
-    );
+    final groups = ref.watch(currentGroupsStateProvider).value;
+    final current = firstResolvedNode(ref, groups);
     final traffics = ref.watch(trafficsProvider).list;
     final lastTraffic = traffics.isEmpty ? const Traffic() : traffics.last;
     final statusText = switch (status) {
@@ -59,7 +55,7 @@ class _HeroCard extends ConsumerWidget {
       CoreStatus.connecting => appLocalizations.connecting,
       CoreStatus.disconnected => appLocalizations.disconnected,
     };
-    final nodeName = current?.now ?? '';
+    final nodeName = current?.name ?? '';
     return CommonCard(
       radius: AppCorner.md,
       child: Padding(
@@ -116,7 +112,7 @@ class _HeroCard extends ConsumerWidget {
                             const SizedBox(width: 8),
                             _NodeDelayText(
                               proxyName: nodeName,
-                              testUrl: current?.testUrl,
+                              testUrl: current?.group.testUrl,
                             ),
                           ],
                         ),
@@ -165,8 +161,8 @@ class _PowerButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = context.colorScheme;
     return SizedBox(
-      width: 68,
-      height: 68,
+      width: 88,
+      height: 88,
       child: Material(
         color: isStart
             ? colorScheme.primary
@@ -186,12 +182,14 @@ class _PowerButton extends ConsumerWidget {
                     height: 30,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: colorScheme.onPrimary,
+                      color: isStart
+                          ? colorScheme.onPrimary
+                          : colorScheme.primary,
                     ),
                   )
                 : Icon(
                     Icons.power_settings_new_rounded,
-                    size: 34,
+                    size: 40,
                     color: isStart
                         ? colorScheme.onPrimary
                         : colorScheme.onSurfaceVariant,
@@ -269,7 +267,7 @@ class _NodeDelayText extends ConsumerWidget {
     }
     if (delay == null) return const SizedBox.shrink();
     return Text(
-      delay > 0 ? '$delay ms' : 'Timeout',
+      formatDelay(context.appLocalizations, delay),
       style: context.textTheme.labelMedium?.copyWith(
         color: getDelayColor(delay),
         fontWeight: FontWeight.w600,
@@ -451,13 +449,25 @@ class _NodesCardState extends ConsumerState<_NodesCard> {
     return EclipseSection(
       title: appLocalizations.nodes,
       subtitle: appLocalizations.delayTestDesc,
-      trailing: _testingAll
-          ? const SizedBox(width: 20, height: 20, child: CommonCircleLoading())
-          : TextButton.icon(
-              onPressed: groups.isEmpty ? null : () => _testAllDelays(groups),
-              icon: const Icon(Icons.bolt_outlined, size: 18),
-              label: Text(appLocalizations.delayTestAll),
-            ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const ProxySortButton(),
+          _testingAll
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CommonCircleLoading(),
+                )
+              : TextButton.icon(
+                  onPressed: groups.isEmpty
+                      ? null
+                      : () => _testAllDelays(groups),
+                  icon: const Icon(Icons.bolt_outlined, size: 18),
+                  label: Text(appLocalizations.delayTestAll),
+                ),
+        ],
+      ),
       divided: false,
       children: [
         if (groups.isEmpty)
@@ -620,7 +630,7 @@ class _NodeRow extends ConsumerWidget {
               )
             else if (delay != null)
               Text(
-                delay > 0 ? '$delay ms' : 'Timeout',
+                formatDelay(context.appLocalizations, delay),
                 style: textTheme.labelMedium?.copyWith(
                   color: getDelayColor(delay),
                 ),

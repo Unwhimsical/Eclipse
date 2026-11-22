@@ -218,8 +218,12 @@ class CoreController {
     return _interface.stopListener();
   }
 
-  Future<Delay?> getDelay(String url, String proxyName) async {
-    return _interface.asyncTestDelay(url, proxyName);
+  Future<Delay?> getDelay(
+    String url,
+    String proxyName, [
+    DelayTestMethod? method,
+  ]) async {
+    return _interface.asyncTestDelay(url, proxyName, method);
   }
 
   Future<Map<String, dynamic>> getConfig(int id) async {

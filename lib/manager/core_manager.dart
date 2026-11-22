@@ -125,6 +125,7 @@ class _CoreContainerState extends ConsumerState<CoreManager>
       return;
     }
     ref.read(coreStatusProvider.notifier).value = CoreStatus.disconnected;
+    ref.read(setupActionProvider.notifier).releaseRunning();
     if (WidgetsBinding.instance.lifecycleState == AppLifecycleState.resumed) {
       context.showNotifier(message, level: MessageLevel.error);
     }

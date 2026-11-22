@@ -1,8 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/l10n/l10n.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
+import 'package:fl_clash/views/proxies/sort_button.dart';
 import 'package:fl_clash/views/desktop/components/components.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/desktop/pages/simple_page.dart';
@@ -27,7 +30,8 @@ class DesktopHomeView extends ConsumerWidget {
         DesktopPageHeader(
           title: appLocalizations.dashboard,
           actions: [
-            _DelayTestAction(),
+            const ProxySortButton(),
+            const _DelayTestAction(),
             const SimpleModeToggleButton(),
             const DesktopRunSwitch(),
           ],
@@ -56,15 +60,20 @@ class DesktopHomeView extends ConsumerWidget {
 }
 
 class _DelayTestAction extends ConsumerWidget {
+  const _DelayTestAction();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appLocalizations = context.appLocalizations;
     return OutlinedButton.icon(
       onPressed: () {
         final groups = ref.read(currentGroupsStateProvider).value;
-        final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-        if (group == null) return;
-        ref.read(proxiesActionProvider.notifier).delayTest(group.all);
+        if (groups.isEmpty) return;
+        final active = firstResolvedNode(ref, groups, listen: false);
+        final proxies = active == null
+            ? [for (final group in groups) ...group.all]
+            : active.group.all;
+        ref.read(proxiesActionProvider.notifier).delayTest(proxies);
       },
       icon: const Icon(Icons.speed_rounded, size: 18),
       label: Text(appLocalizations.delayTest),
@@ -180,7 +189,7 @@ class _RunCard extends ConsumerWidget {
 
   String _currentNodeName(WidgetRef ref) {
     final groups = ref.watch(currentGroupsStateProvider).value;
-    return groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty)?.now ?? '';
+    return firstResolvedNode(ref, groups)?.name ?? '';
   }
 }
 
@@ -239,11 +248,12 @@ class _PowerButton extends ConsumerWidget {
     final theme = Theme.of(context);
     final tokens = theme.extension<DesktopThemeTokens>();
     final accent = tokens?.accent ?? theme.colorScheme.primary;
+    final engaged = isStart || connecting;
     return SizedBox(
-      width: 72,
-      height: 72,
+      width: 84,
+      height: 84,
       child: Material(
-        color: isStart ? accent : Colors.white.withValues(alpha: 0.06),
+        color: engaged ? accent : Colors.white.withValues(alpha: 0.06),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -254,17 +264,17 @@ class _PowerButton extends ConsumerWidget {
                 },
           child: Center(
             child: connecting
-                ? SizedBox(
+                ? const SizedBox(
                     width: 30,
                     height: 30,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
-                      color: theme.colorScheme.onPrimary,
+                      color: Colors.white,
                     ),
                   )
                 : Icon(
                     Icons.power_settings_new_rounded,
-                    size: 34,
+                    size: 36,
                     color: isStart
                         ? Colors.white
                         : (tokens?.text2 ?? theme.colorScheme.onSurfaceVariant),
@@ -383,9 +393,15 @@ class _CurrentNodeCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final tokens = theme.extension<DesktopThemeTokens>();
     final groups = ref.watch(currentGroupsStateProvider).value;
-    final group = groups.firstWhereOrNull((g) => (g.now ?? '').isNotEmpty);
-    final nodeName = group?.now ?? '';
+    final active = firstResolvedNode(ref, groups);
+    final group = active?.group;
+    final nodeName = active?.name ?? '';
     final proxy = group?.all.firstWhereOrNull((p) => p.name == nodeName);
+    final delay = nodeName.isEmpty
+        ? null
+        : ref.watch(
+            delayProvider(proxyName: nodeName, testUrl: group?.testUrl),
+          );
     return DesktopCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,9 +433,10 @@ class _CurrentNodeCard extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        '${group?.name ?? ''} · ${_delayText(ref, nodeName, group?.testUrl)}',
+                        _nodeMeta(appLocalizations, group, delay),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color:
+                              getDelayColor(delay) ??
                               tokens?.text2 ??
                               theme.colorScheme.onSurfaceVariant,
                         ),
@@ -439,9 +456,9 @@ class _CurrentNodeCard extends ConsumerWidget {
                 ),
               ],
             ),
-          if (proxy != null)
+          if (proxy != null && proxy.type.isNotEmpty)
             Text(
-              proxy.name,
+              proxy.type,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: tokens?.text3 ?? theme.colorScheme.onSurfaceVariant,
               ),
@@ -451,11 +468,11 @@ class _CurrentNodeCard extends ConsumerWidget {
     );
   }
 
-  String _delayText(WidgetRef ref, String proxyName, String? testUrl) {
-    final delay = ref.watch(
-      delayProvider(proxyName: proxyName, testUrl: testUrl),
-    );
-    if (delay == null) return '';
-    return delay > 0 ? '$delay ms' : 'Timeout';
+  String _nodeMeta(AppLocalizations l10n, Group? group, int? delay) {
+    final delayText = formatDelay(l10n, delay);
+    final groupName = group?.name ?? '';
+    if (delayText.isEmpty) return groupName;
+    if (groupName.isEmpty) return delayText;
+    return '$groupName · $delayText';
   }
 }

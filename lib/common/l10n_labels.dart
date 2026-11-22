@@ -1,4 +1,5 @@
 import 'package:fl_clash/enum/enum.dart';
+import 'package:fl_clash/l10n/l10n.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'app_localizations.dart';
@@ -125,6 +126,12 @@ extension DynamicSchemeVariantL10n on DynamicSchemeVariant {
       DynamicSchemeVariant.fruitSalad => appLocalizations.fruitSaladScheme,
     };
   }
+}
+
+String formatDelay(AppLocalizations l10n, int? delay) {
+  if (delay == null) return '';
+  if (delay > 0) return '$delay ms';
+  return l10n.timeout;
 }
 
 extension LocaleL10n on Locale {

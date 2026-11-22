@@ -211,6 +211,23 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('a crash clears the running clock', (tester) async {
+    final coreInterface = _coreInterface();
+    final container = await _pumpCoreManager(tester, coreInterface);
+    container.read(coreStatusProvider.notifier).value = CoreStatus.connected;
+    container.read(runTimeProvider.notifier).value = 1000;
+    final subscription = container.listen<int?>(runTimeProvider, (_, _) {});
+    addTearDown(subscription.close);
+
+    coreEventManager.sendEvent(_crash);
+    await tester.pump();
+
+    expect(container.read(coreStatusProvider), CoreStatus.disconnected);
+    expect(container.read(runTimeProvider), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('a crash is ignored when the core is not connected', (
     tester,
   ) async {

@@ -1,6 +1,8 @@
 import 'package:fl_clash/common/common.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
+import 'package:fl_clash/views/proxies/sort_button.dart';
 import 'package:fl_clash/views/desktop/page_header.dart';
 import 'package:fl_clash/views/theme/desktop_theme.dart';
 import 'package:material_ui/material_ui.dart';
@@ -21,6 +23,7 @@ class DesktopProxiesView extends ConsumerWidget {
         DesktopPageHeader(
           title: appLocalizations.proxies,
           actions: [
+            const ProxySortButton(),
             OutlinedButton.icon(
               onPressed: groups.isEmpty
                   ? null
@@ -110,13 +113,11 @@ class _ProxyRow extends ConsumerWidget {
     final accent = tokens?.accent ?? theme.colorScheme.primary;
     final text1 = tokens?.text1 ?? theme.colorScheme.onSurface;
     final text3 = tokens?.text3 ?? theme.colorScheme.onSurfaceVariant;
-    final selected = group.now == proxy.name;
+    final selected = resolvedSelectedName(ref, group) == proxy.name;
     final delay = ref.watch(
       delayProvider(proxyName: proxy.name, testUrl: group.testUrl),
     );
-    final delayText = delay == null
-        ? ''
-        : (delay > 0 ? '$delay ms' : 'Timeout');
+    final delayText = formatDelay(context.appLocalizations, delay);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -164,7 +165,10 @@ class _ProxyRow extends ConsumerWidget {
             if (delayText.isNotEmpty)
               Text(
                 delayText,
-                style: theme.textTheme.labelSmall?.copyWith(color: text3),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: getDelayColor(delay) ?? text3,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
           ],
         ),

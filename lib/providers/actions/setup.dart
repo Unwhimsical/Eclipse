@@ -185,6 +185,11 @@ class SetupAction extends _$SetupAction {
     });
   }
 
+  // stopListener on a dead Core throws, and [_stop] would roll the clock back on.
+  void releaseRunning() {
+    _setLocalRunning(false);
+  }
+
   void _rollbackRunning(_RunRequest request) {
     if (!_isCurrent(request)) {
       return;

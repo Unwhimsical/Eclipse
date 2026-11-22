@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:fl_clash/common/common.dart';
+import 'package:fl_clash/views/proxies/selection.dart';
 import 'package:fl_clash/enum/enum.dart';
 import 'package:fl_clash/models/models.dart';
 import 'package:fl_clash/providers/providers.dart';
@@ -95,12 +95,12 @@ class _CommandPaletteDialogState extends ConsumerState<_CommandPaletteDialog> {
         icon: Icons.speed_rounded,
         run: (ref) {
           final groups = ref.read(currentGroupsStateProvider).value;
-          final group = groups.firstWhereOrNull(
-            (g) => (g.now ?? '').isNotEmpty,
-          );
-          if (group != null) {
-            ref.read(proxiesActionProvider.notifier).delayTest(group.all);
-          }
+          if (groups.isEmpty) return;
+          final active = firstResolvedNode(ref, groups, listen: false);
+          final proxies = active == null
+              ? [for (final group in groups) ...group.all]
+              : active.group.all;
+          ref.read(proxiesActionProvider.notifier).delayTest(proxies);
         },
       ),
       for (final label in const [
