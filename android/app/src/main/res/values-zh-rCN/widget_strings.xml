@@ -4,4 +4,5 @@
     <string name="widget_connect_desc">开关代理</string>
     <string name="widget_on">已连接</string>
     <string name="widget_off">点击连接</string>
+    <string name="widget_busy">处理中</string>
 </resources>

@@ -180,7 +180,7 @@ class _SimpleRunCard extends ConsumerWidget {
             children: [
               _SimplePowerButton(
                 isStart: isStart,
-                connecting: status == CoreStatus.connecting,
+                connecting: isStart && status == CoreStatus.connecting,
               ),
               Expanded(
                 child: Column(
@@ -228,7 +228,7 @@ class _SimpleRunCard extends ConsumerWidget {
                     : () {
                         ref
                             .read(proxiesActionProvider.notifier)
-                            .delayTest(group.all);
+                            .delayTest(group.all, group.testUrl);
                       },
                 icon: const Icon(Icons.speed_rounded, size: 18),
                 label: Text(appLocalizations.delayTest),
@@ -236,7 +236,9 @@ class _SimpleRunCard extends ConsumerWidget {
               if (group != null)
                 Expanded(
                   child: DropdownButton<String>(
-                    value: nodeName.isEmpty ? null : nodeName,
+                    value: group.all.any((proxy) => proxy.name == nodeName)
+                        ? nodeName
+                        : null,
                     isExpanded: true,
                     underline: const SizedBox.shrink(),
                     items: [

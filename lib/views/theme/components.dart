@@ -26,9 +26,8 @@ class EclipseSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
-    // The desktop theme carries its own group-title token (§1: purple 15px
-    // w700); without it the section keeps its current style, so mobile is
-    // pixel-identical.
+    // Desktop theme supplies the purple group title. Other themes use
+    // labelLarge at w700.
     final titleStyle =
         Theme.of(context).extension<DesktopThemeTokens>()?.groupTitleStyle ??
         textTheme.labelLarge?.copyWith(

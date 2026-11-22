@@ -100,7 +100,9 @@ class _CommandPaletteDialogState extends ConsumerState<_CommandPaletteDialog> {
           final proxies = active == null
               ? [for (final group in groups) ...group.all]
               : active.group.all;
-          ref.read(proxiesActionProvider.notifier).delayTest(proxies);
+          ref
+              .read(proxiesActionProvider.notifier)
+              .delayTest(proxies, active?.group.testUrl);
         },
       ),
       for (final label in const [

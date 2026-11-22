@@ -11,10 +11,10 @@
 
     <ImageView
         android:id="@+id/widget_icon"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:contentDescription="@string/widget_connect"
-        android:src="@drawable/ic_shortcut_toggle" />
+        android:background="@drawable/widget_status_dot" />
 
     <TextView
         android:id="@+id/widget_label"

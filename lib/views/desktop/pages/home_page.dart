@@ -64,7 +64,9 @@ class _DelayTestAction extends ConsumerWidget {
         final proxies = active == null
             ? [for (final group in groups) ...group.all]
             : active.group.all;
-        ref.read(proxiesActionProvider.notifier).delayTest(proxies);
+        ref
+            .read(proxiesActionProvider.notifier)
+            .delayTest(proxies, active?.group.testUrl);
       },
       icon: const Icon(Icons.speed_rounded, size: 18),
       label: Text(appLocalizations.delayTest),
@@ -102,7 +104,7 @@ class _RunCard extends ConsumerWidget {
             children: [
               _PowerButton(
                 isStart: isStart,
-                connecting: status == CoreStatus.connecting,
+                connecting: isStart && status == CoreStatus.connecting,
               ),
               Expanded(
                 child: Column(
@@ -286,9 +288,11 @@ class _SideColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [_RunCard(), _TrafficCard()],
+    return const SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [_RunCard(), _TrafficCard()],
+      ),
     );
   }
 }

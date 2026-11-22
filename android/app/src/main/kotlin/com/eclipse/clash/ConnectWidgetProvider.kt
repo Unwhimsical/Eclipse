@@ -30,19 +30,24 @@ class ConnectWidgetProvider : AppWidgetProvider() {
         }
 
         private fun remoteViews(context: Context, state: RunState): RemoteViews {
+            val busy = state == RunState.STARTING || state == RunState.STOPPING
             val active = state == RunState.STARTED
             val views = RemoteViews(context.packageName, R.layout.widget_connect)
-            views.setTextViewText(
-                R.id.widget_label,
-                context.getString(if (active) R.string.widget_on else R.string.widget_off),
-            )
-            val pending = PendingIntent.getActivity(
-                context,
-                7,
-                QuickAction.TOGGLE.quickIntent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-            )
-            views.setOnClickPendingIntent(R.id.widget_root, pending)
+            val label = when {
+                busy -> R.string.widget_busy
+                active -> R.string.widget_on
+                else -> R.string.widget_off
+            }
+            views.setTextViewText(R.id.widget_label, context.getString(label))
+            if (!busy) {
+                val pending = PendingIntent.getActivity(
+                    context,
+                    7,
+                    QuickAction.TOGGLE.quickIntent,
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+                )
+                views.setOnClickPendingIntent(R.id.widget_root, pending)
+            }
             return views
         }
     }
