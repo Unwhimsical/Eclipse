@@ -148,13 +148,13 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('keeps the legacy style without the desktop extension', (
+    testWidgets('uses the grouped title without the desktop extension', (
       tester,
     ) async {
       await pumpSection(tester);
       final text = tester.widget<Text>(find.text('Group'));
       expect(text.style?.color, isNot(const Color(0xFF9F51E3)));
-      expect(text.style?.fontWeight, FontWeight.w600);
+      expect(text.style?.fontWeight, FontWeight.w700);
       expect(tester.takeException(), isNull);
     });
   });
